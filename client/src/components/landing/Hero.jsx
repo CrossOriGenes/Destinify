@@ -3,28 +3,28 @@ import { Link } from "react-router-dom";
 
 const SLIDES = [
   {
-    src: "/images/train-travel.mp4",
+    src: "https://res.cloudinary.com/dtfoedy3u/video/upload/v1755022387/train-travel_isasjo.mp4",
     title: "Railways",
     subtitle: "Through Tracks & Time",
     description:
       "Traveling by train offers a scenic and nostalgic way to explore the heart of a country. Feel the rhythm of the tracks as you glide past villages, rivers, and endless fields — making every moment part of the journey.",
   },
   {
-    src: "/images/road-travel.mp4",
+    src: "https://res.cloudinary.com/dtfoedy3u/video/upload/v1755022371/road-travel_vsdqeu.mp4",
     title: "Road Trips",
     subtitle: "Freedom on Four Wheels",
     description:
       "Whether it's highways or hill roads, road trips are the ultimate symbol of travel freedom. Stop where you want, eat local food, and experience places that aren't even marked on the map.",
   },
   {
-    src: "/images/sea-travel.mp4",
+    src: "https://res.cloudinary.com/dtfoedy3u/video/upload/v1755022397/sea-travel_br3uop.mp4",
     title: "Sea Voyages",
     subtitle: "Sail, Surf & Serenity",
     description:
       "Cruising on vast waters brings peace and excitement all at once. Watch sunsets melt into the horizon and experience life where the sky meets the sea — perfect for soul-searchers and luxury lovers alike.",
   },
   {
-    src: "/images/hill-travel.mp4",
+    src: "https://res.cloudinary.com/dtfoedy3u/video/upload/v1755022372/hill-travel_dqytwf.mp4",
     title: "Hills & Mountains",
     subtitle: "The Call of the Peaks",
     description:
