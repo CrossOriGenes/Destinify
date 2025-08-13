@@ -45,7 +45,7 @@ const Hero = () => {
     }, 12000);
 
     return () => clearInterval(interval);
-  }, [ready, slide]);
+  }, []);
 
   const handleVideoReady = () => {
     if (videoRef.current) {
@@ -55,10 +55,7 @@ const Hero = () => {
 
   const currentSlide = SLIDES[slide];
   return (
-    <section
-      id="hero"
-      className="w-full min-h-[98vh] relative overflow-hidden"
-    >
+    <section id="hero" className="w-full min-h-[98vh] relative overflow-hidden">
       {SLIDES.map((s, idx) => (
         <video
           key={idx}
@@ -83,13 +80,19 @@ const Hero = () => {
         <h1 className="text-7xl font-extrabold text-white" data-aos="fade-up">
           {currentSlide.title}
         </h1>
-        <h5 className="text-lg font-bold tracking-wide text-indigo-800 mt-2 mb-1" data-aos="fade-in">
+        <h5
+          className="text-lg font-bold tracking-wide text-indigo-800 mt-2 mb-1"
+          data-aos="fade-in"
+        >
           {currentSlide.subtitle}
         </h5>
-        <p className="text-base font-light tracking-wide leading-6 text-white mt-1 mb-4" data-aos="fade-in">
+        <p
+          className="text-base font-light tracking-wide leading-6 text-white mt-1 mb-4"
+          data-aos="fade-in"
+        >
           {currentSlide.description}
         </p>
-        <Link to="" className="btn-dark mt-8 z-2" data-aos="fade-up">
+        <Link to="/home" className="btn-dark mt-8 z-2" data-aos="fade-up">
           <span className="uppercase font-semibold tracking-wider text-white">
             Learn More
           </span>
@@ -126,6 +129,6 @@ const Hero = () => {
       </div>
     </section>
   );
-}
+};
 
 export default Hero;

@@ -68,7 +68,7 @@ const Intro = () => {
             autoPlay
             loop
             muted
-            src="/images/travel_bg.mp4"
+            src="https://res.cloudinary.com/dtfoedy3u/video/upload/v1755059125/travel_bg_lg7fhx.mp4"
             className="absolute top-0 right-0 w-full h-full object-cover"
           />
         </div>

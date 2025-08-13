@@ -4,6 +4,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import Root from "./pages/Root";
 import Error404 from "./components/UI/Error404";
+import Home from "./pages/Home";
 
 const router = createBrowserRouter([
   {
@@ -11,6 +12,10 @@ const router = createBrowserRouter([
     errorElement: <Error404 />,
     index: true,
     element: <Root />,
+  },
+  {
+    path: "home",
+    children: [{ index: true, element: <Home /> }],
   },
 ]);
 
@@ -25,7 +30,7 @@ function App() {
       throttleDelay: 200,
     });
   }, []);
-  
+
   return <RouterProvider router={router} />;
 }
 

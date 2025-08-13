@@ -73,7 +73,7 @@ const AboutUs = () => {
   return (
     <section id="about" className="w-full min-h-[120vh] relative overflow-hidden">
       <div
-        className="absolute bottom-0 left-0 w-full h-[200px] bg-blend-screen z-5"
+        className="absolute bottom-0 left-0 w-full h-[100px] bg-blend-screen z-5"
         style={{ background: "linear-gradient(to top, #1E2939, transparent)" }}
       />
       <div className="absolute lg:top-0 top-8 lg:-left-20 left-0 lg:w-[70%] w-full lg:h-[120vh] h-screen overflow-y-visible cursor-grab">
