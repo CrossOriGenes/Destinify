@@ -50,14 +50,14 @@ const MainHeader = ({ activeLink, setActiveLink, fixedClass }) => {
         <div className="lg:flex lg:flex-row flex-col items-center gap-2 hidden">
           <button
             type="button"
-            className="w-26 h-12 py-1 px-4 outline-none border-4 border-teal-800 text-teal-800 hover:bg-teal-700 hover:border-teal-700 hover:text-white rounded-[40px] font-bold text-[12.5px] uppercase tracking-widest cursor-pointer transition duration-300"
+            className="w-26 h-12 py-1 px-4 outline-none border-3 border-teal-800 bg-teal-800 text-white hover:bg-teal-700 hover:border-teal-700 rounded-[40px] font-bold text-[12.5px] uppercase tracking-widest cursor-pointer transition duration-300"
             onClick={() => navigate("auth?mode=signIn")}
           >
             LogIn
           </button>
           <button
             type="button"
-            className="w-26 h-12 py-1 px-4 outline-none border-4 border-teal-800 bg-teal-800 text-white hover:bg-teal-700 hover:border-teal-700 rounded-[40px] font-bold text-[12.5px] uppercase tracking-widest cursor-pointer transition duration-300"
+            className="w-26 h-12 py-1 px-4 outline-none border-3 border-teal-800 text-teal-800 hover:bg-teal-700 hover:border-teal-700 hover:text-white rounded-[40px] font-bold text-[12.5px] uppercase tracking-widest cursor-pointer transition duration-300"
             onClick={() => navigate("auth?mode=signUp")}
           >
             SignUp

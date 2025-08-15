@@ -92,7 +92,7 @@ const MainSection = () => {
       />
       <div className="w-full h-[50px] absolute bottom-0 left-0 bg-transparent rounded-b-[36px] z-5 shadow-solid-dark" />
       <div className="p-[70px] absolute top-0 left-0 w-full h-full flex items-end justify-start z-4">
-        <div className="relative card w-92 h-50 bg-[rgba(0,0,0,0.4)] border-1 border-gray-500 p-6 backdrop-blur-md shadow-xl">
+        <div className="relative card w-92 h-50 bg-[rgba(0,0,0,0.35)] border-1 border-gray-500 p-6 backdrop-blur-md shadow-xl">
           <h3 className="capitalize text-3xl font-bold text-indigo-100 tracking-wider">
             Why wait?
           </h3>
