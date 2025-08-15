@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 
 const Error404 = () => {
   const overlayRef = useRef();
-  const [show, setShow] = useState(true);
   useEffect(() => {
     function handleMouseMove(e) {
       const overlay = overlayRef.current;
@@ -18,23 +17,8 @@ const Error404 = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  useEffect(() => {
-    setTimeout(() => {
-      setShow(!show);
-    }, 5000);
-  });
-
   return (
     <section className="relative w-screen h-screen bg-gray-900 text-white overflow-hidden">
-      {show && (
-        <div className="mx-12 my-6 relative w-full place-items-center z-3">
-          <div className="card bg-[rgba(225, 225, 225, 0.5)] flex flex-col items-center justify-center h-13">
-            <p className="p-4 text-gray-900 font-semibold">
-              Hover on the page to see hidden text!
-            </p>
-          </div>
-        </div>
-      )}
       {/* Main content hidden by default, revealed by spotlight */}
       <div className="absolute inset-0 flex flex-col items-center justify-center z-1">
         <pre className="mb-6 float-animate">

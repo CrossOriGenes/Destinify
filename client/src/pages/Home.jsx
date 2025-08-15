@@ -1,11 +1,16 @@
-import React from "react";
 import MainSection from "../components/main/MainSection";
+import FormSection from "../components/main/FormSection";
+import Header from "../components/UI/Header";
 
 function Home() {
   return (
-    <main>
-      <MainSection />
-    </main>
+    <>
+      <Header />
+      <main>
+        <MainSection />
+        <FormSection />
+      </main>
+    </>
   );
 }
 

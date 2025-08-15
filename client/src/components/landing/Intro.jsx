@@ -166,7 +166,7 @@ const Intro = () => {
                   </p>
                 </div>
                 <div className="w-[25px] h-[25px] flex items-center justify-center rounded-full border-2 border-indigo-400">
-                  <i className="fa fa-arrow-right text-sm text-indigo-400 -rotate-45 transition duration-300 group-hover:rotate-0" />
+                  <i className="fa fa-arrow-right text-sm text-indigo-400 rotate-45 transition duration-300 group-hover:rotate-0" />
                 </div>
               </div>
             </motion.div>

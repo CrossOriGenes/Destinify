@@ -29,30 +29,30 @@ const QuickSearches = () => {
   const { scrollY } = useScroll();
   const textYScroll = useTransform(
     scrollY,
-    [0, 3000, 3200, 3500],
-    [0, -100, -250, -500]
+    [3000, 3200, 3500, 3800, 4100],
+    [-100, -250, -500, -750, -1000]
   );
   const mountain1ScrollY = useTransform(
     scrollY,
-    [0, 3000, 3200, 3500],
-    [0, -10, -25, -60]
+    [3000, 3200, 3500, 3800, 4100],
+    [-45, -25, 5, 15, 25]
   );
   const mountain2ScrollY = useTransform(
     scrollY,
-    [0, 3000, 3200, 3500],
-    [0, -35, -70, -140]
+    [3000, 3200, 3500, 3800, 4100],
+    [30, 0, -35, -70, -140]
   );
 
   return (
     <section id="gallery" className="w-full min-h-[80vh] bg-gray-950">
       <div className="w-full h-[120vh] relative pt-[100px] px-[50px] flex justify-between overflow-hidden">
         <div
-          className="absolute bottom-0 left-0 w-full h-[500px] bg-blend-screen z-5"
+          className="absolute bottom-0 left-0 w-full h-[700px] bg-blend-screen z-5"
           style={{
             background: "linear-gradient(to top, #030712, transparent)",
           }}
         />
-        <div className="flex flex-col w-1/3 -mt-2.5 z-6" data-aos="fade-up">
+        <div className="flex flex-col w-1/3 -mt-3.5 z-6" data-aos="fade-up">
           <p className="text-gray-500 font-medium text-sm mb-6">
             Escape the ordinary and scale breathtaking heights of the peaks of
             Kathmandu! Our hiking package recommendations are designed specially
@@ -90,7 +90,7 @@ const QuickSearches = () => {
         />
       </div>
       <div className="relative p-[140px]">
-        <p className="text-gray-400 -mt-12 mb-20 text-lg" data-aos="fade-up">
+        <p className="text-gray-400 -mt-18 mb-20 text-lg" data-aos="fade-up">
           Our mission is to make meaningful travel accessible, safe, and
           unforgettable. We bring together years of travel experience, global
           knowledge, and a passion for creating memories that last a lifetime.
@@ -144,7 +144,7 @@ const QuickSearches = () => {
                   </p>
                 </div>
                 <div className="w-[25px] h-[25px] flex items-center justify-center rounded-full border-2 border-indigo-400">
-                  <i className="fa fa-arrow-right text-sm text-indigo-400 -rotate-45 transition duration-300 group-hover:rotate-0" />
+                  <i className="fa fa-arrow-right text-sm text-indigo-400 rotate-45 transition duration-300 group-hover:rotate-0" />
                 </div>
               </div>
             </motion.div>
