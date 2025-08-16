@@ -47,18 +47,45 @@ const PLACES = [
   },
 ];
 
-const Intro = () => {
+const PLACES2 = [
+  {
+    place_name: "Manali",
+    pic: "/images/Manali.jpg",
+    subtitle: "(20+ Best visiting Place)",
+    description: "Snowy escapes in Himachal Pradesh.",
+    rating_val: 4,
+  },
+  {
+    place_name: "Leh",
+    pic: "/images/Leh.jpg",
+    subtitle: "(30+ Best visiting Place)",
+    description: "Cozy heaven of Earth.",
+    rating_val: 4.5,
+  },
+  {
+    place_name: "Everest",
+    pic: "/images/Himalayas.jpg",
+    subtitle: "(10+ Best visiting Place)",
+    description: "Where the Earth touches the sky.",
+    rating_val: 3,
+  },
+];
+
+const Quickies = () => {
   const { scrollY } = useScroll();
   const mapScrollY = useTransform(
     scrollY,
-    [0, 950, 1500, 2000],
-    [0, -5, -50, -100]
+    [950, 1500, 2000, 2500, 3000, 3200],
+    [5, -5, -50, -100, -150, -200]
   );
 
   return (
-    <section id="intro" className="w-full min-h-screen relative pb-8 overflow-hidden bg-gray-800">
+    <section
+      id="quickies"
+      className="w-full min-h-screen relative overflow-hidden bg-gray-800"
+    >
       <div
-        className="absolute bottom-0 left-0 w-full h-[300px] bg-blend-screen z-5"
+        className="absolute bottom-0 left-0 w-full h-[300px] bg-blend-screen z-2"
         style={{ background: "linear-gradient(to top, #030712, transparent)" }}
       />
       <div className="relative w-full">
@@ -77,7 +104,10 @@ const Intro = () => {
             className="absolute top-[27%] -right-50 xl:w-[550px] xl:h-99 w-[400px] h-80 bg-[url('/images/india-map.png')] bg-cover bg-center pointer-events-none z-2"
             style={{ y: mapScrollY }}
           />
-          <h1 className="font-extrabold text-6xl capitalize z-3" data-aos="fade-right">
+          <h1
+            className="font-extrabold text-6xl capitalize z-3"
+            data-aos="fade-right"
+          >
             Explore places of <span className="text-indigo-500">India</span>
           </h1>
           <p
@@ -91,15 +121,6 @@ const Intro = () => {
             exploring the spiritual richness of India, we suggest journeys that
             speak to the soull. Our expert-curated itineries are made for every
             kind of traveler.
-            <br />
-            Our mission is to make meaningful travel accessible, safe, and
-            unforgettable. We bring together years of travel experience, global
-            knowledge, and a passion for creating memories that last a lifetime.
-            Whether you're plannig a solo adventure, a romantic gateway or a
-            family holiday, we're here to guide you from inspiration to boooking
-            and beyond. Browser through hand-picked destinations, read real
-            travel stories, and choose from curated packages that go beyond the
-            usual.
           </p>
           <div className="mt-12" data-aos="fade-up">
             <button className="btn-dark w-45 z-3">
@@ -110,9 +131,12 @@ const Intro = () => {
           </div>
         </div>
       </div>
-      <div className="relative w-full xl:p-[140px] py-40 px-20">
+      <div className="relative w-full xl:p-[140px] py-40 px-20 mt-20">
         <div className="place-items-center text-white">
-          <h1 className="font-extrabold capitalize text-6xl pb-3" data-aos="fade-up">
+          <h1
+            className="font-extrabold capitalize text-6xl pb-3"
+            data-aos="fade-up"
+          >
             Explore the <span className="text-indigo-500">spirit of India</span>
           </h1>
           <p
@@ -151,7 +175,10 @@ const Intro = () => {
               <div className="w-full h-full relative flex items-end justify-between text-white z-2 opacity-90">
                 <div className="flex flex-col">
                   <div className="flex flex-row items-center gap-1">
-                    <RatingsStar value={place.rating_val} style={{ maxWidth: 85 }} />
+                    <RatingsStar
+                      value={place.rating_val}
+                      style={{ maxWidth: 85 }}
+                    />
                   </div>
                   <div className="flex items-center gap-2">
                     <h3 className="font-extrabold text-2xl">
@@ -172,9 +199,75 @@ const Intro = () => {
             </motion.div>
           ))}
         </div>
+        <div className="relative mt-30">
+          <h1 className="text-white pt-10" data-aos="fade-left">
+            Opt for <span className="text-indigo-500">Hiking</span>?
+          </h1>
+          <p className="text-gray-400 mt-3 mb-20 text-lg" data-aos="fade-up">
+            Our mission is to make meaningful travel accessible, safe, and
+            unforgettable. We bring together years of travel experience, global
+            knowledge, and a passion for creating memories that last a lifetime.
+            Whether you're plannig a solo adventure, a romantic gateway or a
+            family holiday, we're here to guide you from inspiration to boooking
+            and beyond. Browser through hand-picked destinations, read real
+            travel stories, and choose from curated packages that go beyond the
+            usual.
+          </p>
+          <div className="grid xl:grid-cols-3 grid-cols-1 gap-8 my-9">
+            {PLACES2.map((place, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.5,
+                  delay: idx * 0.3,
+                }}
+                viewport={{ once: true }}
+                className="card relative group rounded-3xl h-[500px] py-4 px-5 shadow-lg cursor-pointer overflow-clip hover:shadow-xl hover:shadow-gray-500 hover:scale-105 hover:rotate-1 transition duration-300"
+              >
+                <div
+                  className="absolute bottom-0 left-0 w-full h-[200px] bg-blend-screen z-1"
+                  style={{
+                    background: "linear-gradient(to top, #000, transparent)",
+                  }}
+                />
+                <img
+                  src={place.pic}
+                  alt={place.place_name}
+                  className="absolute top-0 left-0 w-full h-full object-cover group-hover:scale-120 transition-transform duration-300"
+                />
+                <div className="w-full h-full relative flex items-end justify-between text-white z-2 opacity-90">
+                  <div className="flex flex-col">
+                    <div className="flex flex-row items-center gap-1">
+                      <RatingsStar
+                        value={place.rating_val}
+                        style={{ maxWidth: 85 }}
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-extrabold text-2xl">
+                        {place.place_name}
+                      </h3>
+                      <span className="text-sm font-medium text-indigo-100">
+                        {place.subtitle}
+                      </span>
+                    </div>
+                    <p className="text-xs font-medium text-gray-400">
+                      {place.description}
+                    </p>
+                  </div>
+                  <div className="w-[25px] h-[25px] flex items-center justify-center rounded-full border-2 border-indigo-400">
+                    <i className="fa fa-arrow-right text-sm text-indigo-400 rotate-45 transition duration-300 group-hover:rotate-0" />
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
 };
 
-export default Intro;
+export default Quickies;

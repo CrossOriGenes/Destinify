@@ -1,6 +1,8 @@
+import Header from "../components/UI/Header";
 import MainSection from "../components/main/MainSection";
 import FormSection from "../components/main/FormSection";
-import Header from "../components/UI/Header";
+import Quickies from "../components/main/Quickies";
+import EndLinks from "../components/main/EndLinks";
 
 function Home() {
   return (
@@ -9,7 +11,9 @@ function Home() {
       <main>
         <MainSection />
         <FormSection />
+        <Quickies />
       </main>
+      <EndLinks />
     </>
   );
 }

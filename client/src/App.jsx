@@ -1,10 +1,13 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import Root from "./pages/Root";
 import Error404 from "./components/UI/Error404";
-import Home from "./pages/Home";
+import AppLoader from "./components/UI/AppLoader";
+
+const Root = lazy(() => import("./pages/Root"));
+const Home = lazy(() => import("./pages/Home"));
+const Places = lazy(() => import("./pages/Places"));
 
 const router = createBrowserRouter([
   {
@@ -13,10 +16,8 @@ const router = createBrowserRouter([
     index: true,
     element: <Root />,
   },
-  {
-    path: "home",
-    children: [{ index: true, element: <Home /> }],
-  },
+  { path: "home", element: <Home /> },
+  { path: "places", element: <Places /> },
 ]);
 
 function App() {
@@ -31,7 +32,11 @@ function App() {
     });
   }, []);
 
-  return <RouterProvider router={router} />;
+  return (
+    <Suspense fallback={<AppLoader />}>
+      <RouterProvider router={router} />
+    </Suspense>
+  );
 }
 
 export default App;

@@ -15,6 +15,7 @@ const Footer = () => {
     const yrNext = (yrNow % 100) + 1;
     setYr(`${yrNow}-${yrNext}`);
   }, []);
+  
   return (
     <footer id="newsletter" className="relative w-full overflow-hidden">
       <Newsletter onSubmit={handleNewsletterData} />
