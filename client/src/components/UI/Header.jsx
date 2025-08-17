@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Menu from "./Menu";
+import Wishlist from "./Wishlist";
 
 const Header = () => {
   const [open, setOpen] = useState("");
@@ -38,6 +39,10 @@ const Header = () => {
           </AnimatePresence>
         </div>
       </header>
+
+      <AnimatePresence>
+        {open === "wishlist" && <Wishlist onClose={() => setOpen("")} />}
+      </AnimatePresence>
     </>
   );
 };
