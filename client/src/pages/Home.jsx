@@ -1,4 +1,5 @@
 import Header from "../components/UI/Header";
+import GotoTopButton from "../components/UI/GotoTopButton";
 import MainSection from "../components/main/MainSection";
 import FormSection from "../components/main/FormSection";
 import Quickies from "../components/main/Quickies";
@@ -14,6 +15,8 @@ function Home() {
         <Quickies />
       </main>
       <EndLinks />
+
+      <GotoTopButton />
     </>
   );
 }

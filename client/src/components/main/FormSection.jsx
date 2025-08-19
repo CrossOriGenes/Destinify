@@ -1,12 +1,14 @@
+import { useNavigate } from "react-router-dom";
 import PlaceSuggestionForm from "../landing/PlaceSuggestionForm";
 
 const FormSection = () => {
+  const navigate = useNavigate()
   function getSuggestivePlacesHandler(journeyData) {
     console.log(journeyData);
   }
 
   return (
-    <section className="w-full min-h-screen relative p-[100px] bg-gray-900 overflow-hidden">
+    <section id="tour-request" className="w-full min-h-screen relative p-[100px] bg-gray-900 overflow-hidden">
       <div className="absolute top-40 right-30 w-[250px] h-[250px] rounded-b-full bg-[url('/images/dots.png')] bg-cover bg-center rotation-animate invert-100 opacity-55" />
       <div
         className="absolute bottom-0 left-0 w-full h-[100px] bg-blend-screen z-5"

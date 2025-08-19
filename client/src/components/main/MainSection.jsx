@@ -1,4 +1,5 @@
 import { motion, useScroll, useTransform } from "framer-motion";
+import { Link as ScrollLink } from "react-scroll";
 
 const MainSection = () => {
   const { scrollY } = useScroll();
@@ -41,7 +42,10 @@ const MainSection = () => {
     [0, -5, -10, -15, -20, -25, -30]
   );
   return (
-    <section id="home" className="w-full min-h-screen flex items-center justify-center overflow-hidden bg-blue-300">
+    <section
+      id="home"
+      className="w-full min-h-screen flex items-center justify-center overflow-hidden bg-blue-300"
+    >
       <motion.h1
         className="sigmar-font text-white text-stroke-dark xl:text-[120px] md:text-7xl text-5xl text-center xl:w-full w-24 text-wrap leading-28 z-1"
         style={{ x: textScrollVal }}
@@ -100,7 +104,15 @@ const MainSection = () => {
             Explore the world with us a bunch of customized facilities!
           </p>
           <button className="btn2 group mt-6">
-            <a className="text-[16px] font-semibold text-[#100624] group-hover:text-white me-2">Learn More</a>
+            <ScrollLink
+              to={"tour-request"}
+              smooth={true}
+              duration={500}
+              offset={0}
+              className="text-[16px] font-semibold text-[#100624] group-hover:text-white me-2"
+            >
+              Learn More
+            </ScrollLink>
             <div className="w-7 h-7 rounded-full flex justify-center items-center bg-[#100624] group-hover:bg-white -me-4">
               <i className="fa-solid fa-arrow-right text-white group-hover:text-[#100624] rotate-45 group-hover:rotate-0 transition duration-300" />
             </div>
