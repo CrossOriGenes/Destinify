@@ -162,15 +162,6 @@ body {
   }
 
   /* PRE-LOADER */
-  #loader span {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border-radius: 100%;
-    background-color: #3498db;
-    margin: 35px 5px;
-  }
-
   #loader span:nth-child(1) {
     animation: bounce 1s ease-in-out infinite;
   }
@@ -247,7 +238,8 @@ body {
     color: var(--black) !important;
   }
 
-  .btn2 {
+  .btn2,
+  .btn2-dark {
     position: relative;
     display: flex;
     justify-content: center;
@@ -259,12 +251,17 @@ body {
     cursor: pointer;
     outline: none;
     overflow: hidden;
-    background: var(--white);
+    background: var(--color-white);
     transition: all 0.5s ease;
     z-index: 1;
   }
 
-  .btn2::before {
+  .btn2-dark {
+    background: #100624;
+  }
+
+  .btn2::before,
+  .btn2-dark::before {
     content: "";
     position: absolute;
     top: 0;
@@ -277,7 +274,12 @@ body {
     z-index: -1;
   }
 
-  .btn2:hover::before {
+  .btn2-dark::before {
+    background: var(--color-gray-400);
+  }
+
+  .btn2:hover::before,
+  .btn2-dark:hover::before {
     clip-path: circle(150% at 0 60%);
   }
 

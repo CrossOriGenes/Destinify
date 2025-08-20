@@ -1,6 +1,9 @@
+import { useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import SearchBar from "./SearchBar";
 import RatingsStar from "../UI/RatingsStar";
+import CheckBox from "../UI/CheckBox";
 
 const PLACES = [
   {
@@ -69,13 +72,66 @@ const PLACES = [
 ];
 
 const PlacesListSection = () => {
+  const { state } = useLocation();
+  const [displayText, setDisplayText] = useState("");
+  const fullText = `Your journey starts on ${state?.journey_date}, 
+  returns on ${state?.return_date}.
+  ${state?.description ? "Note: " + state.description : ""}`;
+
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      setDisplayText(fullText.slice(0, i + 1));
+      i++;
+      if (i === fullText.length) clearInterval(interval);
+    }, 40); // speed adjust
+    return () => clearInterval(interval);
+  }, [fullText]);
+  function filterByPlaceHandler(place) {
+    console.log(place);
+  }
   return (
     <section className="w-full min-h-screen bg-gray-800 overflow-hidden">
-      <SearchBar />
+      <SearchBar onSubmit={filterByPlaceHandler} />
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
         <aside className="lg:col-span-1 my-6 p-6">
-          <div className="w-full h-[300px] border-2 border-indigo-500 rounded-2xl mt-2 ml-2 bg-indigo-950"></div>
-          <h5 className="text-zinc-500 font-bold text-xl uppercase tracking-widest ml-2 mt-8 pl-1">Categories</h5>
+          <div className="w-full h-[300px] border-2 border-indigo-500 rounded-2xl mt-2 ml-2 p-4 bg-indigo-950 text-gray-200 flex flex-col">
+            <h5 className="text-sm font-light mb-1">
+              <span className="font-bold">Journey-date: &nbsp;</span>
+              {state.journey_date}
+            </h5>
+            <h5 className="text-sm font-light mb-1">
+              <span className="font-bold">Return-date: &nbsp;</span>
+              {state.return_date}
+            </h5>
+            <p className="font-light text-sm text-justify leading-4.5 overflow-ellipsis">
+              {state?.description ?? ""}
+            </p>
+            {/* <span className="animate-pulse">|</span> */}
+          </div>
+          <div className="ml-2 mt-10">
+            <h5 className="text-zinc-500 font-extrabold text-[17px] uppercase tracking-[3px] pl-1">
+              Categories
+            </h5>
+            <div className="grid xl:grid-cols-2 grid-cols-1 gap-2 mt-3 select-none">
+              <CheckBox id="category-1" label="Road Trip" checked={true} />
+              <CheckBox id="category-2" label="Festivals" checked={true} />
+              <CheckBox id="category-3" label="Beaches" checked={true} />
+              <CheckBox id="category-4" label="Mountains" checked={true} />
+            </div>
+          </div>
+          <div className="ml-2 mt-10">
+            <h5 className="text-zinc-500 font-extrabold text-[17px] uppercase tracking-[3px] pl-1">
+              Filter By
+            </h5>
+            <div className="grid xl:grid-cols-2 grid-cols-1 gap-2 mt-3 select-none">
+              <CheckBox id="filter-1" label="Ratings" checked={false} />
+              <CheckBox id="filter-2" label="Budget" checked={true} />
+              <div className="col-span-2">
+                <input type="range" id="budget-slider" className="w-full" />
+              </div>
+            </div>
+          </div>
         </aside>
 
         <div className="lg:col-span-3 my-12 px-6">
@@ -132,6 +188,13 @@ const PlacesListSection = () => {
                 </div>
               </motion.div>
             ))}
+            <div
+              className="w-full h-[200px] group flex justify-center items-center border-4 border-dashed border-cyan-500 rounded-3xl text-2xl hover:bg-cyan-800 hover:border-cyan-800 !transition !duration-300 cursor-pointer"
+              data-aos="fade-up"
+            >
+              <span className="text-gray-100 me-2">View More</span>
+              <i className="fa-solid fa-arrow-down text-indigo-400 text-xl" />
+            </div>
           </div>
         </div>
       </div>
