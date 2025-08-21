@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import SearchBar from "./SearchBar";
 import RatingsStar from "../UI/RatingsStar";
-import CheckBox from "../UI/CheckBox";
+import FilterListForm from "./FilterListForm";
 
 const PLACES = [
   {
@@ -73,23 +73,10 @@ const PLACES = [
 
 const PlacesListSection = () => {
   const { state } = useLocation();
-  const [displayText, setDisplayText] = useState("");
-  const fullText = `Your journey starts on ${state?.journey_date}, 
-  returns on ${state?.return_date}.
-  ${state?.description ? "Note: " + state.description : ""}`;
-
-  useEffect(() => {
-    let i = 0;
-    const interval = setInterval(() => {
-      setDisplayText(fullText.slice(0, i + 1));
-      i++;
-      if (i === fullText.length) clearInterval(interval);
-    }, 40); // speed adjust
-    return () => clearInterval(interval);
-  }, [fullText]);
-  function filterByPlaceHandler(place) {
-    console.log(place);
+  function filterByPlaceHandler(place){
+    console.log(place)
   }
+
   return (
     <section className="w-full min-h-screen bg-gray-800 overflow-hidden">
       <SearchBar onSubmit={filterByPlaceHandler} />
@@ -107,31 +94,8 @@ const PlacesListSection = () => {
             <p className="font-light text-sm text-justify leading-4.5 overflow-ellipsis">
               {state?.description ?? ""}
             </p>
-            {/* <span className="animate-pulse">|</span> */}
           </div>
-          <div className="ml-2 mt-10">
-            <h5 className="text-zinc-500 font-extrabold text-[17px] uppercase tracking-[3px] pl-1">
-              Categories
-            </h5>
-            <div className="grid xl:grid-cols-2 grid-cols-1 gap-2 mt-3 select-none">
-              <CheckBox id="category-1" label="Road Trip" checked={true} />
-              <CheckBox id="category-2" label="Festivals" checked={true} />
-              <CheckBox id="category-3" label="Beaches" checked={true} />
-              <CheckBox id="category-4" label="Mountains" checked={true} />
-            </div>
-          </div>
-          <div className="ml-2 mt-10">
-            <h5 className="text-zinc-500 font-extrabold text-[17px] uppercase tracking-[3px] pl-1">
-              Filter By
-            </h5>
-            <div className="grid xl:grid-cols-2 grid-cols-1 gap-2 mt-3 select-none">
-              <CheckBox id="filter-1" label="Ratings" checked={false} />
-              <CheckBox id="filter-2" label="Budget" checked={true} />
-              <div className="col-span-2">
-                <input type="range" id="budget-slider" className="w-full" />
-              </div>
-            </div>
-          </div>
+          <FilterListForm />
         </aside>
 
         <div className="lg:col-span-3 my-12 px-6">

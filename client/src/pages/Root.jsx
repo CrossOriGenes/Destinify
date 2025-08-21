@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import Hero from "../components/landing/Hero";
 import Intro from "../components/landing/Intro";
 import QuickSearches from "../components/landing/QuickSearches";
@@ -14,18 +15,17 @@ function Root() {
   const sections = ["hero", "about", "suggestion", "testimonial", "newsletter"];
   const [activeLink, setActiveLink] = useState("hero");
   const [fixedHeader, setFixedHeader] = useState(false);
-  // const [fixedBtn, setFixedBtn] = useState(false);
+  const { pathname } = useLocation();
 
   useEffect(() => {
     function handleScroll() {
       const scrollY = window.scrollY;
       setFixedHeader(scrollY > 670);
-      // setFixedBtn(scrollY > 1340);
 
       for (const id of sections) {
         const section = document.getElementById(id);
         if (section) {
-          const sectionTop = section.offsetTop - 100; // offset for header height
+          const sectionTop = section.offsetTop - 100;
           const sectionHeight = section.offsetHeight;
           if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
             setActiveLink(id);
@@ -37,6 +37,10 @@ function Root() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   return (
     <>
