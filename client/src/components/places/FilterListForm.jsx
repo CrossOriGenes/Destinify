@@ -1,23 +1,58 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import CheckBox from "../UI/CheckBox";
 import BudgetSlider from "./BudgetSlider";
 
-const FilterListForm = () => {
+const FilterListForm = ({ defaultCategories = [] }) => {
+  const [categories, setCategories] = useState(defaultCategories);
+  const [budget, setBudget] = useState(10000);
+  const [duration, setDuration] = useState("2-3");
   const [ratingCount, setRatingCount] = useState(3);
+
+  const handleCategoryChange = (id) => {
+    setCategories((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+    );
+  };
+
+  const handleBudgetChange = (val) => {
+    setBudget(val);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const filters = {
+      categories,
+      budget,
+      duration,
+      rating: ratingCount,
+    };
+    console.log("Filters Applied:", filters);
+  };
+
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <div className="ml-2 mt-10">
         <h5 className="text-zinc-500 font-extrabold text-[17px] uppercase tracking-[3px] pl-1">
           Categories
         </h5>
         <div className="grid xl:grid-cols-2 grid-cols-1 gap-2 mt-3 select-none">
-          <CheckBox id="category1" label="Beaches" checked={true} />
-          <CheckBox id="category2" label="Mountains" checked={true} />
-          <CheckBox id="category3" label="Road-trips" checked={true} />
-          <CheckBox id="category4" label="Cities" checked={false} />
-          <CheckBox id="category5" label="Heritage" checked={false} />
-          <CheckBox id="category6" label="Adventure" checked={false} />
+          {[
+            "Beaches",
+            "Mountains",
+            "Road-trips",
+            "Cities",
+            "Heritage",
+            "Adventure",
+          ].map((cat, idx) => (
+            <CheckBox
+              key={idx}
+              id={cat}
+              label={cat}
+              checked={categories.includes(cat)}
+              onChange={() => handleCategoryChange(cat)}
+            />
+          ))}
         </div>
       </div>
       <div className="ml-2 mt-10">
@@ -25,7 +60,7 @@ const FilterListForm = () => {
           Budget
         </h5>
         <div className="w-full mt-3 relative select-none">
-          <BudgetSlider />
+          <BudgetSlider value={budget} onChange={handleBudgetChange} />
         </div>
       </div>
       <div className="ml-2 mt-10">
@@ -36,6 +71,7 @@ const FilterListForm = () => {
           <select
             id="duration"
             className="w-full bg-gray-700 border-2 border-gray-600 rounded-lg py-2 px-4 text-white text-sm outline-none"
+            onChange={(e) => setDuration(e.target.value)}
           >
             <option value={"2-3"} defaultChecked>
               Weekend (2-3 days)
@@ -54,9 +90,7 @@ const FilterListForm = () => {
             type="button"
             className="w-10 h-10 p-2 rounded-full flex justify-center items-center text-lg text-gray-300 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed transition duration-300"
             onClick={() =>
-              setRatingCount((prev) => {
-                if (prev < 5) return prev + 1;
-              })
+              setRatingCount((prev) => (prev < 5 ? prev + 1 : prev))
             }
             disabled={ratingCount === 5}
             aria-label="Increase rating"
@@ -76,9 +110,7 @@ const FilterListForm = () => {
             type="button"
             className="w-10 h-10 p-2 rounded-full flex justify-center items-center text-lg text-gray-300 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed transition duration-300"
             onClick={() =>
-              setRatingCount((prev) => {
-                if (prev > 1) return prev - 1;
-              })
+              setRatingCount((prev) => (prev > 1 ? prev - 1 : prev))
             }
             disabled={ratingCount === 1}
             aria-label="Decrease rating"
@@ -88,11 +120,16 @@ const FilterListForm = () => {
         </div>
       </div>
       <div className="ml-2 mt-15">
-        <button className="w-full bg-purple-700 border-2 border-purple-700 py-2 px-8 text-center rounded-xl transition duration-300 hover:bg-purple-600 hover:border-purple-600 cursor-pointer">
+        <motion.button
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.8 }}
+          transition={{ type: "spring", damping: 15, stiffness: 700 }}
+          className="w-full bg-purple-700 border-2 border-purple-700 py-2 px-8 text-center rounded-xl hover:bg-purple-600 hover:border-purple-600 cursor-pointer"
+        >
           <span className="uppercase font-semibold text-xl tracking-wider text-white">
             Apply
           </span>
-        </button>
+        </motion.button>
       </div>
     </form>
   );

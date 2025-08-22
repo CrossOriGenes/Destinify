@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const CheckBox = ({ id, label, checked }) => {
+const CheckBox = ({ id, label, checked, onChange }) => {
   const [check, setCheck] = useState(checked);
   return (
     <div className="inline-flex items-center pl-3 cursor-pointer">
@@ -8,7 +8,10 @@ const CheckBox = ({ id, label, checked }) => {
         type="checkbox"
         id={id}
         className="hidden"
-        onChange={() => setCheck(!check)}
+        onChange={() => {
+          setCheck(!check)
+          onChange()
+        }}
         defaultChecked={checked}
       />
       <div

@@ -340,28 +340,47 @@ body {
     );
   }
 
-  /* Hide native thumb completely */
+  input[type="range"].slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: var(--radius-4xl);
+    background: var(--color-gray-700); 
+    cursor: pointer;
+    outline: none;
+  }
+
+  /* Thumb */
   input[type="range"].slider-thumb::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 0;
-    height: 0;
-    background: transparent;
-    border: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #6366f1; 
+    border: 2px solid white;
+    box-shadow: 0 0 6px rgba(99, 102, 241, 0.6);
+    transition: transform 0.2s;
+  }
+  input[type="range"].slider-thumb::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.8);
   }
 
+  /* For Firefox */
   input[type="range"].slider-thumb::-moz-range-thumb {
-    width: 0;
-    height: 0;
-    background: transparent;
-    border: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #6366f1;
+    border: 2px solid white;
+    box-shadow: 0 0 6px rgba(99, 102, 241, 0.6);
+    transition: transform 0.2s;
   }
-
-  input[type="range"].slider-thumb::-ms-thumb {
-    width: 0;
-    height: 0;
-    background: transparent;
-    border: none;
+  input[type="range"].slider-thumb::-moz-range-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.8);
   }
 }
 
