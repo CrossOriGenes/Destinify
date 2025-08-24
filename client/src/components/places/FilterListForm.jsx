@@ -3,10 +3,10 @@ import { motion } from "framer-motion";
 import CheckBox from "../UI/CheckBox";
 import BudgetSlider from "./BudgetSlider";
 
-const FilterListForm = ({ defaultCategories = [] }) => {
+const FilterListForm = ({ defaultCategories = [], initialDays, onFilter }) => {
   const [categories, setCategories] = useState(defaultCategories);
   const [budget, setBudget] = useState(10000);
-  const [duration, setDuration] = useState("2-3");
+  const [duration, setDuration] = useState(initialDays);
   const [ratingCount, setRatingCount] = useState(3);
 
   const handleCategoryChange = (id) => {
@@ -27,7 +27,7 @@ const FilterListForm = ({ defaultCategories = [] }) => {
       duration,
       rating: ratingCount,
     };
-    console.log("Filters Applied:", filters);
+    onFilter(filters);
   };
 
   return (
@@ -73,11 +73,21 @@ const FilterListForm = ({ defaultCategories = [] }) => {
             className="w-full bg-gray-700 border-2 border-gray-600 rounded-lg py-2 px-4 text-white text-sm outline-none"
             onChange={(e) => setDuration(e.target.value)}
           >
-            <option value={"2-3"} defaultChecked>
-              Weekend (2-3 days)
+            <option
+              value={"1-3"}
+              defaultChecked={initialDays >= 1 && initialDays <= 3}
+            >
+              Weekend (1-3 days)
             </option>
-            <option value={"4-6"}>Short trip (4-6 days)</option>
-            <option value={"7+"}>Long holiday (7+ days)</option>
+            <option
+              value={"4-6"}
+              defaultChecked={initialDays >= 4 && initialDays <= 6}
+            >
+              Short trip (4-6 days)
+            </option>
+            <option value={"7+"} defaultChecked={initialDays > 6}>
+              Long holiday (7+ days)
+            </option>
           </select>
         </div>
       </div>

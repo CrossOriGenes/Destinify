@@ -70,32 +70,106 @@ const PLACES = [
     rating_val: 3,
   },
 ];
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "July",
+  "Aug",
+  "Sept",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 
 const PlacesListSection = () => {
   const { state } = useLocation();
-  function filterByPlaceHandler(place){
-    console.log(place)
+  const [jdt, setJdt] = useState("");
+  const [redt, setRedt] = useState("");
+  const [days, setDays] = useState(1);
+
+  useEffect(() => {
+    const j_dt = new Date(state.journey_date);
+    const re_dt = new Date(state.return_date);
+    setJdt(
+      `${MONTHS[j_dt.getMonth()]} ${j_dt.getDate()}, ${j_dt.getFullYear()}`
+    );
+    setRedt(
+      `${MONTHS[re_dt.getMonth()]} ${re_dt.getDate()}, ${re_dt.getFullYear()}`
+    );
+
+    let utc1 = Date.UTC(j_dt.getFullYear(), j_dt.getMonth(), j_dt.getDate());
+    let utc2 = Date.UTC(re_dt.getFullYear(), re_dt.getMonth(), re_dt.getDate());
+    let timeDiff = Math.abs(utc2 - utc1);
+    let daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    setDays(daysDiff);
+  }, []);
+
+  function filterByPlaceHandler(place) {
+    console.log(place);
+  }
+  function filterByPropsHandler(filters) {
+    console.log("Filters Applied:", filters);
+  }
+  function filterByYourLocation(coords) {
+    const { latitude, longitude } = coords;
+    console.log({
+      lat: latitude,
+      lon: longitude,
+    });
   }
 
   return (
     <section className="w-full min-h-screen bg-gray-800 overflow-hidden">
-      <SearchBar onSubmit={filterByPlaceHandler} />
+      <SearchBar
+        onSubmit={filterByPlaceHandler}
+        onLocSuccess={filterByYourLocation}
+      />
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
         <aside className="lg:col-span-1 my-6 p-6">
-          <div className="w-full h-[300px] border-2 border-indigo-500 rounded-2xl mt-2 ml-2 p-4 bg-indigo-950 text-gray-200 flex flex-col">
-            <h5 className="text-sm font-light mb-1">
-              <span className="font-bold">Journey-date: &nbsp;</span>
-              {state.journey_date}
+          <div className="w-full h-[300px] border-2 border-indigo-500 rounded-2xl mt-2 ml-2 p-4 bg-indigo-950 text-gray-200 flex flex-col overflow-hidden">
+            <h5
+              className="text-sm font-light mb-1"
+              data-aos="fade-left"
+              data-aos-delay={100}
+            >
+              <span className="font-bold text-indigo-200">
+                Journey-date: &nbsp;
+              </span>
+              {jdt}
             </h5>
-            <h5 className="text-sm font-light mb-1">
-              <span className="font-bold">Return-date: &nbsp;</span>
-              {state.return_date}
+            <h5
+              className="text-sm font-light mb-1"
+              data-aos="fade-left"
+              data-aos-delay={200}
+            >
+              <span className="font-bold text-indigo-200">
+                Return-date: &nbsp;
+              </span>
+              {redt}
             </h5>
-            <p className="font-light text-sm text-justify leading-4.5 overflow-ellipsis">
+            <h5
+              className="text-sm font-light mb-1"
+              data-aos="fade-left"
+              data-aos-delay={300}
+            >
+              <span className="font-bold text-indigo-200">
+                Total-duration: &nbsp;
+              </span>
+              {days} day(s)
+            </h5>
+            <p
+              className="font-light text-sm text-justify leading-4.5 mt-2 overflow-ellipsis"
+              data-aos="fade-left"
+              data-aos-delay={400}
+            >
               {state?.description ?? ""}
             </p>
           </div>
-          <FilterListForm />
+          <FilterListForm initialDays={days} onFilter={filterByPropsHandler} />
         </aside>
 
         <div className="lg:col-span-3 my-12 px-6">
