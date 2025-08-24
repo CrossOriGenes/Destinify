@@ -81,7 +81,6 @@ const FormSection = () => {
   }
 
   function getSuggestivePlacesHandler(searchData) {
-    // console.log(searchData);
     setLoad(true);
     setTimeout(() => {
       setLoad(!load);

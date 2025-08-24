@@ -34,7 +34,12 @@ const SearchBar = ({ onSubmit, onLocSuccess }) => {
       );
     };
     const onFailure = () => {
-      toast.error("Sorry no positions available!");
+      toast.error(
+        <p className="text-xs text-white">
+          Sorry, accessing location permission denied! Reset browser permission
+          to re-locate.
+        </p>
+      );
       console.log("Sorry no positions available!");
     };
     navigator.geolocation.getCurrentPosition(onSuccess, onFailure);
@@ -112,7 +117,7 @@ const SearchBar = ({ onSubmit, onLocSuccess }) => {
                 <motion.button
                   whileTap={{ scale: 0.8 }}
                   type="button"
-                  className="w-20 h-10 py-2 px-4 me-2 flex items-center justify-center bg-gray-950 border-2 border-gray-950 hover:bg-gray-900 hover:border-gray-900 rounded-md"
+                  className="w-20 h-10 py-2 px-4 me-2 flex items-center justify-center bg-gray-950 border-2 border-gray-950 hover:bg-gray-700 hover:border-gray-700 rounded-md transition duration-300"
                   onClick={locationCoordsHandler}
                 >
                   <span className="font-bold text-sm text-white">Yes</span>
@@ -120,7 +125,7 @@ const SearchBar = ({ onSubmit, onLocSuccess }) => {
                 <motion.button
                   whileTap={{ scale: 0.8 }}
                   type="button"
-                  className="w-20 h-10 py-2 px-4 flex items-center justify-center border-2 border-gray-950 hover:bg-gray-900 hover:border-gray-900 rounded-md group"
+                  className="w-20 h-10 py-2 px-4 flex items-center justify-center border-2 border-gray-950 hover:bg-gray-700 hover:border-gray-700 rounded-md transition duration-300 group"
                   onClick={() => setOpen(!open)}
                 >
                   <span className="font-bold text-sm text-gray-950 group-hover:text-white">

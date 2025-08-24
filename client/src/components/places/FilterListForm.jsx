@@ -1,12 +1,15 @@
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import CheckBox from "../UI/CheckBox";
 import BudgetSlider from "./BudgetSlider";
 
-const FilterListForm = ({ defaultCategories = [], initialDays, onFilter }) => {
+const FilterListForm = ({ defaultCategories = [], onFilter }) => {
+  const { state } = useLocation();
+  const total_days = state.days;
   const [categories, setCategories] = useState(defaultCategories);
   const [budget, setBudget] = useState(10000);
-  const [duration, setDuration] = useState(initialDays);
+  const [duration, setDuration] = useState(total_days);
   const [ratingCount, setRatingCount] = useState(3);
 
   const handleCategoryChange = (id) => {
@@ -29,6 +32,7 @@ const FilterListForm = ({ defaultCategories = [], initialDays, onFilter }) => {
     };
     onFilter(filters);
   };
+
 
   return (
     <form onSubmit={handleSubmit}>
@@ -73,21 +77,9 @@ const FilterListForm = ({ defaultCategories = [], initialDays, onFilter }) => {
             className="w-full bg-gray-700 border-2 border-gray-600 rounded-lg py-2 px-4 text-white text-sm outline-none"
             onChange={(e) => setDuration(e.target.value)}
           >
-            <option
-              value={"1-3"}
-              defaultChecked={initialDays >= 1 && initialDays <= 3}
-            >
-              Weekend (1-3 days)
-            </option>
-            <option
-              value={"4-6"}
-              defaultChecked={initialDays >= 4 && initialDays <= 6}
-            >
-              Short trip (4-6 days)
-            </option>
-            <option value={"7+"} defaultChecked={initialDays > 6}>
-              Long holiday (7+ days)
-            </option>
+            <option value={"1-3"}>Weekend (1-3 days)</option>
+            <option value={"4-6"}>Short trip (4-6 days)</option>
+            <option value={"7+"}>Long holiday (7+ days)</option>
           </select>
         </div>
       </div>

@@ -8,6 +8,7 @@ import AppLoader from "./components/UI/AppLoader";
 const Root = lazy(() => import("./pages/Root"));
 const Home = lazy(() => import("./pages/Home"));
 const Places = lazy(() => import("./pages/Places"));
+const PlaceDetails = lazy(() => import("./pages/PlaceDetails"));
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,7 @@ const router = createBrowserRouter([
   },
   { path: "home", element: <Home /> },
   { path: "places", element: <Places /> },
+  { path: "places/:id", element: <PlaceDetails /> },
 ]);
 
 function App() {

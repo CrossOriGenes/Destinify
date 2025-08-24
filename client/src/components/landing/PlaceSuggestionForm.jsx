@@ -1,5 +1,21 @@
 import { useState, useEffect, useRef } from "react";
 
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "July",
+  "Aug",
+  "Sept",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+
 const PlaceSuggestionForm = ({ onSubmitData }) => {
   const [today, setDate] = useState("");
   const formRef = useRef();
@@ -7,6 +23,8 @@ const PlaceSuggestionForm = ({ onSubmitData }) => {
   const returnDateRef = useRef();
   const [description, setDescription] = useState("");
   const [errMsg, setErrMsg] = useState(null);
+  // const [jdt, setJdt] = useState("");
+  // const [redt, setRedt] = useState("");
 
   useEffect(() => {
     const dt = new Date();
@@ -27,9 +45,19 @@ const PlaceSuggestionForm = ({ onSubmitData }) => {
       setErrMsg("Return date can't be before journey date!");
       return;
     }
+    const j_dt = new Date(journey);
+    const re_dt = new Date(ret);
+    const journey_date = `${MONTHS[j_dt.getMonth()]} ${j_dt.getDate()}, ${j_dt.getFullYear()}`;
+    const return_date = `${MONTHS[re_dt.getMonth()]} ${re_dt.getDate()}, ${re_dt.getFullYear()}`;
+    const utc1 = Date.UTC(j_dt.getFullYear(), j_dt.getMonth(), j_dt.getDate());
+    const utc2 = Date.UTC(re_dt.getFullYear(), re_dt.getMonth(), re_dt.getDate());
+    const timeDiff = Math.abs(utc2 - utc1);
+    const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    
     const searchData = {
-      journey_date: journeyDateRef.current.value,
-      return_date: returnDateRef.current.value,
+      journey_date,
+      return_date,
+      days: daysDiff,
       description,
     };
     setErrMsg(null);

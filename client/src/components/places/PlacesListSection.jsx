@@ -1,5 +1,4 @@
 import { useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import SearchBar from "./SearchBar";
 import RatingsStar from "../UI/RatingsStar";
@@ -70,43 +69,10 @@ const PLACES = [
     rating_val: 3,
   },
 ];
-const MONTHS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "July",
-  "Aug",
-  "Sept",
-  "Oct",
-  "Nov",
-  "Dec",
-];
 
 const PlacesListSection = () => {
   const { state } = useLocation();
-  const [jdt, setJdt] = useState("");
-  const [redt, setRedt] = useState("");
-  const [days, setDays] = useState(1);
-
-  useEffect(() => {
-    const j_dt = new Date(state.journey_date);
-    const re_dt = new Date(state.return_date);
-    setJdt(
-      `${MONTHS[j_dt.getMonth()]} ${j_dt.getDate()}, ${j_dt.getFullYear()}`
-    );
-    setRedt(
-      `${MONTHS[re_dt.getMonth()]} ${re_dt.getDate()}, ${re_dt.getFullYear()}`
-    );
-
-    let utc1 = Date.UTC(j_dt.getFullYear(), j_dt.getMonth(), j_dt.getDate());
-    let utc2 = Date.UTC(re_dt.getFullYear(), re_dt.getMonth(), re_dt.getDate());
-    let timeDiff = Math.abs(utc2 - utc1);
-    let daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-    setDays(daysDiff);
-  }, []);
+  const journeyData = state;
 
   function filterByPlaceHandler(place) {
     console.log(place);
@@ -123,7 +89,7 @@ const PlacesListSection = () => {
   }
 
   return (
-    <section className="w-full min-h-screen bg-gray-800 overflow-hidden">
+    <section className="relative w-full min-h-screen bg-gray-800 overflow-hidden">
       <SearchBar
         onSubmit={filterByPlaceHandler}
         onLocSuccess={filterByYourLocation}
@@ -139,7 +105,7 @@ const PlacesListSection = () => {
               <span className="font-bold text-indigo-200">
                 Journey-date: &nbsp;
               </span>
-              {jdt}
+              {journeyData?.journey_date ?? "N.A."}
             </h5>
             <h5
               className="text-sm font-light mb-1"
@@ -149,7 +115,7 @@ const PlacesListSection = () => {
               <span className="font-bold text-indigo-200">
                 Return-date: &nbsp;
               </span>
-              {redt}
+              {journeyData?.return_date ?? "N.A."}
             </h5>
             <h5
               className="text-sm font-light mb-1"
@@ -159,20 +125,20 @@ const PlacesListSection = () => {
               <span className="font-bold text-indigo-200">
                 Total-duration: &nbsp;
               </span>
-              {days} day(s)
+              {journeyData.days ? `${journeyData.days} day(s)` : "N.A."}
             </h5>
             <p
               className="font-light text-sm text-justify leading-4.5 mt-2 overflow-ellipsis"
               data-aos="fade-left"
               data-aos-delay={400}
             >
-              {state?.description ?? ""}
+              {journeyData?.description ?? ""}
             </p>
           </div>
-          <FilterListForm initialDays={days} onFilter={filterByPropsHandler} />
+          <FilterListForm onFilter={filterByPropsHandler} />
         </aside>
 
-        <div className="lg:col-span-3 my-12 px-6">
+        <div className="lg:col-span-3 mt-12 mb-48 px-6">
           <h3 className="font-extrabold text-4xl text-white mb-6">
             Your <span className="text-indigo-500">Suggestions</span>{" "}
           </h3>
@@ -236,6 +202,10 @@ const PlacesListSection = () => {
           </div>
         </div>
       </div>
+      <div
+        className="absolute bottom-0 left-0 w-full h-[100px] bg-blend-screen z-3"
+        style={{ background: "linear-gradient(to top, #030712, transparent)" }}
+      />
     </section>
   );
 };
