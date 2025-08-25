@@ -1,15 +1,56 @@
-import HeroSection from "../components/place-details/HeroSection"
-import Header from "../components/UI/Header"
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import DescriptionSection from "../components/place-details/DescriptionSection";
+import HeroSection from "../components/place-details/HeroSection";
+import Header from "../components/UI/Header";
+import AsideBar from "../components/place-details/AsideBar";
 
 function PlaceDetails() {
+  const { pathname } = useLocation();
+  const sections = [
+    "place-descr-intro",
+    "ratings",
+    "place-img-gallery",
+    "festivals",
+    "estim-budget",
+  ];
+  const [activeLink, setActiveLink] = useState(sections[0]);
+
+  useEffect(() => {
+    function handleScroll() {
+      const scrollY = window.scrollY;
+      // setFixedTabContents(scrollY > 670);
+
+      for (const id of sections) {
+        const section = document.getElementById(id);
+        if (section) {
+          const sectionTop = section.offsetTop - 100;
+          const sectionHeight = section.offsetHeight;
+          if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+            setActiveLink(id);
+            break;
+          }
+        }
+      }
+    }
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   return (
     <>
       <Header />
-      <main>
+      <main className="grid grid-cols-1 xl:grid-cols-4 gap-6">
         <HeroSection />
+        <AsideBar activeLink={activeLink} setActiveLink={setActiveLink} />
+        <DescriptionSection />
       </main>
     </>
-  )
+  );
 }
 
-export default PlaceDetails
+export default PlaceDetails;

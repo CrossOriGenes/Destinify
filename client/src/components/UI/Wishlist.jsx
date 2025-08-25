@@ -1,11 +1,16 @@
-import { useState, useEffect } from "react";
+import { motion, stagger } from "framer-motion";
 import Drawer from "./Drawer";
 import { RatingHeart } from "./RatingsStar";
 
 const Wishlist = ({ onClose }) => {
   return (
     <Drawer titleHead="Wishlist" onClose={onClose}>
-      <ul className="flex flex-col list-none p-2">
+      <motion.ul
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="flex flex-col list-none p-2"
+      >
         <li className="w-full flex items-start justify-between py-4 px-1 border-b-1 border-gray-400">
           <img
             src="/images/Kerala.jpg"
@@ -90,7 +95,7 @@ const Wishlist = ({ onClose }) => {
             </div>
           </div>
         </li>
-      </ul>
+      </motion.ul>
     </Drawer>
   );
 };

@@ -31,7 +31,7 @@ const Header = () => {
             className="group flex justify-center items-center cursor-pointer hover:bg-[rgba(0,0,0,0.2)] py-2 px-1 -mx-1 rounded-full"
             onClick={() => setOpen("wishlist")}
           >
-            <i className="fa-solid fa-bag-shopping text-2xl transition duration-300 text-gray-900" />
+            <i className="fa-solid fa-bag-shopping text-2xl transition duration-300 text-gray-900 group-hover:text-white" />
           </motion.div>
 
           <AnimatePresence>
