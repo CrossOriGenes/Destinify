@@ -1,6 +1,6 @@
 const HeroSection = () => {
   return (
-    <section className="relative col-span-4 min-h-screen overflow-hidden">
+    <section id="place-details-hero" className="relative col-span-4 min-h-screen overflow-hidden">
       <div className="relative w-full h-[95vh] overflow-hidden clip-hero-img">
         <img
           src="/images/Udaipur.jpg"

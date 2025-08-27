@@ -4,6 +4,7 @@ import DescriptionSection from "../components/place-details/DescriptionSection";
 import HeroSection from "../components/place-details/HeroSection";
 import Header from "../components/UI/Header";
 import AsideBar from "../components/place-details/AsideBar";
+import RatingsReviewSection from "../components/place-details/RatingsReviewSection";
 
 function PlaceDetails() {
   const { pathname } = useLocation();
@@ -48,6 +49,7 @@ function PlaceDetails() {
         <HeroSection />
         <AsideBar activeLink={activeLink} setActiveLink={setActiveLink} />
         <DescriptionSection />
+        <RatingsReviewSection />
       </main>
     </>
   );

@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import SearchBar from "./SearchBar";
 import RatingsStar from "../UI/RatingsStar";
@@ -6,6 +6,7 @@ import FilterListForm from "./FilterListForm";
 
 const PLACES = [
   {
+    _id: "001",
     place_name: "Udaipur",
     pic: "/images/Udaipur.jpg",
     subtitle: "(20+ Best visiting Place)",
@@ -13,6 +14,7 @@ const PLACES = [
     rating_val: 4,
   },
   {
+    _id: "002",
     place_name: "Odisha",
     pic: "/images/Odisha.jpg",
     subtitle: "(10+ Best visiting Place)",
@@ -20,6 +22,7 @@ const PLACES = [
     rating_val: 4.5,
   },
   {
+    _id: "003",
     place_name: "Punjab",
     pic: "/images/Punjab.jpg",
     subtitle: "(15+ Best visiting Place)",
@@ -27,6 +30,7 @@ const PLACES = [
     rating_val: 4,
   },
   {
+    _id: "004",
     place_name: "Goa",
     pic: "/images/Goa.jpg",
     subtitle: "(5+ Best visiting Place)",
@@ -34,6 +38,7 @@ const PLACES = [
     rating_val: 3.5,
   },
   {
+    _id: "005",
     place_name: "Sikkim",
     pic: "/images/Sikkim.jpg",
     subtitle: "(10+ Best visiting Place)",
@@ -41,6 +46,7 @@ const PLACES = [
     rating_val: 5,
   },
   {
+    _id: "006",
     place_name: "Kerala",
     pic: "/images/Kerala.jpg",
     subtitle: "(20+ Best visiting Place)",
@@ -48,6 +54,7 @@ const PLACES = [
     rating_val: 4.5,
   },
   {
+    _id: "007",
     place_name: "Manali",
     pic: "/images/Manali.jpg",
     subtitle: "(20+ Best visiting Place)",
@@ -55,6 +62,7 @@ const PLACES = [
     rating_val: 4,
   },
   {
+    _id: "008",
     place_name: "Leh",
     pic: "/images/Leh.jpg",
     subtitle: "(30+ Best visiting Place)",
@@ -62,6 +70,7 @@ const PLACES = [
     rating_val: 4.5,
   },
   {
+    _id: "009",
     place_name: "Everest",
     pic: "/images/Himalayas.jpg",
     subtitle: "(10+ Best visiting Place)",
@@ -73,6 +82,7 @@ const PLACES = [
 const PlacesListSection = () => {
   const { state } = useLocation();
   const journeyData = state;
+  const navigate = useNavigate();
 
   function filterByPlaceHandler(place) {
     console.log(place);
@@ -154,6 +164,7 @@ const PlacesListSection = () => {
                 }}
                 viewport={{ once: true }}
                 className="card relative group rounded-3xl h-[200px] py-4 px-5 shadow-lg cursor-pointer overflow-clip hover:shadow-xl hover:shadow-gray-500 hover:scale-101 hover:rotate-1 transition duration-300"
+                onClick={() => navigate(p._id)}
               >
                 <div
                   className="absolute bottom-0 left-0 w-full h-[200px] bg-blend-screen z-1"
