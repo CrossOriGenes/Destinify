@@ -5,6 +5,7 @@ import HeroSection from "../components/place-details/HeroSection";
 import Header from "../components/UI/Header";
 import AsideBar from "../components/place-details/AsideBar";
 import RatingsReviewSection from "../components/place-details/RatingsReviewSection";
+import PlaceImageGallery from "../components/place-details/PlaceImageGallery";
 
 function PlaceDetails() {
   const { pathname } = useLocation();
@@ -45,11 +46,12 @@ function PlaceDetails() {
   return (
     <>
       <Header />
-      <main className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+      <main className="grid grid-cols-1 xl:grid-cols-4">
         <HeroSection />
         <AsideBar activeLink={activeLink} setActiveLink={setActiveLink} />
         <DescriptionSection />
         <RatingsReviewSection />
+        <PlaceImageGallery />
       </main>
     </>
   );

@@ -2,12 +2,15 @@ const DescriptionSection = () => {
   return (
     <section
       id="place-descr-intro"
-      className="lg:col-span-3 col-span-4 xl:px-[100px] xl:pt-[50px] p-[70px] text-right"
+      className="relative lg:col-span-3 col-span-4 xl:px-[100px] xl:py-[60px] pt-0 p-[60px] text-right"
     >
-      <h1 className="text-6xl font-extrabold">
+      <h1 className="text-6xl font-extrabold" data-aos="fade-up">
         About the <span className="text-indigo-500">place</span>
       </h1>
-      <p className="font-medium text-lg text-gray-600 leading-6 mt-6 pl-20">
+      <p
+        className="font-medium text-lg text-gray-600 leading-6 mt-6 xl:pl-20 pl-0"
+        data-aos="fade-in"
+      >
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet nam
         dicta expedita atque nobis quidem, ab libero, dolorem fugiat id
         perspiciatis dolorum culpa nisi minima debitis similique, autem ad
