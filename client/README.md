@@ -1,12 +1,34 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# **Destinify** - client  
 
-Currently, two official plugins are available:
+This is the client folder containing all the frontend code written for the app on *React (Vite)* and follows simple-to-initiate structure.
+### **Installation**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Navigate to **/client** folder of the app folder - 'Destinify':
+```bash
+  cd client
+```
 
-## Expanding the ESLint configuration
+Install *node_modules* with *npm*:
+```bash  
+  npm install
+```
+Run and launch the **localhost:5173** server with:
+```bash  
+  npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+    
+### **Tech Stack**
+
+ - React
+ - TailwindCSS
+ - Framer-motion
+ - gsap
+
+### *Badges*
+
+
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/) 
+

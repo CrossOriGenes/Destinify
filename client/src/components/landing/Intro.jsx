@@ -89,14 +89,14 @@ const Intro = () => {
             Whether you're hiking through the snowy trails of the Himalayas,
             thriving through the dense rainforests in the mid-America or
             exploring the spiritual richness of India, we suggest journeys that
-            speak to the soull. Our expert-curated itineries are made for every
+            speak to the soul. Our expert-curated itineries are made for every
             kind of traveler.
             <br />
             Our mission is to make meaningful travel accessible, safe, and
             unforgettable. We bring together years of travel experience, global
             knowledge, and a passion for creating memories that last a lifetime.
             Whether you're plannig a solo adventure, a romantic gateway or a
-            family holiday, we're here to guide you from inspiration to boooking
+            family holiday, we're here to guide you from inspiration to booking
             and beyond. Browser through hand-picked destinations, read real
             travel stories, and choose from curated packages that go beyond the
             usual.
