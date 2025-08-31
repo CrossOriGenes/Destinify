@@ -1,0 +1,7 @@
+# Logs
+venv/
+
+# Editor directories and files
+__pycache__/
+*.pyc
+.env
