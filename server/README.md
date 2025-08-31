@@ -6,6 +6,8 @@ This is the server folder containing all the backend codes, ML models, datasets 
 ## **Installation**
 Just run the code:
 ```bash
+  python -m venv venv
+  venv\Scripts\activate
   pip install -r requirements.txt
   python app.py
 ```
