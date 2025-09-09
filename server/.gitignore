@@ -1,7 +1,9 @@
 # Logs
 venv/
+data/
 
 # Editor directories and files
 __pycache__/
 *.pyc
 .env
+*.csv

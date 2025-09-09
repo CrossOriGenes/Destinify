@@ -1,35 +1,43 @@
 from flask import Blueprint, jsonify, request
-import controllers.places_utils as plu
+import controllers.utils as ut
+from models.place_model import Places
 
 places_routes = Blueprint('places-routes', __name__)
+
 
 # get all places by category
 @places_routes.route("/category/<string:category>")
 def get_places_by_category(category):
     categ = category.lower()
     page_count = int(request.args.get("count-request", 1))  # query param ?count-request=2
-    limit = 20 if page_count == 1 else 8           
+    limit = 25 if page_count == 1 else 8           
 
-    if categ not in plu.keywords:
+    if categ not in ut.keywords:
         return jsonify({ "errMsg": "Invalid category!" }), 400
       
-    mask = plu.df["Place_Desc"].str.lower().str.contains(
-        "|".join(plu.keywords[categ]), na=False
-    )
-    results = plu.df[mask].sort_values(by="Place_Rating", ascending=False, na_position="last").to_dict(orient="records")
+    query = {
+        "Place_Desc":{
+            "$regex": "|".join(ut.keywords[categ]),  # keyword match using regex
+            "$options": "i"  #case insensitive   
+        }
+    }
+    cursor = Places.find(query).sort("Place_Rating", -1)
+    all_results = list(cursor)
+    total_matches = len(all_results)
     # calculate slicing as per 3 pages max → free plan
     start = (page_count - 1) * limit
     end = start + limit
-    sliced = results[start:end]  
+    sliced = ut.formatted_data(all_results[start:end])  
     if page_count > 3:
         return jsonify({ 
             "errMsg": "Your Free plan expired, please switch to our premium plans for more benefits." 
         }), 403
 
-    print("\nTotal-matches found: ", len(results))
+    print("\nTotal-matches found: ", total_matches)
     return jsonify({
         "success": True,
         "count": len(sliced),
+        "total": total_matches,
         "data": sliced,
         "msg": f"Your recommendations on {category}"
     }), 200
@@ -59,31 +67,10 @@ def get_place_recommendations():
 # Test API
 @places_routes.route("/test")
 def test_route():
-    try:
-        # Unique cities
-        unique_cities = list(set(plu.df["City"].dropna()))
-        print("Unique cities count:", len(unique_cities))
-
-        # Rest half to stay within API limit
-        half = len(unique_cities) // 2
-        selected_cities = unique_cities[half:]
-
-        assigned = set()
-        for idx, row in plu.df.iterrows():
-            city = row["City"]
-            if city in selected_cities and city not in assigned:
-                img_url = plu.fetch_image(city)
-                if img_url:
-                    plu.df.at[idx, "Place_images"] = [img_url]
-                    assigned.add(city)
-
-        # Save updated dataset
-        plu.df.to_csv('india_places_new.csv', index=False)
-
-        return jsonify({
-            "success": True,
-            "msg": f"Updated {len(assigned)} cities with images",
-        }), 200
-        
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500  
+    cities = Places.find({"City": "Digha"})
+    documents = list(cities)  
+    data = ut.formatted_data(documents)  
+    return jsonify({
+        "success": True,
+        "cities": data,
+    }), 200
