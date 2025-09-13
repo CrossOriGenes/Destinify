@@ -1,9 +1,14 @@
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import SearchBar from "./SearchBar";
 import RatingsStar from "../UI/RatingsStar";
 import FilterListForm from "./FilterListForm";
+import LoaderBackdrop from "../UI/LoaderBackdrop";
+import { toast } from "react-toastify";
+import Modal from "../UI/Modal";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const PLACES = [
   {
     _id: "001",
@@ -80,7 +85,14 @@ const PLACES = [
 ];
 
 const PlacesListSection = () => {
-  const { state } = useLocation();
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [places, setPlaces] = useState([]);
+  const [subscribeMsg, setSubscribeMsg] = useState("");
+  const { state, search } = useLocation();
+  const query = new URLSearchParams(search);
+  const category = query.get("category");
+  const place = query.get("place");
   const journeyData = state;
   const navigate = useNavigate();
 
@@ -97,127 +109,216 @@ const PlacesListSection = () => {
       lon: longitude,
     });
   }
+  async function fetchPlacesByCategory() {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${BASE_URL}/api/places/category/${category}?count-request=1`
+      );
+      const result = await response.json();
+      setLoading(false);
+      if (response.status === 200) {
+        setPlaces(result.places);
+        toast.success(result.msg);
+        console.log(result);
+        return;
+      }
+      if (response.status === 403) {
+        setSubscribeMsg(result.infoMsg);
+        toast.warning("Your Free tier expired!");
+        setOpen(true);
+        return;
+      }
+      if (response.status === 400) {
+        toast.error(result.errMsg);
+        return;
+      }
+    } catch (e) {
+      toast.error("Sorry, Something went wrong!😢");
+      console.log(e);
+    }
+  }
+
+  useEffect(() => {
+    if (category && places.length === 0) {
+      fetchPlacesByCategory();
+      // console.log(category);
+    }
+    if (place) console.log(place);
+  }, []);
 
   return (
-    <section className="relative w-full min-h-screen bg-gray-800 overflow-hidden">
-      <SearchBar
-        onSubmit={filterByPlaceHandler}
-        onLocSuccess={filterByYourLocation}
-      />
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-        <aside className="lg:col-span-1 my-6 p-6">
-          <div className="w-full h-[300px] border-2 border-indigo-500 rounded-2xl mt-2 ml-2 p-4 bg-indigo-950 text-gray-200 flex flex-col overflow-hidden">
-            <h5
-              className="text-sm font-light mb-1"
-              data-aos="fade-left"
-              data-aos-delay={100}
-            >
-              <span className="font-bold text-indigo-200">
-                Journey-date: &nbsp;
-              </span>
-              {journeyData?.journey_date ?? "N.A."}
-            </h5>
-            <h5
-              className="text-sm font-light mb-1"
-              data-aos="fade-left"
-              data-aos-delay={200}
-            >
-              <span className="font-bold text-indigo-200">
-                Return-date: &nbsp;
-              </span>
-              {journeyData?.return_date ?? "N.A."}
-            </h5>
-            <h5
-              className="text-sm font-light mb-1"
-              data-aos="fade-left"
-              data-aos-delay={300}
-            >
-              <span className="font-bold text-indigo-200">
-                Total-duration: &nbsp;
-              </span>
-              {journeyData.days ? `${journeyData.days} day(s)` : "N.A."}
-            </h5>
-            <p
-              className="font-light text-sm text-justify leading-4.5 mt-2 overflow-ellipsis"
-              data-aos="fade-left"
-              data-aos-delay={400}
-            >
-              {journeyData?.description ?? ""}
-            </p>
-          </div>
-          <FilterListForm onFilter={filterByPropsHandler} />
-        </aside>
-
-        <div className="lg:col-span-3 mt-12 mb-48 px-6">
-          <h3 className="font-extrabold text-4xl text-white mb-6">
-            Your <span className="text-indigo-500">Suggestions</span>{" "}
-          </h3>
-          <div className="space-y-6">
-            {PLACES.map((p, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.5,
-                  delay: idx * 0.15,
-                }}
-                viewport={{ once: true }}
-                className="card relative group rounded-3xl h-[200px] py-4 px-5 shadow-lg cursor-pointer overflow-clip hover:shadow-xl hover:shadow-gray-500 hover:scale-101 hover:rotate-1 transition duration-300"
-                onClick={() => navigate(p._id)}
-              >
-                <div
-                  className="absolute bottom-0 left-0 w-full h-[200px] bg-blend-screen z-1"
-                  style={{
-                    background: "linear-gradient(to top, #000, transparent)",
-                  }}
-                />
-                <img
-                  src={p.pic}
-                  alt={p.place_name}
-                  className="absolute top-0 left-0 w-full h-full object-cover group-hover:scale-120 transition-transform duration-300"
-                />
-                <div className="w-full h-full relative flex items-end justify-between text-white z-2 opacity-90">
-                  <div className="flex flex-col">
-                    <div className="flex flex-row items-center gap-1">
-                      <RatingsStar
-                        value={p.rating_val}
-                        style={{ maxWidth: 85 }}
-                      />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-extrabold text-2xl">
-                        {p.place_name}
-                      </h3>
-                      <span className="text-sm font-medium text-indigo-100">
-                        {p.subtitle}
-                      </span>
-                    </div>
-                    <p className="text-xs font-medium text-gray-400">
-                      {p.description}
-                    </p>
-                  </div>
-                  <div className="w-[25px] h-[25px] flex items-center justify-center rounded-full border-2 border-indigo-400">
-                    <i className="fa fa-arrow-right text-sm text-indigo-400 rotate-45 transition duration-300 group-hover:rotate-0" />
-                  </div>
+    <>
+      {loading && <LoaderBackdrop />}
+      {!loading && (
+        <section className="relative w-full min-h-screen bg-gray-800 overflow-hidden">
+          <SearchBar
+            onSubmit={filterByPlaceHandler}
+            onLocSuccess={filterByYourLocation}
+          />
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+            <aside className="lg:col-span-1 my-6 p-6">
+              {state && (
+                <div className="w-full h-[300px] border-2 border-indigo-500 rounded-2xl mt-2 ml-2 p-4 bg-indigo-950 text-gray-200 flex flex-col overflow-hidden">
+                  <h5
+                    className="text-sm font-light mb-1"
+                    data-aos="fade-left"
+                    data-aos-delay={100}
+                  >
+                    <span className="font-bold text-indigo-200">
+                      Journey-date: &nbsp;
+                    </span>
+                    {journeyData?.journey_date ?? "N.A."}
+                  </h5>
+                  <h5
+                    className="text-sm font-light mb-1"
+                    data-aos="fade-left"
+                    data-aos-delay={200}
+                  >
+                    <span className="font-bold text-indigo-200">
+                      Return-date: &nbsp;
+                    </span>
+                    {journeyData?.return_date ?? "N.A."}
+                  </h5>
+                  <h5
+                    className="text-sm font-light mb-1"
+                    data-aos="fade-left"
+                    data-aos-delay={300}
+                  >
+                    <span className="font-bold text-indigo-200">
+                      Total-duration: &nbsp;
+                    </span>
+                    {journeyData.days ? `${journeyData.days} day(s)` : "N.A."}
+                  </h5>
+                  <p
+                    className="font-light text-sm text-justify leading-4.5 mt-2 overflow-ellipsis"
+                    data-aos="fade-left"
+                    data-aos-delay={400}
+                  >
+                    {journeyData?.description ?? ""}
+                  </p>
                 </div>
-              </motion.div>
-            ))}
-            <div
-              className="w-full h-[200px] group flex justify-center items-center border-4 border-dashed border-cyan-500 rounded-3xl text-2xl hover:bg-cyan-800 hover:border-cyan-800 !transition !duration-300 cursor-pointer"
-              data-aos="fade-up"
-            >
-              <span className="text-gray-100 me-2">View More</span>
-              <i className="fa-solid fa-arrow-down text-indigo-400 text-xl" />
+              )}
+              <FilterListForm
+                onFilter={filterByPropsHandler}
+                prompt={state ? true : false}
+              />
+            </aside>
+
+            <div className="lg:col-span-3 px-6 mt-12 mb-48">
+              <h3 className="font-extrabold text-4xl text-white mb-6">
+                Your <span className="text-indigo-500">Suggestions</span>{" "}
+              </h3>
+              <div className="space-y-6">
+                {places.map((p, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.5,
+                      delay: idx * 0.15,
+                    }}
+                    viewport={{ once: true }}
+                    className="card relative group rounded-3xl h-[200px] py-4 px-5 shadow-lg cursor-pointer overflow-clip hover:shadow-xl hover:shadow-gray-500 hover:scale-101 hover:rotate-1 transition duration-300"
+                    onClick={() => navigate(p._id)}
+                  >
+                    <div
+                      className="absolute bottom-0 left-0 w-full h-[200px] bg-blend-screen z-1"
+                      style={{
+                        background:
+                          "linear-gradient(to top, #000, transparent)",
+                      }}
+                    />
+                    <img
+                      src={p.Place_images[0]}
+                      alt={p.place_name}
+                      className="absolute top-0 left-0 w-full h-full object-cover group-hover:scale-120 transition-transform duration-300"
+                    />
+                    <div className="w-full h-full relative flex items-end justify-between text-white z-2 opacity-90">
+                      <div className="flex flex-col">
+                        <div className="flex flex-row items-center gap-1">
+                          <RatingsStar
+                            value={p.Place_Rating}
+                            style={{ maxWidth: 85 }}
+                          />
+                        </div>
+                        <h3 className="font-extrabold text-2xl">{p.Place}</h3>
+                        <div className="flex items-center my-1.5 text-indigo-200">
+                          <i className="fa-solid fa-location-dot text-xs" />
+                          <span className="text-xs font-medium ml-0.5">
+                            {p.City}
+                          </span>
+                        </div>
+                        <p className="relative text-xs font-medium text-gray-400 w-[350px] overflow-hidden text-ellipsis whitespace-nowrap">
+                          {p.Place_Desc}
+                        </p>
+                      </div>
+                      <div className="w-[25px] h-[25px] flex items-center justify-center rounded-full border-2 border-indigo-400">
+                        <i className="fa fa-arrow-right text-sm text-indigo-400 rotate-45 transition duration-300 group-hover:rotate-0" />
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+                <div
+                  className="w-full h-[200px] group flex justify-center items-center border-4 border-dashed border-cyan-500 rounded-3xl text-2xl hover:bg-cyan-800 hover:border-cyan-800 !transition !duration-300 cursor-pointer"
+                  data-aos="fade-up"
+                >
+                  <span className="text-gray-100 me-2">View More</span>
+                  <i className="fa-solid fa-arrow-down text-indigo-400 text-xl" />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div
-        className="absolute bottom-0 left-0 w-full h-[100px] bg-blend-screen z-3"
-        style={{ background: "linear-gradient(to top, #030712, transparent)" }}
-      />
-    </section>
+          <div
+            className="absolute bottom-0 left-0 w-full h-[100px] bg-blend-screen z-3"
+            style={{
+              background: "linear-gradient(to top, #030712, transparent)",
+            }}
+          />
+        </section>
+      )}
+
+      <AnimatePresence>
+        {open && (
+          <Modal onClose={() => setOpen(!open)}>
+            <header className="flex items-center justify-start bg-pink-700 py-1 px-2 rounded-lg">
+              <h2 className="text-2xl text-white font-extrabold capitalize pl-1.5">
+                Upgrade to premium
+              </h2>
+            </header>
+            <div className="flex flex-col p-2">
+              <p className="text-gray-400 text-md leading-5 mt-2 mb-3">
+                {subscribeMsg ? subscribeMsg : ""}
+              </p>
+              <div className="flex items-end justify-end pt-1.5">
+                <motion.button
+                  whileTap={{ scale: 0.8 }}
+                  type="button"
+                  className="w-35 h-10 py-2 px-4 me-2 flex items-center justify-center bg-gray-950 border-2 border-gray-950 hover:bg-gray-700 hover:border-gray-700 rounded-md transition duration-300 group"
+                  // onClick={}
+                >
+                  <span className="font-bold text-sm text-white">
+                    See Pricing
+                  </span>
+                  <i className="fa-solid fa-arrow-right text-gray-500 rotate-45 group-hover:rotate-0 transition duration-200 ml-0.5 -me-1" />
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.8 }}
+                  type="button"
+                  className="w-20 h-10 py-2 px-4 flex items-center justify-center border-2 border-gray-950 hover:bg-gray-700 hover:border-gray-700 rounded-md transition duration-300 group"
+                  onClick={() => setOpen(!open)}
+                >
+                  <span className="font-bold text-sm text-gray-950 group-hover:text-white">
+                    Cancel
+                  </span>
+                </motion.button>
+              </div>
+            </div>
+          </Modal>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

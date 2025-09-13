@@ -1,9 +1,12 @@
 import { useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Modal from "../UI/Modal";
 import { toast } from "react-toastify";
 
 const SearchBar = ({ onSubmit, onLocSuccess }) => {
+  const { search } = useLocation();
+  const place = new URLSearchParams(search).get("place");
   const searchBarRef = useRef();
   const [open, setOpen] = useState(false);
 
@@ -52,7 +55,7 @@ const SearchBar = ({ onSubmit, onLocSuccess }) => {
       <div className="relative w-full h-[12rem] p-[70px] flex justify-center items-center bg-white">
         <div className="w-full flex items-center justify-between gap-[0.5rem] mx-35 -mb-15 z-1">
           <form
-            className="relative w-[92%]"
+            className={`relative ${!place ? "w-[92%]" : "w-full"}`}
             onSubmit={handleSearchPlaceSubmitHandler}
           >
             <input
@@ -63,7 +66,7 @@ const SearchBar = ({ onSubmit, onLocSuccess }) => {
               maxLength={15}
               minLength={2}
               required
-              placeholder="Some place preferences..."
+              placeholder="Filter by place preferences..."
             />
             <div className="absolute top-[5px] -right-2.5">
               <motion.button
@@ -77,21 +80,23 @@ const SearchBar = ({ onSubmit, onLocSuccess }) => {
               </motion.button>
             </div>
           </form>
-          <div className="group relative">
-            <div
-              className="w-15 h-15 flex justify-center items-center p-4 rounded-full group-hover:bg-gray-200 transition duration-300 cursor-pointer"
-              onClick={() => setOpen(true)}
-            >
-              <i className="fa-solid fa-location-crosshairs text-3xl text-indigo-400 group-hover:text-pink-600" />
+          {!place && (
+            <div className="group relative">
+              <div
+                className="w-15 h-15 flex justify-center items-center p-4 rounded-full group-hover:bg-gray-200 transition duration-300 cursor-pointer"
+                onClick={() => setOpen(true)}
+              >
+                <i className="fa-solid fa-location-crosshairs text-3xl text-indigo-400 group-hover:text-pink-600" />
+              </div>
+              <div className="absolute -top-2 left-15 w-30 h-20 bg-gray-900 p-2 rounded-md z-2 transition duration-500 hidden group-hover:block">
+                <div className="absolute w-2.5 h-2.5 top-8 -left-1 bg-gray-900 rotate-45" />
+                <p className="text-xs text-white">
+                  Or, search visitable places within <strong>10m</strong> of
+                  your current location.
+                </p>
+              </div>
             </div>
-            <div className="absolute -top-2 left-15 w-30 h-20 bg-gray-900 p-2 rounded-md z-2 transition duration-500 hidden group-hover:block">
-              <div className="absolute w-2.5 h-2.5 top-8 -left-1 bg-gray-900 rotate-45" />
-              <p className="text-xs text-white">
-                Or, search visitable places within <strong>10m</strong> of your
-                current location.
-              </p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 

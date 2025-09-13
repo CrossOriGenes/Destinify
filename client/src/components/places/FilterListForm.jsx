@@ -1,15 +1,12 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import CheckBox from "../UI/CheckBox";
 import BudgetSlider from "./BudgetSlider";
 
 const FilterListForm = ({ defaultCategories = [], onFilter }) => {
-  const { state } = useLocation();
-  const total_days = state.days;
   const [categories, setCategories] = useState(defaultCategories);
   const [budget, setBudget] = useState(10000);
-  const [duration, setDuration] = useState(total_days);
+  const [duration, setDuration] = useState("1-3");
   const [ratingCount, setRatingCount] = useState(3);
 
   const handleCategoryChange = (id) => {
@@ -32,7 +29,6 @@ const FilterListForm = ({ defaultCategories = [], onFilter }) => {
     };
     onFilter(filters);
   };
-
 
   return (
     <form onSubmit={handleSubmit}>

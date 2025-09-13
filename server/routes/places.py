@@ -30,15 +30,14 @@ def get_places_by_category(category):
     sliced = ut.formatted_data(all_results[start:end])  
     if page_count > 3:
         return jsonify({ 
-            "errMsg": "Your Free plan expired, please switch to our premium plans for more benefits." 
+            "infoMsg": "Your Free plan expired, please switch to our premium plans for more benefits." 
         }), 403
 
     print("\nTotal-matches found: ", total_matches)
     return jsonify({
-        "success": True,
         "count": len(sliced),
         "total": total_matches,
-        "data": sliced,
+        "places": sliced,
         "msg": f"Your recommendations on {category}"
     }), 200
 

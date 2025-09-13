@@ -11,13 +11,52 @@ UNSPLASH_KEY = os.getenv("UNSPLASH_ACCESS_KEY")
 
 
 keywords = {
-    "beach": ["beach", "beaches", "sea", "coast"],
-    "mountain": ["mountain", "hill", "peak"],
-    "heritage": ["temple", "fort", "palace", "heritage"],
-    "adventure": ["trek", "trekking", "rafting", "safari"],
-    "city": ["city", "urban", "metropolis"],
-    "road-trip": ["highway", "drive", "driving"]
+    "beach": [
+        "goa", "andaman", "beach", "sea", "shore", "cove", "sandy", "sunset", "waves", "resort"
+    ],
+    "beaches": [
+        "goa", "andaman", "beach", "sea", "shore", "cove", "sandy", "sunset", "waves", "resort"
+    ],
+    "mountain": [
+        "mountain", "hill", "peak", "ridge", "snow", "valley", "glacier", "meadow",
+        "manali", "leh", "kashmir", "nainital", "darjeeling"
+    ],
+    "mountains": [
+        "mountain", "hill", "peak", "ridge", "snow", "valley", "glacier", "meadow",
+        "manali", "leh", "kashmir", "nainital", "darjeeling"
+    ],
+    "heritage": [
+        "temple", "fort", "palace", "heritage", "monument", "architecture", "museum", "agra", "jaipur", "khajuraho"
+    ],
+    "heritages": [
+        "temple", "fort", "palace", "heritage", "monument", "architecture", "museum", "agra", "jaipur", "khajuraho"
+    ],
+    "adventure": [
+        "trek", "rafting", "safari", "paragliding", "bungee", "rafting", "camping",
+        "zipline", "climbing", "river rafting", "andaman", "himalayas"
+    ],
+    "adventures": [
+        "trek", "rafting", "safari", "paragliding", "bungee", "rafting", "camping",
+        "zipline", "climbing", "river rafting", "andaman", "himalayas"
+    ],
+    "city": [
+        "delhi", "bengaluru", "mumbai", "chennai", "pune", "city", "urban", "nightlife",
+        "shopping", "cafes", "restaurants", "architecture", "metro"
+    ],
+    "cities": [
+        "delhi", "bengaluru", "mumbai", "chennai", "pune", "city", "urban", "nightlife",
+        "shopping", "cafes", "restaurants", "architecture", "metro"
+    ],
+    "road-trip": [
+        "highway", "drive", "scenic route", "rotang la", "khardung la", "leh", "manali",
+        "valley road", "pass", "mountain road"
+    ],
+    "road-trips": [
+        "highway", "drive", "scenic route", "rotang la", "khardung la", "leh", "manali",
+        "valley road", "pass", "mountain road"
+    ]
 }
+
 
 # Helper: Unsplash se ek image fetch
 def fetch_image(query):

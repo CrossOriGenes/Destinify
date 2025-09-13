@@ -1,6 +1,24 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
+const MESSAGES = [
+  "Fetching resources",
+  "Personalizing your suggestions...",
+  "Almost there...",
+  "Just a moment...",
+];
+
 const LoaderBackdrop = () => {
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIdx((prevIndex) => (prevIndex + 1) % MESSAGES.length);
+    }, 2500);
+    
+    return () => clearInterval(interval)
+  }, []);
+  
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -17,7 +35,7 @@ const LoaderBackdrop = () => {
         </div>
       </div>
       <p className="uppercase font-bold text-lg tracking-widest text-white">
-        Personalizing your suggestions...
+        {MESSAGES[idx]}
       </p>
     </motion.div>
   );

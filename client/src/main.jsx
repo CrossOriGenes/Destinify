@@ -8,7 +8,7 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ToastContainer
       position="top-right"
-      autoClose={8000}
+      autoClose={12000}
       newestOnTop={false}
       closeOnClick={true}
       draggable

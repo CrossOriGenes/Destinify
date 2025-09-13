@@ -72,7 +72,7 @@ const Menu = ({ onClose }) => {
               exit="hidden"
               className="inline-flex items-center py-1.5 w-full hover:bg-gray-400 rounded-sm cursor-default"
               onClick={() => {
-                navigate("profile");
+                navigate("../profile");
                 onClose();
               }}
             >

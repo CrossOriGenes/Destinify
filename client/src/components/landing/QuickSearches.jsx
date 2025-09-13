@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import RatingsStar from "../UI/RatingsStar";
 
@@ -26,6 +27,7 @@ const PLACES = [
 ];
 
 const QuickSearches = () => {
+  const navigate = useNavigate();
   const { scrollY } = useScroll();
   const textYScroll = useTransform(
     scrollY,
@@ -55,14 +57,17 @@ const QuickSearches = () => {
         <div className="flex flex-col w-1/3 -mt-3.5 z-6" data-aos="fade-up">
           <p className="text-gray-500 font-medium text-sm mb-6">
             Escape the ordinary and scale breathtaking heights of the peaks of
-            Kathmandu! Our hiking package recommendations are designed specially
-            for witnessing every level of adventure, offering unforgettable
-            views, local culture, and the pure joy of conquering nature.
+            India! Our hiking package recommendations are designed specially for
+            witnessing every level of adventure, offering unforgettable views,
+            local culture, and the pure joy of conquering nature.
             <br />
-            Visit the link below to get direct access to all hiking packages for
-            Nepal and the foothills of Everest
+            Find the detailed whereabouts and more suggestive areas apt for your
+            hilly adventure on the land of India!
           </p>
-          <button className="btn w-35 cursor-pointer z-3">
+          <button
+            className="btn w-35 cursor-pointer z-3"
+            onClick={() => navigate("/places?category=mountain")}
+          >
             <span className="font-bold text-sm uppercase tracking-wide text-white">
               View More
             </span>
