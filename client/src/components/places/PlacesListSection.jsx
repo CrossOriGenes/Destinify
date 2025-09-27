@@ -118,7 +118,7 @@ const PlacesListSection = () => {
       if (page > 1) window.scrollTo({ top: 0, behavior: "smooth" });
       setLoading(page === 1 ? "overlay" : "skeleton");
       const response = await fetch(
-        `${BASE_URL}/api/places/category/${category}?count-request=${page}`
+        `${BASE_URL}/places/category/${category}?count-request=${page}`
       );
       const result = await response.json();
       if (response.status === 200) {
@@ -161,7 +161,7 @@ const PlacesListSection = () => {
     //   if (page > 1) window.scrollTo({ top: 0, behavior: "smooth" });
     //   setLoading(page === 1 ? "overlay" : "skeleton");
     //   const response = await fetch(
-    //     `${BASE_URL}/api/places/category/${category}?count-request=${page}`
+    //     `${BASE_URL}/places/place/${place}?count-request=${page}`
     //   );
     //   const result = await response.json();
     //   if (response.status === 200) {
@@ -204,7 +204,7 @@ const PlacesListSection = () => {
     //   if (page > 1) window.scrollTo({ top: 0, behavior: "smooth" });
     //   setLoading(page === 1 ? "overlay" : "skeleton");
     //   const response = await fetch(
-    //     `${BASE_URL}/api/places/category/${category}?count-request=${page}`
+    //     `${BASE_URL}/places/recommend?count-request=${page}`
     //   );
     //   const result = await response.json();
     //   if (response.status === 200) {
