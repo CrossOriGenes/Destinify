@@ -19,7 +19,7 @@ const MainHeader = ({ activeLink, setActiveLink, fixedClass }) => {
     <>
       <header
         className={`${
-          fixedClass ? "fixed" : "absolute"
+          fixedClass ? "fixed backdrop-blur-3xl" : "absolute"
         } top-0 left-0 w-full py-4 px-12 flex items-center justify-between transition-all duration-500 z-10`}
         data-aos="fade-in"
       >

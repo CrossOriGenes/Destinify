@@ -82,3 +82,9 @@
 }
 
 /* //modal popup */
+
+all_results = ut.apply_month_filter(all_results)
+city_names = list({p.get("City") for p in all_results if p.get("City")})
+festival_place_ids = ut.get_current_festival_place_ids(city_names, all_results)
+final_data = ut.apply_festival_boost(all_results, festival_place_ids) if festival_place_ids else all_results
+    

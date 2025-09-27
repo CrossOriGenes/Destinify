@@ -1,94 +1,97 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "react-toastify";
 import SearchBar from "./SearchBar";
+import { PlaceCardSkeleton } from "../UI/LoaderSkeletons";
 import RatingsStar from "../UI/RatingsStar";
 import FilterListForm from "./FilterListForm";
 import LoaderBackdrop from "../UI/LoaderBackdrop";
-import { toast } from "react-toastify";
 import Modal from "../UI/Modal";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const PLACES = [
-  {
-    _id: "001",
-    place_name: "Udaipur",
-    pic: "/images/Udaipur.jpg",
-    subtitle: "(20+ Best visiting Place)",
-    description: "Romantic lakes & regal palaces.",
-    rating_val: 4,
-  },
-  {
-    _id: "002",
-    place_name: "Odisha",
-    pic: "/images/Odisha.jpg",
-    subtitle: "(10+ Best visiting Place)",
-    description: "Spiritual vibes & historic treasures.",
-    rating_val: 4.5,
-  },
-  {
-    _id: "003",
-    place_name: "Punjab",
-    pic: "/images/Punjab.jpg",
-    subtitle: "(15+ Best visiting Place)",
-    description: "Where tradition meets vibrant hospitality.",
-    rating_val: 4,
-  },
-  {
-    _id: "004",
-    place_name: "Goa",
-    pic: "/images/Goa.jpg",
-    subtitle: "(5+ Best visiting Place)",
-    description: "Sun, sand & soul soothing vibes.",
-    rating_val: 3.5,
-  },
-  {
-    _id: "005",
-    place_name: "Sikkim",
-    pic: "/images/Sikkim.jpg",
-    subtitle: "(10+ Best visiting Place)",
-    description: "Serenity in every snow-capped peak.",
-    rating_val: 5,
-  },
-  {
-    _id: "006",
-    place_name: "Kerala",
-    pic: "/images/Kerala.jpg",
-    subtitle: "(20+ Best visiting Place)",
-    description: "The beauty of the God's-own country.",
-    rating_val: 4.5,
-  },
-  {
-    _id: "007",
-    place_name: "Manali",
-    pic: "/images/Manali.jpg",
-    subtitle: "(20+ Best visiting Place)",
-    description: "Snowy escapes in Himachal Pradesh.",
-    rating_val: 4,
-  },
-  {
-    _id: "008",
-    place_name: "Leh",
-    pic: "/images/Leh.jpg",
-    subtitle: "(30+ Best visiting Place)",
-    description: "Cozy heaven of Earth.",
-    rating_val: 4.5,
-  },
-  {
-    _id: "009",
-    place_name: "Everest",
-    pic: "/images/Himalayas.jpg",
-    subtitle: "(10+ Best visiting Place)",
-    description: "Where the Earth touches the sky.",
-    rating_val: 3,
-  },
-];
+// const PLACES = [
+//   {
+//     _id: "001",
+//     place_name: "Udaipur",
+//     pic: "/images/Udaipur.jpg",
+//     subtitle: "(20+ Best visiting Place)",
+//     description: "Romantic lakes & regal palaces.",
+//     rating_val: 4,
+//   },
+//   {
+//     _id: "002",
+//     place_name: "Odisha",
+//     pic: "/images/Odisha.jpg",
+//     subtitle: "(10+ Best visiting Place)",
+//     description: "Spiritual vibes & historic treasures.",
+//     rating_val: 4.5,
+//   },
+//   {
+//     _id: "003",
+//     place_name: "Punjab",
+//     pic: "/images/Punjab.jpg",
+//     subtitle: "(15+ Best visiting Place)",
+//     description: "Where tradition meets vibrant hospitality.",
+//     rating_val: 4,
+//   },
+//   {
+//     _id: "004",
+//     place_name: "Goa",
+//     pic: "/images/Goa.jpg",
+//     subtitle: "(5+ Best visiting Place)",
+//     description: "Sun, sand & soul soothing vibes.",
+//     rating_val: 3.5,
+//   },
+//   {
+//     _id: "005",
+//     place_name: "Sikkim",
+//     pic: "/images/Sikkim.jpg",
+//     subtitle: "(10+ Best visiting Place)",
+//     description: "Serenity in every snow-capped peak.",
+//     rating_val: 5,
+//   },
+//   {
+//     _id: "006",
+//     place_name: "Kerala",
+//     pic: "/images/Kerala.jpg",
+//     subtitle: "(20+ Best visiting Place)",
+//     description: "The beauty of the God's-own country.",
+//     rating_val: 4.5,
+//   },
+//   {
+//     _id: "007",
+//     place_name: "Manali",
+//     pic: "/images/Manali.jpg",
+//     subtitle: "(20+ Best visiting Place)",
+//     description: "Snowy escapes in Himachal Pradesh.",
+//     rating_val: 4,
+//   },
+//   {
+//     _id: "008",
+//     place_name: "Leh",
+//     pic: "/images/Leh.jpg",
+//     subtitle: "(30+ Best visiting Place)",
+//     description: "Cozy heaven of Earth.",
+//     rating_val: 4.5,
+//   },
+//   {
+//     _id: "009",
+//     place_name: "Everest",
+//     pic: "/images/Himalayas.jpg",
+//     subtitle: "(10+ Best visiting Place)",
+//     description: "Where the Earth touches the sky.",
+//     rating_val: 3,
+//   },
+// ];
 
 const PlacesListSection = () => {
-  const [loading, setLoading] = useState(false);
+  const fetchedRef = useRef(false);
+  const [loading, setLoading] = useState("");
+  const [msg, setMsg] = useState("");
   const [open, setOpen] = useState(false);
+  const [cnt, setCnt] = useState(1);
   const [places, setPlaces] = useState([]);
-  const [subscribeMsg, setSubscribeMsg] = useState("");
   const { state, search } = useLocation();
   const query = new URLSearchParams(search);
   const category = query.get("category");
@@ -109,23 +112,35 @@ const PlacesListSection = () => {
       lon: longitude,
     });
   }
-  async function fetchPlacesByCategory() {
+  async function fetchPlacesByCategory(page) {
     try {
-      setLoading(true);
+      console.log(page);
+      if (page > 1) window.scrollTo({ top: 0, behavior: "smooth" });
+      setLoading(page === 1 ? "overlay" : "skeleton");
       const response = await fetch(
-        `${BASE_URL}/api/places/category/${category}?count-request=1`
+        `${BASE_URL}/api/places/category/${category}?count-request=${page}`
       );
       const result = await response.json();
-      setLoading(false);
       if (response.status === 200) {
-        setPlaces(result.places);
-        toast.success(result.msg);
+        setPlaces((prev) => {
+          if (page === 1) return result.places;
+          const temp = [...prev, ...result.places];
+          const uniquePlaces = [
+            ...new Map(temp.map((item) => [item.Place, item])).values(),
+          ];
+          // console.log(uniquePlaces);
+          return uniquePlaces;
+        });
+        if (page === 1)
+          toast.success(
+            <p className="text-[12.5px] font-semibold">{result.msg}</p>
+          );
         console.log(result);
         return;
       }
       if (response.status === 403) {
-        setSubscribeMsg(result.infoMsg);
-        toast.warning("Your Free tier expired!");
+        setMsg(result.infoMsg);
+        toast.warning("You're out of limit!");
         setOpen(true);
         return;
       }
@@ -136,148 +151,280 @@ const PlacesListSection = () => {
     } catch (e) {
       toast.error("Sorry, Something went wrong!😢");
       console.log(e);
+    } finally {
+      setLoading("");
     }
+  }
+  async function fetchPlacesByName(page) {
+    // try {
+    //   console.log(page);
+    //   if (page > 1) window.scrollTo({ top: 0, behavior: "smooth" });
+    //   setLoading(page === 1 ? "overlay" : "skeleton");
+    //   const response = await fetch(
+    //     `${BASE_URL}/api/places/category/${category}?count-request=${page}`
+    //   );
+    //   const result = await response.json();
+    //   if (response.status === 200) {
+    //     setPlaces((prev) => {
+    //       if (page === 1) return result.places;
+    //       const temp = [...prev, ...result.places];
+    //       const uniquePlaces = [
+    //         ...new Map(temp.map((item) => [item.Place, item])).values(),
+    //       ];
+    //       // console.log(uniquePlaces);
+    //       return uniquePlaces;
+    //     });
+    //     if (page === 1)
+    //       toast.success(
+    //         <p className="text-[12.5px] font-semibold">{result.msg}</p>
+    //       );
+    //     console.log(result);
+    //     return;
+    //   }
+    //   if (response.status === 403) {
+    //     setMsg(result.infoMsg);
+    //     toast.warning("You're out of limit!");
+    //     setOpen(true);
+    //     return;
+    //   }
+    //   if (response.status === 400) {
+    //     toast.error(result.errMsg);
+    //     return;
+    //   }
+    // } catch (e) {
+    //   toast.error("Sorry, Something went wrong!😢");
+    //   console.log(e);
+    // } finally {
+    //   setLoading("");
+    // }
+  }
+  async function fetchPlacesByJourneyData(page) {
+    // try {
+    //   console.log(page);
+    //   if (page > 1) window.scrollTo({ top: 0, behavior: "smooth" });
+    //   setLoading(page === 1 ? "overlay" : "skeleton");
+    //   const response = await fetch(
+    //     `${BASE_URL}/api/places/category/${category}?count-request=${page}`
+    //   );
+    //   const result = await response.json();
+    //   if (response.status === 200) {
+    //     setPlaces((prev) => {
+    //       if (page === 1) return result.places;
+    //       const temp = [...prev, ...result.places];
+    //       const uniquePlaces = [
+    //         ...new Map(temp.map((item) => [item.Place, item])).values(),
+    //       ];
+    //       // console.log(uniquePlaces);
+    //       return uniquePlaces;
+    //     });
+    //     if (page === 1)
+    //       toast.success(
+    //         <p className="text-[12.5px] font-semibold">{result.msg}</p>
+    //       );
+    //     console.log(result);
+    //     return;
+    //   }
+    //   if (response.status === 403) {
+    //     setMsg(result.infoMsg);
+    //     toast.warning("You're out of limit!");
+    //     setOpen(true);
+    //     return;
+    //   }
+    //   if (response.status === 400) {
+    //     toast.error(result.errMsg);
+    //     return;
+    //   }
+    // } catch (e) {
+    //   toast.error("Sorry, Something went wrong!😢");
+    //   console.log(e);
+    // } finally {
+    //   setLoading("");
+    // }
+  }
+  function addMorePlacesHandler(payload) {
+    setCnt((prev) => {
+      const next = prev + 1;
+      if (payload === "categ") {
+        fetchPlacesByCategory(next);
+      } else if (payload === "place") {
+        fetchPlacesByName(next);
+      } else if (payload === "recom") {
+        fetchPlacesByJourneyData(next);
+      } else {
+        return null;
+      }
+      return next;
+    });
+    // console.log(cnt);
   }
 
   useEffect(() => {
-    if (category && places.length === 0) {
-      fetchPlacesByCategory();
+    if (!fetchedRef.current && category && places.length === 0) {
+      fetchPlacesByCategory(cnt);
+      fetchedRef.current = true;
       // console.log(category);
     }
     if (place) console.log(place);
+    console.log(cnt);
   }, []);
 
   return (
     <>
-      {loading && <LoaderBackdrop />}
-      {!loading && (
-        <section className="relative w-full min-h-screen bg-gray-800 overflow-hidden">
-          <SearchBar
-            onSubmit={filterByPlaceHandler}
-            onLocSuccess={filterByYourLocation}
-          />
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-            <aside className="lg:col-span-1 my-6 p-6">
-              {state && (
-                <div className="w-full h-[300px] border-2 border-indigo-500 rounded-2xl mt-2 ml-2 p-4 bg-indigo-950 text-gray-200 flex flex-col overflow-hidden">
-                  <h5
-                    className="text-sm font-light mb-1"
-                    data-aos="fade-left"
-                    data-aos-delay={100}
-                  >
-                    <span className="font-bold text-indigo-200">
-                      Journey-date: &nbsp;
-                    </span>
-                    {journeyData?.journey_date ?? "N.A."}
-                  </h5>
-                  <h5
-                    className="text-sm font-light mb-1"
-                    data-aos="fade-left"
-                    data-aos-delay={200}
-                  >
-                    <span className="font-bold text-indigo-200">
-                      Return-date: &nbsp;
-                    </span>
-                    {journeyData?.return_date ?? "N.A."}
-                  </h5>
-                  <h5
-                    className="text-sm font-light mb-1"
-                    data-aos="fade-left"
-                    data-aos-delay={300}
-                  >
-                    <span className="font-bold text-indigo-200">
-                      Total-duration: &nbsp;
-                    </span>
-                    {journeyData.days ? `${journeyData.days} day(s)` : "N.A."}
-                  </h5>
-                  <p
-                    className="font-light text-sm text-justify leading-4.5 mt-2 overflow-ellipsis"
-                    data-aos="fade-left"
-                    data-aos-delay={400}
-                  >
-                    {journeyData?.description ?? ""}
-                  </p>
-                </div>
-              )}
-              <FilterListForm
-                onFilter={filterByPropsHandler}
-                prompt={state ? true : false}
-              />
-            </aside>
+      <section className="relative w-full min-h-screen bg-gray-800 overflow-hidden">
+        {loading === "overlay" && <LoaderBackdrop />}
+        {!loading && (
+          <div className="relative">
+            <SearchBar
+              onSubmit={filterByPlaceHandler}
+              onLocSuccess={filterByYourLocation}
+            />
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+              <aside className="lg:col-span-1 my-6 p-6">
+                {state && (
+                  <div className="w-full h-[300px] border-2 border-indigo-500 rounded-2xl mt-2 ml-2 p-4 bg-indigo-950 text-gray-200 flex flex-col overflow-hidden">
+                    <h5
+                      className="text-sm font-light mb-1"
+                      data-aos="fade-left"
+                      data-aos-delay={100}
+                    >
+                      <span className="font-bold text-indigo-200">
+                        Journey-date: &nbsp;
+                      </span>
+                      {journeyData?.journey_date ?? "N.A."}
+                    </h5>
+                    <h5
+                      className="text-sm font-light mb-1"
+                      data-aos="fade-left"
+                      data-aos-delay={200}
+                    >
+                      <span className="font-bold text-indigo-200">
+                        Return-date: &nbsp;
+                      </span>
+                      {journeyData?.return_date ?? "N.A."}
+                    </h5>
+                    <h5
+                      className="text-sm font-light mb-1"
+                      data-aos="fade-left"
+                      data-aos-delay={300}
+                    >
+                      <span className="font-bold text-indigo-200">
+                        Total-duration: &nbsp;
+                      </span>
+                      {journeyData.days ? `${journeyData.days} day(s)` : "N.A."}
+                    </h5>
+                    <p
+                      className="font-light text-sm text-justify leading-4.5 mt-2 overflow-ellipsis"
+                      data-aos="fade-left"
+                      data-aos-delay={400}
+                    >
+                      {journeyData?.description ?? ""}
+                    </p>
+                  </div>
+                )}
+                <FilterListForm
+                  onFilter={filterByPropsHandler}
+                  prompt={state ? true : false}
+                />
+              </aside>
 
-            <div className="lg:col-span-3 px-6 mt-12 mb-48">
-              <h3 className="font-extrabold text-4xl text-white mb-6">
-                Your <span className="text-indigo-500">Suggestions</span>{" "}
-              </h3>
-              <div className="space-y-6">
-                {places.map((p, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.5,
-                      delay: idx * 0.15,
-                    }}
-                    viewport={{ once: true }}
-                    className="card relative group rounded-3xl h-[200px] py-4 px-5 shadow-lg cursor-pointer overflow-clip hover:shadow-xl hover:shadow-gray-500 hover:scale-101 hover:rotate-1 transition duration-300"
-                    onClick={() => navigate(p._id)}
-                  >
-                    <div
-                      className="absolute bottom-0 left-0 w-full h-[200px] bg-blend-screen z-1"
-                      style={{
-                        background:
-                          "linear-gradient(to top, #000, transparent)",
-                      }}
-                    />
-                    <img
-                      src={p.Place_images[0]}
-                      alt={p.place_name}
-                      className="absolute top-0 left-0 w-full h-full object-cover group-hover:scale-120 transition-transform duration-300"
-                    />
-                    <div className="w-full h-full relative flex items-end justify-between text-white z-2 opacity-90">
-                      <div className="flex flex-col">
-                        <div className="flex flex-row items-center gap-1">
-                          <RatingsStar
-                            value={p.Place_Rating}
-                            style={{ maxWidth: 85 }}
+              <div className="lg:col-span-3 px-6 mt-12 mb-48">
+                <h3 className="font-extrabold text-4xl text-white mb-6">
+                  Your <span className="text-indigo-500">Suggestions</span>{" "}
+                </h3>
+                <div className="space-y-6">
+                  {loading === "skeleton" ? (
+                    <>
+                      <PlaceCardSkeleton />
+                      <PlaceCardSkeleton />
+                      <PlaceCardSkeleton />
+                      <PlaceCardSkeleton />
+                    </>
+                  ) : (
+                    <>
+                      {places.map((p, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, y: 30 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.5,
+                            delay: idx * 0.15,
+                          }}
+                          viewport={{ once: true }}
+                          className="card relative group rounded-3xl h-[200px] py-4 px-5 shadow-lg cursor-pointer overflow-clip hover:shadow-xl hover:shadow-gray-500 hover:scale-101 hover:rotate-1 transition duration-300"
+                          onClick={() => navigate(p._id)}
+                        >
+                          <div
+                            className="absolute bottom-0 left-0 w-full h-[200px] bg-blend-screen z-1"
+                            style={{
+                              background:
+                                "linear-gradient(to top, #000, transparent)",
+                            }}
                           />
-                        </div>
-                        <h3 className="font-extrabold text-2xl">{p.Place}</h3>
-                        <div className="flex items-center my-1.5 text-indigo-200">
-                          <i className="fa-solid fa-location-dot text-xs" />
-                          <span className="text-xs font-medium ml-0.5">
-                            {p.City}
-                          </span>
-                        </div>
-                        <p className="relative text-xs font-medium text-gray-400 w-[350px] overflow-hidden text-ellipsis whitespace-nowrap">
-                          {p.Place_Desc}
-                        </p>
+                          <img
+                            src={p.Place_images[0]}
+                            alt={p.place_name}
+                            className="absolute top-0 left-0 w-full h-full object-cover group-hover:scale-120 transition-transform duration-300"
+                          />
+                          <div className="w-full h-full relative flex items-end justify-between text-white z-2 opacity-90">
+                            <div className="flex flex-col">
+                              <div className="flex flex-row items-center gap-1">
+                                <RatingsStar
+                                  value={p.Place_Rating}
+                                  style={{ maxWidth: 85 }}
+                                />
+                              </div>
+                              <h3 className="font-extrabold text-2xl">
+                                {p.Place}
+                              </h3>
+                              <div className="flex items-center my-1.5 text-indigo-200">
+                                <i className="fa-solid fa-location-dot text-xs" />
+                                <span className="text-xs font-medium ml-0.5">
+                                  {p.City}
+                                </span>
+                              </div>
+                              <p className="relative text-xs font-medium text-gray-400 w-[350px] overflow-hidden text-ellipsis whitespace-nowrap">
+                                {p.Place_Desc}
+                              </p>
+                            </div>
+                            <div className="w-[25px] h-[25px] flex items-center justify-center rounded-full border-2 border-indigo-400">
+                              <i className="fa fa-arrow-right text-sm text-indigo-400 rotate-45 transition duration-300 group-hover:rotate-0" />
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                      <div
+                        className="w-full h-[200px] group flex justify-center items-center border-4 border-dashed border-cyan-500 rounded-3xl text-2xl hover:bg-cyan-800 hover:border-cyan-800 !transition !duration-300 cursor-pointer"
+                        data-aos="fade-up"
+                        onClick={() => {
+                          addMorePlacesHandler(
+                            category
+                              ? "categ"
+                              : place
+                              ? "place"
+                              : state
+                              ? "recom"
+                              : ""
+                          );
+                        }}
+                      >
+                        <span className="text-gray-100 me-2">View More</span>
+                        <i className="fa-solid fa-arrow-down text-indigo-400 text-xl" />
                       </div>
-                      <div className="w-[25px] h-[25px] flex items-center justify-center rounded-full border-2 border-indigo-400">
-                        <i className="fa fa-arrow-right text-sm text-indigo-400 rotate-45 transition duration-300 group-hover:rotate-0" />
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-                <div
-                  className="w-full h-[200px] group flex justify-center items-center border-4 border-dashed border-cyan-500 rounded-3xl text-2xl hover:bg-cyan-800 hover:border-cyan-800 !transition !duration-300 cursor-pointer"
-                  data-aos="fade-up"
-                >
-                  <span className="text-gray-100 me-2">View More</span>
-                  <i className="fa-solid fa-arrow-down text-indigo-400 text-xl" />
+                    </>
+                  )}
                 </div>
               </div>
             </div>
+            <div
+              className="absolute bottom-0 left-0 w-full h-[100px] bg-blend-screen z-3"
+              style={{
+                background: "linear-gradient(to top, #030712, transparent)",
+              }}
+            />
           </div>
-          <div
-            className="absolute bottom-0 left-0 w-full h-[100px] bg-blend-screen z-3"
-            style={{
-              background: "linear-gradient(to top, #030712, transparent)",
-            }}
-          />
-        </section>
-      )}
+        )}
+      </section>
 
       <AnimatePresence>
         {open && (
@@ -288,15 +435,13 @@ const PlacesListSection = () => {
               </h2>
             </header>
             <div className="flex flex-col p-2">
-              <p className="text-gray-400 text-md leading-5 mt-2 mb-3">
-                {subscribeMsg ? subscribeMsg : ""}
-              </p>
+              <p className="text-gray-400 text-md leading-5 mt-2 mb-3">{msg}</p>
               <div className="flex items-end justify-end pt-1.5">
                 <motion.button
                   whileTap={{ scale: 0.8 }}
                   type="button"
                   className="w-35 h-10 py-2 px-4 me-2 flex items-center justify-center bg-gray-950 border-2 border-gray-950 hover:bg-gray-700 hover:border-gray-700 rounded-md transition duration-300 group"
-                  // onClick={}
+                  onClick={() => navigate("../pricing")}
                 >
                   <span className="font-bold text-sm text-white">
                     See Pricing

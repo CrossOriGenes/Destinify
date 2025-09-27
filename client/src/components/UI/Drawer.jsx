@@ -12,7 +12,7 @@ const Backdrop = ({ onClose }) => {
   );
 };
 
-const Drawer = ({ className, titleHead, onClose, children }) => {
+const Drawer = ({ className, titleText, onClose, children }) => {
   return createPortal(
     <>
       <Backdrop />
@@ -24,9 +24,7 @@ const Drawer = ({ className, titleHead, onClose, children }) => {
         className="fixed top-0 right-0 h-screen w-[22rem] py-4 px-2 bg-gray-700 z-10"
       >
         <header className="flex justify-between items-center p-2">
-          <h1 className="text-4xl font-extrabold text-white ml-1">
-            {titleHead}
-          </h1>
+          {titleText}
           <motion.div
             whileTap={{ scale: 0.9 }}
             transition={{ type: "spring", stiffness: 800 }}

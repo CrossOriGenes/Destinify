@@ -28,10 +28,18 @@ const Header = () => {
           <motion.div
             whileTap={{ scale: 0.8 }}
             transition={{ type: "spring", stiffness: 700 }}
-            className="group flex justify-center items-center cursor-pointer hover:bg-[rgba(0,0,0,0.2)] py-2 px-1 -mx-1 rounded-full"
+            className="group flex justify-center items-center w-[35px] h-[35px] cursor-pointer mt-1 -mx-1"
+            onClick={() => setOpen("notification_menu")}
+          >
+            <i className="fa-solid fa-bell text-[21.5px] transition duration-300 text-gray-700 group-hover:text-gray-300" />
+          </motion.div>
+          <motion.div
+            whileTap={{ scale: 0.8 }}
+            transition={{ type: "spring", stiffness: 700 }}
+            className="group flex justify-center items-center w-[35px] h-[35px] cursor-pointer hover:bg-[rgba(0,0,0,0.2)] p-2.5 -mx-1 rounded-full"
             onClick={() => setOpen("wishlist")}
           >
-            <i className="fa-solid fa-bag-shopping text-2xl transition duration-300 text-gray-900 group-hover:text-white" />
+            <i className="fa-solid fa-plane text-xl transition duration-300 text-gray-900 group-hover:text-gray-200 -rotate-45" />
           </motion.div>
 
           <AnimatePresence>

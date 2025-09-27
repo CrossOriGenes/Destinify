@@ -53,7 +53,7 @@ const SearchBar = ({ onSubmit, onLocSuccess }) => {
   return (
     <>
       <div className="relative w-full h-[12rem] p-[70px] flex justify-center items-center bg-white">
-        <div className="w-full flex items-center justify-between gap-[0.5rem] mx-35 -mb-15 z-1">
+        <div className="w-full flex items-center justify-between lg:gap-[0.5rem] gap-[1.5rem] lg:mx-35 -mb-15 z-1">
           <form
             className={`relative ${!place ? "w-[92%]" : "w-full"}`}
             onSubmit={handleSearchPlaceSubmitHandler}

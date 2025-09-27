@@ -4,7 +4,14 @@ import { RatingHeart } from "./RatingsStar";
 
 const Wishlist = ({ onClose }) => {
   return (
-    <Drawer titleHead="Wishlist" onClose={onClose}>
+    <Drawer
+      titleText={
+        <h1 className="text-4xl font-extrabold text-white ml-1">
+          Your <span className="text-indigo-500">Favs</span>
+        </h1>
+      }
+      onClose={onClose}
+    >
       <motion.ul
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

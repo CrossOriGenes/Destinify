@@ -66,7 +66,7 @@ const QuickSearches = () => {
           </p>
           <button
             className="btn w-35 cursor-pointer z-3"
-            onClick={() => navigate("/places?category=mountain")}
+            onClick={() => navigate("/places?category=trek,hills")}
           >
             <span className="font-bold text-sm uppercase tracking-wide text-white">
               View More
@@ -78,8 +78,8 @@ const QuickSearches = () => {
           className="text-8xl sigmar-font text-white text-right leading-20 transform translate-y-1/2"
           style={{ y: textYScroll }}
         >
-          Want to hike the{" "}
-          <span className="sigmar-font text-indigo-400">Himalayas?</span>
+          Want to go for{" "}
+          <span className="sigmar-font text-indigo-400">Trekking?</span>
         </motion.h1>
         <motion.img
           src="/images/mountain_range-2.png"

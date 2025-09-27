@@ -36,13 +36,11 @@ const Hero = () => {
   const [slide, setSlide] = useState(0);
   const [ready, setReady] = useState(false);
   const videoRef = useRef(null);
-
+  
   useEffect(() => {
-    if (!ready) return;
-
     const interval = setInterval(() => {
       setSlide((prev) => (prev + 1) % SLIDES.length);
-    }, 12000);
+    }, 12000); 
 
     return () => clearInterval(interval);
   }, []);
@@ -64,6 +62,7 @@ const Hero = () => {
           autoPlay
           muted
           loop
+          playsInline
           onCanPlay={handleVideoReady}
           className={`video-slide absolute top-0 left-0 w-full h-[98vh] rounded-b-4xl object-cover z-2 ${
             idx === slide ? "active opacity-100" : "opacity-0"
@@ -93,7 +92,7 @@ const Hero = () => {
           {currentSlide.description}
         </p>
         <Link to="/home" className="btn-dark mt-8 z-2" data-aos="fade-up">
-          <span className="uppercase font-semibold tracking-wider text-white">
+          <span className="uppercase font-bold tracking-wider text-white">
             Learn More
           </span>
         </Link>

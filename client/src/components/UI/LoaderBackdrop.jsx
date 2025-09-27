@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 const MESSAGES = [
-  "Fetching resources",
+  "Fetching resources...",
   "Personalizing your suggestions...",
   "Almost there...",
   "Just a moment...",

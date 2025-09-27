@@ -31,7 +31,7 @@ const Error404 = () => {
           Sorry, we couldn't find the page you're looking for.
         </p>
         <motion.a
-          href="../.."
+          href="../../home"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           transition={{ type: "spring", damping: 15, stiffness: 900 }}
