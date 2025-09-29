@@ -74,6 +74,229 @@ def get_places_by_name(place):
     }), 200
 
             
+# ====================================
+# GET PLACES QUICK ACCESS SUMMARIES
+# ====================================
+
+# ------------ set 1 ---------------
+@places_routes.route("/summaries/s1")
+def get_summary_set_1():
+    # 1
+    cursor_1 = Places.find({"City_Desc": {"$regex": "odisha", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_1))
+    place_1 = {
+        "place_name": "Odisha",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    }  
+    # 2
+    cursor_2 = Places.find({"City_Desc": {"$regex": "goa", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_2))
+    place_2 = {
+        "place_name": "Goa",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    } 
+    # 3
+    cursor_3 = Places.find({"City_Desc": {"$regex": "punjab", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_3))
+    place_3 = {
+        "place_name": "Punjab",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    } 
+    # 4
+    cursor_4 = Places.find({"City_Desc": {"$regex": "udaipur", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_4))
+    place_4 = {
+        "place_name": "Udaipur",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    } 
+    # 5
+    cursor_5 = Places.find({"City_Desc": {"$regex": "sikkim", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_5))
+    place_5 = {
+        "place_name": "Sikkim",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    } 
+    # 6
+    cursor_6 = Places.find({"City_Desc": {"$regex": "kerala", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_6))
+    place_6 = {
+        "place_name": "Kerala",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    } 
+    
+    return jsonify({
+        "success": True,    
+        "data": [ place_1, place_2, place_3, place_4, place_5, place_6 ]
+    }), 200
+
+# ------------ set 2 ---------------
+@places_routes.route("/summaries/s2")
+def get_summary_set_2():
+    # 1
+    cursor_1 = Places.find({"City_Desc": {"$regex": "manali", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_1))
+    place_1 = {
+        "place_name": "Manali",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    } 
+    # 2
+    cursor_2 = Places.find({"City_Desc": {"$regex": "leh", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_2))
+    place_2 = {
+        "place_name": "Leh Ladakh",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    }  
+    # 3
+    cursor_3 = Places.find({"City_Desc": {"$regex": "darjeeling", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_3))
+    place_3 = {
+        "place_name": "Darjeeling",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    } 
+    
+    return jsonify({
+        "success": True,    
+        "data": [ place_1, place_2, place_3]
+    }), 200
+
+# ------------ set 1 ---------------
+@places_routes.route("/summaries/s3")
+def get_summary_set_3():
+    # 1
+    cursor_1 = Places.find({"City_Desc": {"$regex": "varanasi", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_1))
+    place_1 = {
+        "place_name": "Varanasi",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    }  
+    # 2
+    cursor_2 = Places.find({"City_Desc": {"$regex": "jaipur", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_2))
+    place_2 = {
+        "place_name": "Jaipur",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    } 
+    # 3
+    cursor_3 = Places.find({"City_Desc": {"$regex": "bhubaneshwar", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_3))
+    place_3 = {
+        "place_name": "Bhubaneshwar",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    } 
+    # 4
+    cursor_4 = Places.find({"City_Desc": {"$regex": "ooty", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_4))
+    place_4 = {
+        "place_name": "Ooty",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    } 
+    # 5
+    cursor_5 = Places.find({"City_Desc": {"$regex": "rishikesh", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_5))
+    place_5 = {
+        "place_name": "Rishikesh",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    } 
+    # 6
+    cursor_6 = Places.find({"City_Desc": {"$regex": "lakshadweep", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_6))
+    place_6 = {
+        "place_name": "Lakshadweep",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    } 
+    
+    return jsonify({
+        "success": True,    
+        "data": [ place_1, place_2, place_3, place_4, place_5, place_6 ]
+    }), 200
+
+# ------------ set 2 ---------------
+@places_routes.route("/summaries/s4")
+def get_summary_set_4():
+    # 1
+    cursor_1 = Places.find({"City_Desc": {"$regex": "shimla", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_1))
+    place_1 = {
+        "place_name": "Shimla",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    } 
+    # 2
+    cursor_2 = Places.find({"City_Desc": {"$regex": "munnar", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_2))
+    place_2 = {
+        "place_name": "Munnar",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    }  
+    # 3
+    cursor_3 = Places.find({"City_Desc": {"$regex": "coorg", "$options": "i"}}).sort("City_Rating", -1)
+    temp = ut.formatted_data(list(cursor_3))
+    place_3 = {
+        "place_name": "Coorg",
+        "pic": temp[0].get("Place_images")[0],
+        "subtitle": f"({len(temp)}+ Best visiting Place)",
+        "description": temp[0].get("City_Desc").split(".")[0],
+        "rating_val": temp[0].get("City_Rating"),
+    } 
+    
+    return jsonify({
+        "success": True,    
+        "data": [ place_1, place_2, place_3]
+    }), 200
+
+
+
+
 # get recommendations list 
 @places_routes.route("/recommend", methods=['POST'])
 def get_place_recommendations():
@@ -98,8 +321,16 @@ def get_place_recommendations():
 # Test API
 @places_routes.route("/test")
 def test_route():
+    img_url = ut.fetch_image("Dalhousie")
+    if not img_url:
+        return jsonify({ "errMsg": "No image Found!" }), 404
+    result = Places.update_many(
+        { "City": "Dalhousie" },
+        {"$set": {"Place_images": [img_url]}}
+    )
     
+    print(f"Updated {result.modified_count} docs for Dalhousie")
     return jsonify({
         "success": True,
-        "data": {}
+        "count": result.modified_count
     }), 200

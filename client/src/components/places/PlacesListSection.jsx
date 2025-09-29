@@ -156,47 +156,47 @@ const PlacesListSection = () => {
     }
   }
   async function fetchPlacesByName(page) {
-    // try {
-    //   console.log(page);
-    //   if (page > 1) window.scrollTo({ top: 0, behavior: "smooth" });
-    //   setLoading(page === 1 ? "overlay" : "skeleton");
-    //   const response = await fetch(
-    //     `${BASE_URL}/places/place/${place}?count-request=${page}`
-    //   );
-    //   const result = await response.json();
-    //   if (response.status === 200) {
-    //     setPlaces((prev) => {
-    //       if (page === 1) return result.places;
-    //       const temp = [...prev, ...result.places];
-    //       const uniquePlaces = [
-    //         ...new Map(temp.map((item) => [item.Place, item])).values(),
-    //       ];
-    //       // console.log(uniquePlaces);
-    //       return uniquePlaces;
-    //     });
-    //     if (page === 1)
-    //       toast.success(
-    //         <p className="text-[12.5px] font-semibold">{result.msg}</p>
-    //       );
-    //     console.log(result);
-    //     return;
-    //   }
-    //   if (response.status === 403) {
-    //     setMsg(result.infoMsg);
-    //     toast.warning("You're out of limit!");
-    //     setOpen(true);
-    //     return;
-    //   }
-    //   if (response.status === 400) {
-    //     toast.error(result.errMsg);
-    //     return;
-    //   }
-    // } catch (e) {
-    //   toast.error("Sorry, Something went wrong!😢");
-    //   console.log(e);
-    // } finally {
-    //   setLoading("");
-    // }
+    try {
+      console.log(page);
+      if (page > 1) window.scrollTo({ top: 0, behavior: "smooth" });
+      setLoading(page === 1 ? "overlay" : "skeleton");
+      const response = await fetch(
+        `${BASE_URL}/places/place/${place}?count-request=${page}`
+      );
+      const result = await response.json();
+      if (response.status === 200) {
+        setPlaces((prev) => {
+          if (page === 1) return result.places;
+          const temp = [...prev, ...result.places];
+          const uniquePlaces = [
+            ...new Map(temp.map((item) => [item.Place, item])).values(),
+          ];
+          // console.log(uniquePlaces);
+          return uniquePlaces;
+        });
+        if (page === 1)
+          toast.success(
+            <p className="text-[12.5px] font-semibold">{result.msg}</p>
+          );
+        console.log(result);
+        return;
+      }
+      if (response.status === 403) {
+        setMsg(result.infoMsg);
+        toast.warning("You're out of limit!");
+        setOpen(true);
+        return;
+      }
+      if (response.status === 400) {
+        toast.error(result.errMsg);
+        return;
+      }
+    } catch (e) {
+      toast.error("Sorry, Something went wrong!😢");
+      console.log(e);
+    } finally {
+      setLoading("");
+    }
   }
   async function fetchPlacesByJourneyData(page) {
     // try {
@@ -264,7 +264,11 @@ const PlacesListSection = () => {
       fetchedRef.current = true;
       // console.log(category);
     }
-    if (place) console.log(place);
+    if (!fetchedRef.current && place && places.length === 0) {
+      fetchPlacesByName(cnt);
+      fetchedRef.current = true;
+      // console.log(place);
+    }
     console.log(cnt);
   }, []);
 
@@ -312,13 +316,26 @@ const PlacesListSection = () => {
                       </span>
                       {journeyData.days ? `${journeyData.days} day(s)` : "N.A."}
                     </h5>
-                    <p
-                      className="font-light text-sm text-justify leading-4.5 mt-2 overflow-ellipsis"
+                    <h5
+                      className="text-sm font-light mb-1"
                       data-aos="fade-left"
-                      data-aos-delay={400}
+                      data-aos-delay={300}
                     >
-                      {journeyData?.description ?? ""}
-                    </p>
+                      <span className="font-bold text-indigo-200">
+                        Destination: &nbsp;
+                      </span>
+                      {journeyData?.destination ?? "N.A."}
+                    </h5>
+                    <h5
+                      className="text-sm font-light mb-1"
+                      data-aos="fade-left"
+                      data-aos-delay={300}
+                    >
+                      <span className="font-bold text-indigo-200">
+                        Budget: &nbsp;
+                      </span>
+                      {journeyData.budget ? `₹ ${journeyData.budget}` : "--"}
+                    </h5>
                   </div>
                 )}
                 <FilterListForm
@@ -368,12 +385,14 @@ const PlacesListSection = () => {
                           />
                           <div className="w-full h-full relative flex items-end justify-between text-white z-2 opacity-90">
                             <div className="flex flex-col">
-                              <div className="flex flex-row items-center gap-1">
-                                <RatingsStar
-                                  value={p.Place_Rating}
-                                  style={{ maxWidth: 85 }}
-                                />
-                              </div>
+                              {p.Place_Rating > 0.0 && (
+                                <div className="flex flex-row items-center gap-1">
+                                  <RatingsStar
+                                    value={p.Place_Rating}
+                                    style={{ maxWidth: 85 }}
+                                  />
+                                </div>
+                              )}
                               <h3 className="font-extrabold text-2xl">
                                 {p.Place}
                               </h3>

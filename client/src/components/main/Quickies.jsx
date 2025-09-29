@@ -1,83 +1,62 @@
+import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import RatingsStar from "../UI/RatingsStar";
-
-const PLACES = [
-  {
-    place_name: "Udaipur",
-    pic: "/images/Udaipur.jpg",
-    subtitle: "(20+ Best visiting Place)",
-    description: "Romantic lakes & regal palaces.",
-    rating_val: 4,
-  },
-  {
-    place_name: "Odisha",
-    pic: "/images/Odisha.jpg",
-    subtitle: "(10+ Best visiting Place)",
-    description: "Spiritual vibes & historic treasures.",
-    rating_val: 4.5,
-  },
-  {
-    place_name: "Punjab",
-    pic: "/images/Punjab.jpg",
-    subtitle: "(15+ Best visiting Place)",
-    description: "Where tradition meets vibrant hospitality.",
-    rating_val: 4,
-  },
-  {
-    place_name: "Goa",
-    pic: "/images/Goa.jpg",
-    subtitle: "(5+ Best visiting Place)",
-    description: "Sun, sand & soul soothing vibes.",
-    rating_val: 3.5,
-  },
-  {
-    place_name: "Sikkim",
-    pic: "/images/Sikkim.jpg",
-    subtitle: "(10+ Best visiting Place)",
-    description: "Serenity in every snow-capped peak.",
-    rating_val: 5,
-  },
-  {
-    place_name: "Kerala",
-    pic: "/images/Kerala.jpg",
-    subtitle: "(20+ Best visiting Place)",
-    description: "The beauty of the God's-own country.",
-    rating_val: 4.5,
-  },
-];
-
-const PLACES2 = [
-  {
-    place_name: "Manali",
-    pic: "/images/Manali.jpg",
-    subtitle: "(20+ Best visiting Place)",
-    description: "Snowy escapes in Himachal Pradesh.",
-    rating_val: 4,
-  },
-  {
-    place_name: "Leh",
-    pic: "/images/Leh.jpg",
-    subtitle: "(30+ Best visiting Place)",
-    description: "Cozy heaven of Earth.",
-    rating_val: 4.5,
-  },
-  {
-    place_name: "Everest",
-    pic: "/images/Himalayas.jpg",
-    subtitle: "(10+ Best visiting Place)",
-    description: "Where the Earth touches the sky.",
-    rating_val: 3,
-  },
-];
+import { PlaceCardSkeleton2, PlaceCardSkeleton3 } from "../UI/LoaderSkeletons";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Quickies = () => {
+  const fetchedRef1 = useRef(false);
+  const fetchedRef2 = useRef(false);
+  const [places1, setPlaces1] = useState([]);
+  const [places2, setPlaces2] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const { scrollY } = useScroll();
   const mapScrollY = useTransform(
     scrollY,
     [950, 1500, 2000, 2500, 3000, 3200],
     [5, -5, -50, -100, -150, -200]
   );
+  async function fetchPlaceSummary1() {
+    try {
+      setLoading((loading) => !loading);
+      const res = await fetch(`${BASE_URL}/places/summaries/s3`);
+      const result = await res.json();
+
+      if (res.status === 200) setPlaces1(result.data);
+      console.log(result);
+    } catch (err) {
+      console.error("Failed to fetch summaries!", err);
+      return;
+    } finally {
+      setLoading(false);
+    }
+  }
+  async function fetchPlaceSummary2() {
+    try {
+      setLoading((loading) => !loading);
+      const res = await fetch(`${BASE_URL}/places/summaries/s4`);
+      const result = await res.json();
+
+      if (res.status === 200) setPlaces2(result.data);
+    } catch (err) {
+      console.error("Failed to fetch summaries!", err);
+      return;
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    if (!fetchedRef1.current) {
+      fetchPlaceSummary1();
+      fetchedRef1.current = true;
+    }
+    if (!fetchedRef2.current) {
+      fetchPlaceSummary2();
+      fetchedRef2.current = true;
+    }
+  }, []);
 
   return (
     <section
@@ -149,82 +128,29 @@ const Quickies = () => {
           </p>
         </div>
         <div className="grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-8 my-12 mx-10">
-          {PLACES.map((place, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.5,
-                delay: idx * 0.15,
-              }}
-              viewport={{ once: true }}
-              className="card relative group rounded-3xl h-[250px] py-4 px-5 shadow-lg cursor-pointer overflow-clip hover:shadow-xl hover:shadow-gray-500 hover:scale-105 hover:rotate-1 transition duration-300"
-            >
-              <div
-                className="absolute bottom-0 left-0 w-full h-[200px] bg-blend-screen z-1"
-                style={{
-                  background: "linear-gradient(to top, #000, transparent)",
-                }}
-              />
-              <img
-                src={place.pic}
-                alt={place.place_name}
-                className="absolute top-0 left-0 w-full h-full object-cover group-hover:scale-120 transition-transform duration-300"
-              />
-              <div className="w-full h-full relative flex items-end justify-between text-white z-2 opacity-90">
-                <div className="flex flex-col">
-                  <div className="flex flex-row items-center gap-1">
-                    <RatingsStar
-                      value={place.rating_val}
-                      style={{ maxWidth: 85 }}
-                    />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-extrabold text-2xl">
-                      {place.place_name}
-                    </h3>
-                    <span className="text-sm font-medium text-indigo-100">
-                      {place.subtitle}
-                    </span>
-                  </div>
-                  <p className="text-xs font-medium text-gray-400">
-                    {place.description}
-                  </p>
-                </div>
-                <div className="w-[25px] h-[25px] flex items-center justify-center rounded-full border-2 border-indigo-400">
-                  <i className="fa fa-arrow-right text-sm text-indigo-400 rotate-45 transition duration-300 group-hover:rotate-0" />
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-        <div className="relative mt-30">
-          <h1 className="text-white pt-10" data-aos="fade-left">
-            Opt for <span className="text-indigo-500">Hiking</span>?
-          </h1>
-          <p className="text-gray-400 mt-3 mb-20 text-lg" data-aos="fade-up">
-            Our mission is to make meaningful travel accessible, safe, and
-            unforgettable. We bring together years of travel experience, global
-            knowledge, and a passion for creating memories that last a lifetime.
-            Whether you're plannig a solo adventure, a romantic gateway or a
-            family holiday, we're here to guide you from inspiration to boooking
-            and beyond. Browser through hand-picked destinations, read real
-            travel stories, and choose from curated packages that go beyond the
-            usual.
-          </p>
-          <div className="grid xl:grid-cols-3 grid-cols-1 gap-8 my-9">
-            {PLACES2.map((place, idx) => (
+          {loading && (
+            <>
+              <PlaceCardSkeleton2 />
+              <PlaceCardSkeleton2 />
+              <PlaceCardSkeleton2 />
+              <PlaceCardSkeleton2 />
+              <PlaceCardSkeleton2 />
+              <PlaceCardSkeleton2 />
+            </>
+          )}
+          {!loading &&
+            places1.map((place, idx) => (
               <motion.div
                 key={idx}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{
                   duration: 0.5,
-                  delay: idx * 0.3,
+                  delay: idx * 0.15,
                 }}
                 viewport={{ once: true }}
-                className="card relative group rounded-3xl h-[500px] py-4 px-5 shadow-lg cursor-pointer overflow-clip hover:shadow-xl hover:shadow-gray-500 hover:scale-105 hover:rotate-1 transition duration-300"
+                className="card relative group rounded-3xl h-[250px] py-4 px-5 shadow-lg cursor-pointer select-none overflow-clip hover:shadow-xl hover:shadow-gray-500 hover:scale-105 hover:rotate-1 transition duration-300"
+                onClick={() => navigate(`/places?place=${place.place_name}`)}
               >
                 <div
                   className="absolute bottom-0 left-0 w-full h-[200px] bg-blend-screen z-1"
@@ -253,7 +179,7 @@ const Quickies = () => {
                         {place.subtitle}
                       </span>
                     </div>
-                    <p className="text-xs font-medium text-gray-400">
+                    <p className="text-xs font-medium text-gray-400 w-[280px] overflow-hidden text-ellipsis whitespace-nowrap">
                       {place.description}
                     </p>
                   </div>
@@ -263,6 +189,81 @@ const Quickies = () => {
                 </div>
               </motion.div>
             ))}
+        </div>
+        <div className="relative mt-30">
+          <h1 className="text-white pt-10" data-aos="fade-left">
+            Opt for <span className="text-indigo-500">Hiking</span>?
+          </h1>
+          <p className="text-gray-400 mt-3 mb-20 text-lg" data-aos="fade-up">
+            Our mission is to make meaningful travel accessible, safe, and
+            unforgettable. We bring together years of travel experience, global
+            knowledge, and a passion for creating memories that last a lifetime.
+            Whether you're plannig a solo adventure, a romantic gateway or a
+            family holiday, we're here to guide you from inspiration to boooking
+            and beyond. Browser through hand-picked destinations, read real
+            travel stories, and choose from curated packages that go beyond the
+            usual. Here we present you the top-3 picked hill-stations to enjoy
+            the best of your trips be it either of a short or a long one...
+          </p>
+          <div className="grid xl:grid-cols-3 grid-cols-1 gap-8 my-9">
+            {loading && (
+              <>
+                <PlaceCardSkeleton3 />
+                <PlaceCardSkeleton3 />
+                <PlaceCardSkeleton3 />
+              </>
+            )}
+            {!loading &&
+              places2.map((place, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.5,
+                    delay: idx * 0.3,
+                  }}
+                  viewport={{ once: true }}
+                  className="card relative group rounded-3xl h-[500px] py-4 px-5 shadow-lg cursor-pointer select-none overflow-clip hover:shadow-xl hover:shadow-gray-500 hover:scale-105 hover:rotate-1 transition duration-300"
+                  onClick={() => navigate(`/places?place=${place.place_name}`)}
+                >
+                  <div
+                    className="absolute bottom-0 left-0 w-full h-[200px] bg-blend-screen z-1"
+                    style={{
+                      background: "linear-gradient(to top, #000, transparent)",
+                    }}
+                  />
+                  <img
+                    src={place.pic}
+                    alt={place.place_name}
+                    className="absolute top-0 left-0 w-full h-full object-cover group-hover:scale-120 transition-transform duration-300"
+                  />
+                  <div className="w-full h-full relative flex items-end justify-between text-white z-2 opacity-90">
+                    <div className="flex flex-col">
+                      <div className="flex flex-row items-center gap-1">
+                        <RatingsStar
+                          value={place.rating_val}
+                          style={{ maxWidth: 85 }}
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-extrabold text-2xl">
+                          {place.place_name}
+                        </h3>
+                        <span className="text-sm font-medium text-indigo-100">
+                          {place.subtitle}
+                        </span>
+                      </div>
+                      <p className="text-xs font-medium text-gray-400 w-[280px] overflow-hidden text-ellipsis whitespace-nowrap">
+                        {place.description}
+                      </p>
+                    </div>
+                    <div className="w-[25px] h-[25px] flex items-center justify-center rounded-full border-2 border-indigo-400">
+                      <i className="fa fa-arrow-right text-sm text-indigo-400 rotate-45 transition duration-300 group-hover:rotate-0" />
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
           </div>
         </div>
       </div>

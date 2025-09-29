@@ -131,17 +131,25 @@ body {
     animation: rotatebox 50s linear infinite;
   }
 
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    appearance: none !important;
+    margin: 0 !important;
+  }
+
   ::-webkit-calendar-picker-indicator {
-    filter: invert(1);
+    filter: invert(0%) sepia(100%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%) !important;
+    cursor: pointer !important;
+    opacity: 1 !important;
   }
 
   .no-scrollbar::-webkit-scrollbar {
-    display: none;
+    display: none !important;
   }
 
   .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
   }
 
   .text-stroke-dark {

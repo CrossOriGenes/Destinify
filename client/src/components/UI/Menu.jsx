@@ -42,11 +42,11 @@ const Menu = ({ onClose }) => {
         exit="hidden"
         className="absolute top-14 right-0 w-[250px] h-[202px] bg-amber-50 rounded-lg shadow-xl z-10"
       >
-        <div className="absolute -top-1.5 right-14 w-3 h-3 bg-amber-50 rotate-45" />
+        <div className="absolute -top-1.5 right-24 w-3 h-3 bg-amber-50 rotate-45" />
         <div className="relative py-3 px-1">
           <div className="flex items-center justify-around mt-1">
             <img
-              src="/images/user2.jpg"
+              src="/images/user3.jpg"
               alt=""
               className="w-15 h-15 bg-cover bg-center rounded-full"
             />

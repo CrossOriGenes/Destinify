@@ -20,7 +20,7 @@ const Header = () => {
             onClick={() => setOpen("menu")}
           >
             <img
-              src="/images/user2.jpg"
+              src="/images/user3.jpg"
               alt=""
               className="absolute top-0 left-0 w-full h-full object-cover"
             />
