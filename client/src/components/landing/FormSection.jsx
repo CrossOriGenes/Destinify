@@ -75,7 +75,7 @@ const FormSection = () => {
       ease: "back.out(2)",
     });
   }
-  function getSuggestivePlacesHandler(searchData) {
+  function fetchRecommendationsHandler(searchData) {
     navigate("../places", { state: searchData });
   }
 
@@ -150,7 +150,7 @@ const FormSection = () => {
               className="relative flex flex-col pl-2.5 pe-0 w-full md:w-[60%]"
               data-aos="fade-right"
             >
-              <PlaceSuggestionForm onSubmitData={getSuggestivePlacesHandler} />
+              <PlaceSuggestionForm onSubmitData={fetchRecommendationsHandler} />
             </div>
           </div>
         </div>

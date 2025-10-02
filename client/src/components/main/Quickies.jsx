@@ -25,7 +25,7 @@ const Quickies = () => {
       const result = await res.json();
 
       if (res.status === 200) setPlaces1(result.data);
-      console.log(result);
+      // console.log(result);
     } catch (err) {
       console.error("Failed to fetch summaries!", err);
       return;

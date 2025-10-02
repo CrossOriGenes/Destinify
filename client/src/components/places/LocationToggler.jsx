@@ -1,19 +1,10 @@
-import { useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import Modal from "../UI/Modal";
 import { toast } from "react-toastify";
+import Modal from "../UI/Modal";
 
-const SearchBar = ({ onSubmit, onLocSuccess }) => {
-  const { search } = useLocation();
-  const place = new URLSearchParams(search).get("place");
-  const searchBarRef = useRef();
+const LocationToggler = ({ onSubmit, onLocSuccess }) => {
   const [open, setOpen] = useState(false);
-
-  function handleSearchPlaceSubmitHandler(e) {
-    e.preventDefault();
-    onSubmit(searchBarRef.current.value);
-  }
   function locationCoordsHandler() {
     if (!navigator.geolocation) {
       setOpen(!open);
@@ -24,16 +15,9 @@ const SearchBar = ({ onSubmit, onLocSuccess }) => {
     }
     const onSuccess = (position) => {
       onLocSuccess(position.coords);
+      console.log(position.coords);
       toast.info(
-        <div className="leading-5">
-          <strong>
-            lat: <em className="font-light">{position.coords.latitude}</em>
-          </strong>
-          <br />
-          <strong>
-            lon: <em className="font-light">{position.coords.longitude}</em>
-          </strong>
-        </div>
+        <p className="text-[11px] font-semibold">Coordinates collected👍🏻</p>
       );
     };
     const onFailure = () => {
@@ -53,50 +37,20 @@ const SearchBar = ({ onSubmit, onLocSuccess }) => {
   return (
     <>
       <div className="relative w-full h-[12rem] p-[70px] flex justify-center items-center bg-white">
-        <div className="w-full flex items-center justify-between lg:gap-[0.5rem] gap-[1.5rem] lg:mx-35 -mb-15 z-1">
-          <form
-            className={`relative ${!place ? "w-[92%]" : "w-full"}`}
-            onSubmit={handleSearchPlaceSubmitHandler}
+        <div className="group relative">
+          <div
+            className="w-15 h-15 flex justify-center items-center p-4 rounded-full group-hover:bg-gray-200 transition duration-300 cursor-pointer"
+            onClick={() => setOpen(true)}
           >
-            <input
-              type="text"
-              ref={searchBarRef}
-              id="search-by-loc"
-              className="w-full outline-none border-3 border-gray-600 focus:ring-4 ring-indigo-500 py-4 px-8 rounded-4xl ml-4 text-lg font-semibold text-zinc-700 placeholder:text-zinc-400 transition duration-300"
-              maxLength={15}
-              minLength={2}
-              required
-              placeholder="Filter by place preferences..."
-            />
-            <div className="absolute top-[5px] -right-2.5">
-              <motion.button
-                whileTap={{ scale: 0.7 }}
-                transition={{ type: "spring", damping: 15, stiffness: 500 }}
-                className="btn2-dark h-[55px] rounded-4xl group"
-              >
-                <span className="text-white group-hover:text-[#100624] font-semibold">
-                  Search
-                </span>
-              </motion.button>
-            </div>
-          </form>
-          {!place && (
-            <div className="group relative">
-              <div
-                className="w-15 h-15 flex justify-center items-center p-4 rounded-full group-hover:bg-gray-200 transition duration-300 cursor-pointer"
-                onClick={() => setOpen(true)}
-              >
-                <i className="fa-solid fa-location-crosshairs text-3xl text-indigo-400 group-hover:text-pink-600" />
-              </div>
-              <div className="absolute -top-2 left-15 w-30 h-20 bg-gray-900 p-2 rounded-md z-2 transition duration-500 hidden group-hover:block">
-                <div className="absolute w-2.5 h-2.5 top-8 -left-1 bg-gray-900 rotate-45" />
-                <p className="text-xs text-white">
-                  Or, search visitable places within <strong>10m</strong> of
-                  your current location.
-                </p>
-              </div>
-            </div>
-          )}
+            <i className="fa-solid fa-location-crosshairs text-3xl text-indigo-400 group-hover:text-pink-600" />
+          </div>
+          <div className="absolute -top-2 left-15 w-30 h-20 bg-gray-900 p-2 rounded-md z-2 transition duration-500 hidden group-hover:block">
+            <div className="absolute w-2.5 h-2.5 top-8 -left-1 bg-gray-900 rotate-45" />
+            <p className="text-xs text-white">
+              Or, search visitable places within <strong>10m</strong> of your
+              current location.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -146,4 +100,4 @@ const SearchBar = ({ onSubmit, onLocSuccess }) => {
   );
 };
 
-export default SearchBar;
+export default LocationToggler;

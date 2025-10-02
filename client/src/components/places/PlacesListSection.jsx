@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "react-toastify";
-import SearchBar from "./SearchBar";
+import SearchBar from "./LocationToggler";
 import { PlaceCardSkeleton } from "../UI/LoaderSkeletons";
 import RatingsStar from "../UI/RatingsStar";
 import FilterListForm from "./FilterListForm";
@@ -91,6 +91,7 @@ const PlacesListSection = () => {
   const [msg, setMsg] = useState("");
   const [open, setOpen] = useState(false);
   const [cnt, setCnt] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
   const [places, setPlaces] = useState([]);
   const { state, search } = useLocation();
   const query = new URLSearchParams(search);
@@ -104,13 +105,6 @@ const PlacesListSection = () => {
   }
   function filterByPropsHandler(filters) {
     console.log("Filters Applied:", filters);
-  }
-  function filterByYourLocation(coords) {
-    const { latitude, longitude } = coords;
-    console.log({
-      lat: latitude,
-      lon: longitude,
-    });
   }
   async function fetchPlacesByCategory(page) {
     try {
@@ -131,10 +125,12 @@ const PlacesListSection = () => {
           // console.log(uniquePlaces);
           return uniquePlaces;
         });
-        if (page === 1)
+        if (page === 1) {
           toast.success(
             <p className="text-[12.5px] font-semibold">{result.msg}</p>
           );
+          setTotalRecords(result.total);
+        }
         console.log(result);
         return;
       }
@@ -174,10 +170,12 @@ const PlacesListSection = () => {
           // console.log(uniquePlaces);
           return uniquePlaces;
         });
-        if (page === 1)
+        if (page === 1) {
           toast.success(
             <p className="text-[12.5px] font-semibold">{result.msg}</p>
           );
+          setTotalRecords(result.total);
+        }
         console.log(result);
         return;
       }
@@ -198,48 +196,50 @@ const PlacesListSection = () => {
       setLoading("");
     }
   }
-  async function fetchPlacesByJourneyData(page) {
-    // try {
-    //   console.log(page);
-    //   if (page > 1) window.scrollTo({ top: 0, behavior: "smooth" });
-    //   setLoading(page === 1 ? "overlay" : "skeleton");
-    //   const response = await fetch(
-    //     `${BASE_URL}/places/recommend?count-request=${page}`
-    //   );
-    //   const result = await response.json();
-    //   if (response.status === 200) {
-    //     setPlaces((prev) => {
-    //       if (page === 1) return result.places;
-    //       const temp = [...prev, ...result.places];
-    //       const uniquePlaces = [
-    //         ...new Map(temp.map((item) => [item.Place, item])).values(),
-    //       ];
-    //       // console.log(uniquePlaces);
-    //       return uniquePlaces;
-    //     });
-    //     if (page === 1)
-    //       toast.success(
-    //         <p className="text-[12.5px] font-semibold">{result.msg}</p>
-    //       );
-    //     console.log(result);
-    //     return;
-    //   }
-    //   if (response.status === 403) {
-    //     setMsg(result.infoMsg);
-    //     toast.warning("You're out of limit!");
-    //     setOpen(true);
-    //     return;
-    //   }
-    //   if (response.status === 400) {
-    //     toast.error(result.errMsg);
-    //     return;
-    //   }
-    // } catch (e) {
-    //   toast.error("Sorry, Something went wrong!😢");
-    //   console.log(e);
-    // } finally {
-    //   setLoading("");
-    // }
+  async function fetchRecommendations() {
+    const { journey_date, return_date, days, destination, budget } = state;
+    const journeyData = {
+      journey_date,
+      return_date,
+      days,
+      destination,
+      budget,
+    };
+    // console.log(journeyData)
+    try {
+      setLoading("overlay");
+      const response = await fetch(`${BASE_URL}/places/recommend`, {
+        method: "POST",
+        body: JSON.stringify(journeyData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const result = await response.json();
+      if (response.status === 200) {
+        setPlaces(result.places);
+        toast.success(
+          <p className="text-[12.5px] font-semibold">{result.msg}</p>
+        );
+        console.log(result);
+        return;
+      }
+      if (response.status === 400) {
+        toast.error(
+          <p className="text-[11px] font-semibold">{result.errMsg}</p>
+        );
+        return;
+      }
+    } catch (e) {
+      toast.error(
+        <p className="text-[11px] font-semibold">
+          Sorry, Something went wrong!😢
+        </p>
+      );
+      console.log(e);
+    } finally {
+      setLoading("");
+    }
   }
   function addMorePlacesHandler(payload) {
     setCnt((prev) => {
@@ -249,7 +249,7 @@ const PlacesListSection = () => {
       } else if (payload === "place") {
         fetchPlacesByName(next);
       } else if (payload === "recom") {
-        fetchPlacesByJourneyData(next);
+        fetchRecommendations(next);
       } else {
         return null;
       }
@@ -269,23 +269,45 @@ const PlacesListSection = () => {
       fetchedRef.current = true;
       // console.log(place);
     }
-    console.log(cnt);
+    if (!fetchedRef.current && state && places.length === 0) {
+      fetchRecommendations();
+      fetchedRef.current = true;
+      // console.log(state);
+    }
+    // console.log(cnt);
   }, []);
 
   return (
     <>
-      <section className="relative w-full min-h-screen bg-gray-800 overflow-hidden">
+      <section className="relative w-full min-h-screen bg-gray-900 overflow-hidden">
         {loading === "overlay" && <LoaderBackdrop />}
         {!loading && (
-          <div className="relative">
-            <SearchBar
-              onSubmit={filterByPlaceHandler}
-              onLocSuccess={filterByYourLocation}
-            />
+          <div className="relative mt-16">
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-              <aside className="lg:col-span-1 my-6 p-6">
+              <aside className="lg:col-span-1 my-6 p-6 border-r-1 border-gray-700">
+                <form className="relative w-full mt-14 ml-2">
+                  <input
+                    type="text"
+                    id="search-by-loc"
+                    className="w-full outline-none border-3 border-gray-600 focus:ring-4 ring-gray-500 py-2 px-4 rounded-lg text-[17px] font-medium text-zinc-200 placeholder:text-zinc-700 transition duration-300"
+                    placeholder="Filter by place preferences..."
+                  />
+                  <div className="absolute top-[5px] right-[5px]">
+                    <motion.button
+                      whileTap={{ scale: 0.7 }}
+                      transition={{
+                        type: "spring",
+                        damping: 15,
+                        stiffness: 500,
+                      }}
+                      className="w-9 h-9 bg-pink-700 hover:bg-pink-500 rounded-sm place-items-center cursor-pointer transition duration-300"
+                    >
+                      <i className="fa-solid fa-filter text-white" />
+                    </motion.button>
+                  </div>
+                </form>
                 {state && (
-                  <div className="w-full h-[300px] border-2 border-indigo-500 rounded-2xl mt-2 ml-2 p-4 bg-indigo-950 text-gray-200 flex flex-col overflow-hidden">
+                  <div className="w-full h-[300px] border-2 border-indigo-500 rounded-2xl mt-6 ml-2 p-4 bg-indigo-950 text-gray-200 flex flex-col overflow-hidden">
                     <h5
                       className="text-sm font-light mb-1"
                       data-aos="fade-left"
@@ -294,7 +316,7 @@ const PlacesListSection = () => {
                       <span className="font-bold text-indigo-200">
                         Journey-date: &nbsp;
                       </span>
-                      {journeyData?.journey_date ?? "N.A."}
+                      {journeyData?.j_dt ?? "N.A."}
                     </h5>
                     <h5
                       className="text-sm font-light mb-1"
@@ -304,7 +326,7 @@ const PlacesListSection = () => {
                       <span className="font-bold text-indigo-200">
                         Return-date: &nbsp;
                       </span>
-                      {journeyData?.return_date ?? "N.A."}
+                      {journeyData?.re_dt ?? "N.A."}
                     </h5>
                     <h5
                       className="text-sm font-light mb-1"
@@ -345,7 +367,7 @@ const PlacesListSection = () => {
               </aside>
 
               <div className="lg:col-span-3 px-6 mt-12 mb-48">
-                <h3 className="font-extrabold text-4xl text-white mb-6">
+                <h3 className="font-extrabold text-5xl text-white mb-10">
                   Your <span className="text-indigo-500">Suggestions</span>{" "}
                 </h3>
                 <div className="space-y-6">
@@ -412,24 +434,26 @@ const PlacesListSection = () => {
                           </div>
                         </motion.div>
                       ))}
-                      <div
-                        className="w-full h-[200px] group flex justify-center items-center border-4 border-dashed border-cyan-500 rounded-3xl text-2xl hover:bg-cyan-800 hover:border-cyan-800 !transition !duration-300 cursor-pointer"
-                        data-aos="fade-up"
-                        onClick={() => {
-                          addMorePlacesHandler(
-                            category
-                              ? "categ"
-                              : place
-                              ? "place"
-                              : state
-                              ? "recom"
-                              : ""
-                          );
-                        }}
-                      >
-                        <span className="text-gray-100 me-2">View More</span>
-                        <i className="fa-solid fa-arrow-down text-indigo-400 text-xl" />
-                      </div>
+                      {totalRecords > 25 && (
+                        <div
+                          className="w-full h-[200px] group flex justify-center items-center border-4 border-dashed border-cyan-500 rounded-3xl text-2xl hover:bg-cyan-800 hover:border-cyan-800 !transition !duration-300 cursor-pointer"
+                          data-aos="fade-up"
+                          onClick={() => {
+                            addMorePlacesHandler(
+                              category
+                                ? "categ"
+                                : place
+                                ? "place"
+                                : state
+                                ? "recom"
+                                : ""
+                            );
+                          }}
+                        >
+                          <span className="text-gray-100 me-2">View More</span>
+                          <i className="fa-solid fa-arrow-down text-indigo-400 text-xl" />
+                        </div>
+                      )}
                     </>
                   )}
                 </div>

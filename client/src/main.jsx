@@ -1,11 +1,11 @@
-// import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./assets/index.css";
-import App from "./App.jsx";
 import { ToastContainer, Zoom } from "react-toastify";
+import App from "./App.jsx";
+import { AppContextProvider } from "./components/store/AppContext.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <>
+  <AppContextProvider>
     <ToastContainer
       position="bottom-left"
       autoClose={12000}
@@ -18,5 +18,5 @@ createRoot(document.getElementById("root")).render(
       transition={Zoom}
     />
     <App />
-  </>
+  </AppContextProvider>
 );

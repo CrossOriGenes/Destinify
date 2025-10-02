@@ -23,8 +23,6 @@ const PlaceSuggestionForm = ({ onSubmitData }) => {
   const placeRef = useRef();
   const budgetRef = useRef();
   const [errMsg, setErrMsg] = useState(null);
-  // const [jdt, setJdt] = useState("");
-  // const [redt, setRedt] = useState("");
 
   useEffect(() => {
     const dt = new Date();
@@ -34,9 +32,6 @@ const PlaceSuggestionForm = ({ onSubmitData }) => {
     setDate(`${yyyy}-${mm}-${dd}`);
   }, []);
 
-  // function handleDescriptionChange(e) {
-  //   setDescription(e.target.value);
-  // }
   function submitFormHandler(e) {
     e.preventDefault();
     const journey = new Date(journeyDateRef.current.value);
@@ -45,29 +40,41 @@ const PlaceSuggestionForm = ({ onSubmitData }) => {
       setErrMsg("Return date can't be before journey date!");
       return;
     }
-    const j_dt = new Date(journey);
-    const re_dt = new Date(ret);
-    const journey_date = `${
-      MONTHS[j_dt.getMonth()]
-    } ${j_dt.getDate()}, ${j_dt.getFullYear()}`;
-    const return_date = `${
-      MONTHS[re_dt.getMonth()]
-    } ${re_dt.getDate()}, ${re_dt.getFullYear()}`;
-    const utc1 = Date.UTC(j_dt.getFullYear(), j_dt.getMonth(), j_dt.getDate());
-    const utc2 = Date.UTC(
-      re_dt.getFullYear(),
-      re_dt.getMonth(),
-      re_dt.getDate()
+    if (ret.getDate() === journey.getDate()) {
+      setErrMsg("Journey date & Return date can't be same!");
+      return;
+    }
+    const journey_date = `${journey.getFullYear()}-${String(
+      journey.getMonth() + 1
+    ).padStart(2, "0")}-${String(journey.getDate()).padStart(2, "0")}`;
+    const return_date = `${ret.getFullYear()}-${String(
+      ret.getMonth() + 1
+    ).padStart(2, "0")}-${String(ret.getDate()).padStart(2, "0")}`;
+    // console.log("Journey date: ", journey_date);
+    // console.log("Return date: ", return_date);
+    const j_dt = `${
+      MONTHS[journey.getMonth()]
+    } ${journey.getDate()}, ${journey.getFullYear()}`;
+    const re_dt = `${
+      MONTHS[ret.getMonth()]
+    } ${ret.getDate()}, ${ret.getFullYear()}`;
+    const utc1 = Date.UTC(
+      journey.getFullYear(),
+      journey.getMonth(),
+      journey.getDate()
     );
+    const utc2 = Date.UTC(ret.getFullYear(), ret.getMonth(), ret.getDate());
     const timeDiff = Math.abs(utc2 - utc1);
     const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
     const searchData = {
       journey_date,
       return_date,
+      j_dt,
+      re_dt,
       days: daysDiff,
       destination: placeRef.current.value,
-      budget: Number(budgetRef.current.value)
+      budget: Number(budgetRef.current.value),
     };
     setErrMsg(null);
     onSubmitData(searchData);

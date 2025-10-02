@@ -1,9 +1,31 @@
 from flask import Blueprint, jsonify, request
 import controllers.utils as ut
 from models.place_model import Places
+from bson import ObjectId
+from datetime import datetime
+import re
 
 
 places_routes = Blueprint('places-routes', __name__)
+            
+            
+# ===================================
+# GET PLACE DATA BY ID
+# ===================================
+@places_routes.route("/")
+def get_place_data_by_id():
+    place_id = request.args.get("id", "")
+    if not place_id:
+        return jsonify({ "errMsg": "Place-ID missing!" }), 404
+    cursor = Places.find_one({ "_id": ObjectId(place_id) })
+    if not cursor:
+        return jsonify({ "errMsg": "No data found!" }), 404    
+    data = ut.formatted_data([cursor])
+    return jsonify({ 
+        "success": True, 
+        "data": data[0] 
+    }), 200
+
 
 # ================================
 # GET PLACES BY CATEGORY
@@ -73,11 +95,25 @@ def get_places_by_name(place):
         "msg": "Recommendations fetched successfully"
     }), 200
 
+
+# ================================
+# GET A PLACE BY SEARCHED NAME
+# ================================
+@places_routes.route("/search")
+def get_a_place_by_name():
+    place_name = request.args.get("p", "")
+    if not place_name:
+        return jsonify({ "errMsg": "Missing Place name!" }), 404
+    
+    cursor = Places.find_one({ "Place": place_name }, { "_id": 1 })
+    if not cursor:
+        return jsonify({ "errMsg": f"No match found with '{place_name}'!" }), 404
+    return jsonify({ "id": str(cursor["_id"]) }), 200
+
             
 # ====================================
 # GET PLACES QUICK ACCESS SUMMARIES
 # ====================================
-
 # ------------ set 1 ---------------
 @places_routes.route("/summaries/s1")
 def get_summary_set_1():
@@ -186,7 +222,7 @@ def get_summary_set_2():
         "data": [ place_1, place_2, place_3]
     }), 200
 
-# ------------ set 1 ---------------
+# ------------ set 3 ---------------
 @places_routes.route("/summaries/s3")
 def get_summary_set_3():
     # 1
@@ -255,7 +291,7 @@ def get_summary_set_3():
         "data": [ place_1, place_2, place_3, place_4, place_5, place_6 ]
     }), 200
 
-# ------------ set 2 ---------------
+# ------------ set 4 ---------------
 @places_routes.route("/summaries/s4")
 def get_summary_set_4():
     # 1
@@ -294,33 +330,99 @@ def get_summary_set_4():
         "data": [ place_1, place_2, place_3]
     }), 200
 
+                    
+# ===================================
+# GET SUGGESTIVE PLACE NAMES (SEARCHBAR)
+# ===================================
+@places_routes.route("/suggest")
+def suggest_places():
+    query = request.args.get("q", "").strip()
+    if not query:
+        return jsonify({ "suggestions": [] })
+    
+    regex = re.compile(query, re.IGNORECASE)
+    cursor = Places.find(
+        {"$or": [{"Place": regex}, {"City": regex}]},
+        {"Place": 1, "City": 1, "_id": 0}
+    ).limit(5)
+    suggestions = list(cursor)
+    return jsonify({ "suggestions": suggestions }), 200
 
-
-
-# get recommendations list 
+            
+# ===================================
+# GET RECOMMENDATIONS ACCORDING TO USERS DATA
+# ===================================
 @places_routes.route("/recommend", methods=['POST'])
 def get_place_recommendations():
     data = request.get_json()
-    if not data:
-        return jsonify({ 
-            "success": False, 
-            "errMsg": "Missing info!" 
-        }), 400
-    if not data.get("journey_date") or not data.get("return_date"):
-        return jsonify({ 
-            "success": False, 
-            "errMsg": "Dates are missing!" 
-        }), 400
+    journey_date = data.get("journey_date")
+    return_date = data.get("return_date")
+    destination = data.get("destination", "").strip()
+    budget = data.get("budget")   
+    days = data.get("days")       
+    if not journey_date or not return_date or not destination or not days:
+        return jsonify({"errMsg": "Missing required fields!"}), 400
+    if journey_date > return_date:
+        return jsonify({"errMsg": "Return date can't be before journey date!"}), 400    
+    if journey_date == return_date:
+        return jsonify({"errMsg": "Dates can't be same!"}), 400
         
+    if days <= 4:
+        duration = "short"
+    elif days <= 7:
+        duration = "medium"
+    else:
+        duration = "long"
+    query = {
+        "$or": [
+            {"Place": {"$regex": f"^{destination}$", "$options": "i"}},
+            {"City": {"$regex": f"^{destination}$", "$options": "i"}},
+            {"Place_Desc": {"$regex": f"^{destination}$", "$options": "i"}},
+            {"City_Desc": {"$regex": f"^{destination}$", "$options": "i"}}
+        ]
+    }
+    if budget and isinstance(budget, list) and len(budget) == 2:
+        query["budget.0"] = {"$lte": budget[1]}  
+        query["budget.1"] = {"$gte": budget[0]}  
+    cursor = Places.find(query)
+    results = list(cursor)
+    jd = datetime.fromisoformat(journey_date)
+    current_month = jd.month
+    seasonal_matches = []
+    others = []
+    for r in results:
+        months = r.get("Best_Time_To_Visit", []) or r.get("Ideal_Months", [])
+        if current_month in months:
+            seasonal_matches.append(r)
+        else:
+            others.append(r)
+    final_results = seasonal_matches + others
+    city_names = list({p.get("City") for p in final_results if p.get("City")})
+    festival_ids = ut.get_current_festival_place_ids(city_names, final_results)
+    if festival_ids:
+        final_results = ut.apply_festival_boost(final_results, festival_ids)
+    final_results = ut.formatted_data(final_results[:20])
+
     return jsonify({
-        "success": True,
-        "data": data
-    })
+        "count": len(final_results),
+        "duration": duration,
+        "places": final_results,
+        "msg": "Here are your best suggestions..."
+    }), 200
 
 
+
+# ===========================
 # Test API
+# ===========================
 @places_routes.route("/test")
 def test_route():
+    return jsonify({
+        "success": True,
+        "count": 0
+    }), 200
+        
+# def temp():
     img_url = ut.fetch_image("Dalhousie")
     if not img_url:
         return jsonify({ "errMsg": "No image Found!" }), 404

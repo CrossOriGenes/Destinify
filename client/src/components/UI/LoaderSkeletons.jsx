@@ -46,3 +46,12 @@ export const PlaceCardSkeleton3 = () => {
     </div>
   );
 };
+
+export const ListSkeleton = () => {
+  return (
+    <li className="relative w-full flex flex-col gap-1.5 p-2 rounded-lg overflow-ellipsis">
+      <div className="relative w-[80%] h-[17px] bg-gray-500 rounded-md animate-pulse" />
+      <div className="relative w-[40%] h-[10px] bg-gray-700 rounded-lg animate-pulse" />
+    </li>
+  );
+};

@@ -11,54 +11,6 @@ UNSPLASH_KEY = os.getenv("UNSPLASH_ACCESS_KEY")
 CALENDARIFIC_API_KEY = os.getenv("CALENDARIFIC_API_KEY")
 EVENTBRITE_TOKEN = os.getenv("EVENTBRITE_TOKEN")
 
-# Keywords matching place category
-keywords = {
-    "beach": [
-        "goa", "andaman", "beach", "sea", "shore", "cove", "sandy", "sunset", "waves", "resort"
-    ],
-    "beaches": [
-        "goa", "andaman", "beach", "sea", "shore", "cove", "sandy", "sunset", "waves", "resort"
-    ],
-    "mountain": [
-        "mountain", "hill", "peak", "ridge", "snow", "valley", "glacier", "meadow",
-        "manali", "leh", "kashmir", "nainital", "darjeeling"
-    ],
-    "mountains": [
-        "mountain", "hill", "peak", "ridge", "snow", "valley", "glacier", "meadow",
-        "manali", "leh", "kashmir", "nainital", "darjeeling"
-    ],
-    "heritage": [
-        "temple", "fort", "palace", "heritage", "monument", "architecture", "museum", "agra", "jaipur", "khajuraho"
-    ],
-    "heritages": [
-        "temple", "fort", "palace", "heritage", "monument", "architecture", "museum", "agra", "jaipur", "khajuraho"
-    ],
-    "adventure": [
-        "trek", "rafting", "safari", "paragliding", "bungee", "rafting", "camping",
-        "zipline", "climbing", "river rafting", "andaman", "himalayas"
-    ],
-    "adventures": [
-        "trek", "rafting", "safari", "paragliding", "bungee", "rafting", "camping",
-        "zipline", "climbing", "river rafting", "andaman", "himalayas"
-    ],
-    "city": [
-        "kolkata", "delhi", "bengaluru", "mumbai", "chennai", "pune", "city", "urban", "nightlife",
-        "shopping", "cafes", "restaurants", "architecture", "metro"
-    ],
-    "cities": [
-        "kolkata", "delhi", "bengaluru", "mumbai", "chennai", "pune", "city", "urban", "nightlife",
-        "shopping", "cafes", "restaurants", "architecture", "metro"
-    ],
-    "road-trip": [
-        "highway", "drive", "scenic route", "rotang la", "khardung la", "leh", "manali",
-        "valley road", "pass", "mountain road"
-    ],
-    "road-trips": [
-        "highway", "drive", "scenic route", "rotang la", "khardung la", "leh", "manali",
-        "valley road", "pass", "mountain road"
-    ]
-}
-
 # Helper: Unsplash se ek image fetch
 def fetch_image(query):
     url = f"https://api.unsplash.com/search/photos?query={query}&per_page=1"
@@ -104,9 +56,7 @@ def apply_month_filter(data):
 
 def apply_festival_boost(data, festival_place_ids):
     """
-    Boost festival-matched places to the top of the list.
-    data: list of place dicts (already filtered from DB)
-    festival_place_ids: list of place_ids from get_current_festival_place_ids()
+    Boost only those festival places which are already filtered in 'data'.
     """
     boosted = []
     normal = []
@@ -131,6 +81,8 @@ def get_current_festival_place_ids(city_names, places):
 
     # Combine and remove duplicates
     combined_ids = list(set(holiday_place_ids + event_place_ids))
+    valid_ids = set(str(p["_id"]) for p in places)
+    combined_ids = [fid for fid in combined_ids if fid in valid_ids]
     return combined_ids
 
 def fetch_holidays(start_date, end_date, places):

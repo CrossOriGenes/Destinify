@@ -1,4 +1,5 @@
-const DescriptionSection = () => {
+const DescriptionSection = ({ data }) => {
+  const { Place_Desc, City_Desc } = data;
   return (
     <section
       id="place-descr-intro"
@@ -11,20 +12,11 @@ const DescriptionSection = () => {
         className="font-medium text-lg text-gray-600 leading-6 mt-6 xl:pl-20 pl-0"
         data-aos="fade-in"
       >
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet nam
-        dicta expedita atque nobis quidem, ab libero, dolorem fugiat id
-        perspiciatis dolorum culpa nisi minima debitis similique, autem ad
-        consequatur. Nisi debitis quo sint quidem nam cumque est consequuntur
-        dolore rerum hic exercitationem totam, provident vero libero expedita
-        blanditiis? Corrupti, tenetur! Quam voluptates labore officiis
-        reiciendis cupiditate eaque quos. Repellat? Lorem ipsum dolor sit amet
-        consectetur adipisicing elit. Ut accusamus repellendus pariatur laborum
-        iste a laudantium possimus placeat atque harum laboriosam iure,
-        doloremque earum iusto consequuntur enim minus incidunt eius. Deserunt
-        at itaque, quo aliquam eligendi odio facere consequatur exercitationem
-        iure, minima neque pariatur fuga amet libero reiciendis perspiciatis
-        perferendis beatae sequi eum excepturi, laborum nostrum dolorem!
-        Suscipit, nemo odit!
+        {Place_Desc ||
+          "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptatum, id laudantium facere omnis quaerat fugit nulla nisi repudiandae reprehenderit dolorum commodi recusandae esse tempora vero. Sunt voluptatem tempora doloremque unde? Dolorum praesentium officia quis a minima magni est vero reiciendis totam, dignissimos temporibus explicabo neque perferendis eos? Officiis odit sit non quod, quam iusto quas animi molestiae dolorum mollitia itaque?"}
+        <br />
+        {City_Desc ||
+          "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam sunt commodi eum architecto, illo est ipsam odit voluptate deleniti molestias laboriosam aliquam laborum eaque rerum atque cupiditate. Officia, reiciendis vitae."}
       </p>
     </section>
   );

@@ -3,10 +3,10 @@ import { motion, useInView } from "framer-motion";
 import CountUp from "react-countup";
 
 const stats = [
-  { lbl: "Places to travel", value: 500, suffix: "+" },
-  { lbl: "Satisfied Users", value: 2000, suffix: "+" },
+  { lbl: "Places to travel", value: 2500, suffix: "+" },
+  { lbl: "Satisfied Users", value: 500, suffix: "+" },
   { lbl: "Accurate recommendations", value: 95, suffix: "%" },
-  { lbl: "Customer active-support", value: 24, suffix: "hrs" },
+  { lbl: "Users active-support", value: 24, suffix: "hrs" },
 ];
 
 const StatBlock = ({ value, lbl, suffix, delay, className }) => {
