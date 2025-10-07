@@ -248,6 +248,10 @@ def fetch_google_reviews(place_name):
         photos = result.get("photos", [])
         photo_refs = [p.get("photo_reference") for p in photos if p.get("photo_reference")]
         photo_urls = fetch_place_google_photos(photo_refs)
+        # print(photo_urls)
+        if not photo_urls or len(photo_urls) == 0:
+            print(f"No google photos found for {place_name}!\nUsing Unsplash fallback to generate new photos...")
+            photo_urls = fetch_place_unsplash_photos(place_name, 10)
         reviews = []
         for r in result.get("reviews", []):
             reviews.append({

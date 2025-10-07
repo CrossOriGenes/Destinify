@@ -24,19 +24,17 @@ def get_place_data_by_id():
     place = data[0].get("Place")
     place_review = ut.fetch_google_reviews(place)
     existing_photos = data[0].get("Place_images")
-    new_photos = place_review.get("photos", [])
-    if not new_photos or len(new_photos) < 1:
-        print(f"No google photos found for {place}!\nUsing Unsplash fallback to generate new photos...")
-        new_photos = ut.fetch_place_unsplash_photos(place, 10)
+    new_photos = place_review.get("photos")
     photos = new_photos + existing_photos
-    Places.update_one(
-        {"_id": place_id},
-        {"$set": { "Place_images": photos }}
+    # print("Updated place photos: ", photos)
+    result = Places.update_one(
+        { "_id": ObjectId(place_id) },
+        { "$set": { "Place_images": photos }}
     )
+    print(f"{result.modified_count} document modified")
     reviews = place_review.get("reviews")
     aspect_ratings = place_review.get("aspect_ratings")
     overall_rating = place_review.get("overall_rating")
-    
     
     return jsonify({ 
         "success": True, 
@@ -44,7 +42,8 @@ def get_place_data_by_id():
             "place_data": data[0], 
             "reviews": reviews,
             "overall_rating": overall_rating,
-            "aspect_ratings": aspect_ratings
+            "aspect_ratings": aspect_ratings,
+            "photos": photos
         }
     }), 200
 

@@ -45,11 +45,10 @@ function PlaceDetails() {
       }
       if (result.data) {
         console.log(result.data);
-        const { place_data, reviews, aspect_ratings, overall_rating } =
+        const { place_data, reviews, aspect_ratings, overall_rating, photos } =
           result.data;
         if (place_data) setPlaceData(place_data);
-        if (place_data && Array.isArray(place_data.Place_images))
-          setImageGallery(place_data.Place_images);
+        if (photos && Array.isArray(photos)) setImageGallery(photos);
         if (reviews && Array.isArray(reviews)) setReviews(reviews);
         if (aspect_ratings) setRatings(aspect_ratings);
         if (overall_rating) setOverallRating(overall_rating);
