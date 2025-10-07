@@ -2,12 +2,12 @@ import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "react-toastify";
-import SearchBar from "./LocationToggler";
 import { PlaceCardSkeleton } from "../UI/LoaderSkeletons";
 import RatingsStar from "../UI/RatingsStar";
-import FilterListForm from "./FilterListForm";
 import LoaderBackdrop from "../UI/LoaderBackdrop";
 import Modal from "../UI/Modal";
+import FilterListForm from "./FilterListForm";
+import { useAppContext } from "../store/AppContext";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 // const PLACES = [
@@ -86,11 +86,12 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 // ];
 
 const PlacesListSection = () => {
+  const { pageReqCnt, setRequestCount } = useAppContext();
+  const [cnt, setCnt] = useState(pageReqCnt);
   const fetchedRef = useRef(false);
   const [loading, setLoading] = useState("");
   const [msg, setMsg] = useState("");
   const [open, setOpen] = useState(false);
-  const [cnt, setCnt] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
   const [places, setPlaces] = useState([]);
   const { state, search } = useLocation();
@@ -100,9 +101,6 @@ const PlacesListSection = () => {
   const journeyData = state;
   const navigate = useNavigate();
 
-  function filterByPlaceHandler(place) {
-    console.log(place);
-  }
   function filterByPropsHandler(filters) {
     console.log("Filters Applied:", filters);
   }
@@ -256,6 +254,7 @@ const PlacesListSection = () => {
       return next;
     });
     // console.log(cnt);
+    setRequestCount(cnt);
   }
 
   useEffect(() => {

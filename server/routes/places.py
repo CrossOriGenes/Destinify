@@ -21,9 +21,31 @@ def get_place_data_by_id():
     if not cursor:
         return jsonify({ "errMsg": "No data found!" }), 404    
     data = ut.formatted_data([cursor])
+    place = data[0].get("Place")
+    place_review = ut.fetch_google_reviews(place)
+    existing_photos = data[0].get("Place_images")
+    new_photos = place_review.get("photos", [])
+    if not new_photos or len(new_photos) < 1:
+        print(f"No google photos found for {place}!\nUsing Unsplash fallback to generate new photos...")
+        new_photos = ut.fetch_place_unsplash_photos(place, 10)
+    photos = new_photos + existing_photos
+    Places.update_one(
+        {"_id": place_id},
+        {"$set": { "Place_images": photos }}
+    )
+    reviews = place_review.get("reviews")
+    aspect_ratings = place_review.get("aspect_ratings")
+    overall_rating = place_review.get("overall_rating")
+    
+    
     return jsonify({ 
         "success": True, 
-        "data": data[0] 
+        "data": {
+            "place_data": data[0], 
+            "reviews": reviews,
+            "overall_rating": overall_rating,
+            "aspect_ratings": aspect_ratings
+        }
     }), 200
 
 
@@ -417,22 +439,27 @@ def get_place_recommendations():
 # ===========================
 @places_routes.route("/test")
 def test_route():
-    return jsonify({
-        "success": True,
-        "count": 0
-    }), 200
-        
-# def temp():
-    img_url = ut.fetch_image("Dalhousie")
-    if not img_url:
+    place_id = request.args.get("id", "")
+    if not place_id:
+        return jsonify({ "errMsg": "Place-ID missing!" }), 404
+    cursor = Places.find_one({ "_id": ObjectId(place_id) })
+    if not cursor:
+        return jsonify({ "errMsg": "No data found!" }), 404    
+    data = ut.formatted_data([cursor])
+    place = data[0].get("Place")
+    img_urls = ut.fetch_place_unsplash_photos(place, 10)
+    if not img_urls:
         return jsonify({ "errMsg": "No image Found!" }), 404
-    result = Places.update_many(
-        { "City": "Dalhousie" },
-        {"$set": {"Place_images": [img_url]}}
-    )
+    existing_photos = data[0].get("Place_images")
+    # result = Places.update_one(
+    #     { "Place": place },
+    #     {"$set": {"Place_images": [img_url]}}
+    # )
     
-    print(f"Updated {result.modified_count} docs for Dalhousie")
+    # print(f"Updated {result.modified_count} docs for Dalhousie")
     return jsonify({
-        "success": True,
-        "count": result.modified_count
+        "place": place,
+        # "count": result.modified_count
+        "new_images": img_urls,
+        "old_images": existing_photos
     }), 200

@@ -7,7 +7,7 @@ const HeroSection = ({ data }) => {
     >
       <div className="relative w-full h-[95vh] overflow-hidden clip-hero-img">
         <img
-          src={Place_images?.[0] ?? ""}
+          src={Place_images?.[0] ?? null}
           alt=""
           className="absolute top-0 left-0 w-full h-full object-cover bg-no-repeat bg-center"
         />

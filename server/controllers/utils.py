@@ -4,25 +4,37 @@ from dotenv import load_dotenv
 from bson import ObjectId, Decimal128
 from datetime import datetime, timedelta
 import requests
+import re
+import statistics
+
 
 load_dotenv()
 
 UNSPLASH_KEY = os.getenv("UNSPLASH_ACCESS_KEY")
 CALENDARIFIC_API_KEY = os.getenv("CALENDARIFIC_API_KEY")
 EVENTBRITE_TOKEN = os.getenv("EVENTBRITE_TOKEN")
+GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY")
 
-# Helper: Unsplash se ek image fetch
-def fetch_image(query):
-    url = f"https://api.unsplash.com/search/photos?query={query}&per_page=1"
+
+# image fetcher for a particular place
+def fetch_place_unsplash_photos(query, counts):
+    url = f"https://api.unsplash.com/search/photos?query={query}&per_page={counts}"
     headers = {"Authorization": f"Client-ID {UNSPLASH_KEY}"}
     try:
-        r = requests.get(url, headers=headers)
+        r = requests.get(url, headers=headers, timeout=10)
+        r.raise_for_status()
         data = r.json()
-        if "results" in data and len(data["results"]) > 0:
-            return data["results"][0]["urls"]["regular"]
+        
+        photos = []
+        if "results" in data:
+            for img in data["results"]:
+                if "urls" in img and "regular" in img["urls"]:
+                    photos.append(img["urls"]["regular"])
+        
+        return photos[:counts] if photos else []
     except Exception as e:
-        print("Image fetch error:", e)
-    return None
+        print("Image fetch error: ", e)
+        return []
 
 # data formatter
 def formatted_data(documents):   
@@ -41,23 +53,20 @@ def formatted_data(documents):
         processed.append(new_doc)
     return processed
 
-# sort place-list by current month in ideal-months
-def apply_month_filter(data):
-    current_month = datetime.now().month
-    filtered = []
-    for place in data:
-        best_time = place.get("Best_Time_To_Visit", [])
-        # place["month_boost"] = current_month in best_time
-        if current_month in best_time:
-            place["month_boost"] = True
-            filtered.append(place)
-    # return sorted(data, key=lambda x: not x["month_boost"])
-    return filtered
+# def apply_month_filter(data):
+#     current_month = datetime.now().month
+#     filtered = []
+#     for place in data:
+#         best_time = place.get("Best_Time_To_Visit", [])
+#         # place["month_boost"] = current_month in best_time
+#         if current_month in best_time:
+#             place["month_boost"] = True
+#             filtered.append(place)
+#     # return sorted(data, key=lambda x: not x["month_boost"])
+#     return filtered
 
+# Boost output-list by current festivals
 def apply_festival_boost(data, festival_place_ids):
-    """
-    Boost only those festival places which are already filtered in 'data'.
-    """
     boosted = []
     normal = []
     for place in data:
@@ -67,12 +76,8 @@ def apply_festival_boost(data, festival_place_ids):
             normal.append(place)
     return boosted + normal
     
+# retrieve festivals place IDs
 def get_current_festival_place_ids(city_names, places):
-    """
-    Combines Calendarific and Eventbrite data to find festivals/events for current date + 7 days.
-    city_names: list of city names to check
-    Returns list of place IDs that match festivals/events
-    """
     today = datetime.now()
     end_date = today + timedelta(days=7)
 
@@ -85,6 +90,7 @@ def get_current_festival_place_ids(city_names, places):
     combined_ids = [fid for fid in combined_ids if fid in valid_ids]
     return combined_ids
 
+# fetch upcoming holidays
 def fetch_holidays(start_date, end_date, places):
     url = "https://calendarific.com/api/v2/holidays"
     params = {
@@ -102,13 +108,13 @@ def fetch_holidays(start_date, end_date, places):
             date_str = hol.get("date", {}).get("iso", "")
             hol_date = datetime.fromisoformat(date_str) if date_str else None
             if hol_date and start_date <= hol_date <= end_date:
-                # Example: you can map holiday to places by name matching or predefined list
                 holiday_place_ids.extend(match_places_by_holiday(hol, places))
         return holiday_place_ids
     except Exception as e:
         print("Error fetching holidays:", e)
         return []
 
+# fetch upcoming events
 def fetch_events(start_date, end_date, city_names, places):
     url = "https://www.eventbriteapi.com/v3/events/search/"
     headers = {"Authorization": f"Bearer {EVENTBRITE_TOKEN}"}
@@ -133,12 +139,8 @@ def fetch_events(start_date, end_date, city_names, places):
 
     return list(set(event_place_ids))  # unique IDs
 
+# match places in db by retrieved holidays
 def match_places_by_holiday(holiday, places):
-    """
-    holiday: dict from Calendarific
-    places: iterable of place docs (subset already filtered)
-    Returns list of matching place IDs
-    """
     results = []
     name = holiday.get("name", "").lower()
     if not name:
@@ -157,6 +159,7 @@ def match_places_by_holiday(holiday, places):
             results.append(str(place["_id"]))  # ensure string ID
     return results
 
+# match places in db by retrieved events
 def match_places_by_event(event, places):
     # Match Eventbrite event with places by city/desc
     results = []
@@ -169,3 +172,102 @@ def match_places_by_event(event, places):
         if str(place.get("City", "")).lower() == city_name:
             results.append(str(place["_id"]))
     return results
+
+# fetch images of place from google places API
+def fetch_place_google_photos(photo_refs, MAX=10):
+    photo_urls = []
+    for ref in photo_refs[:MAX]:
+        try:
+            url = (
+                f"https://maps.googleapis.com/maps/api/place/photo"
+                f"?maxwidth=1600&photo_reference={ref}&key={GOOGLE_PLACES_API_KEY}"
+            )
+            response = requests.get(url, allow_redirects=False)
+            if response.status_code in (301, 302):
+                photo_urls.append(response.headers.get("Location"))
+        except Exception as e:
+            print("Error fetching photo:", e)
+    return photo_urls
+
+# get aspect ratings of a place
+def analyze_aspect_ratings(reviews):
+    aspects = {
+        "climate": ["weather", "heat", "cold", "climate", "temperature"],
+        "food": ["food", "restaurant", "cuisine", "taste", "meal"],
+        "transport": ["bus", "train", "car", "travel", "road", "transport"],
+        "cleanliness": ["clean", "dirty", "hygiene", "neat"],
+        "hospitality": ["people", "locals", "welcome", "friendly", "staff"]
+    }
+    scores = {key: [] for key in aspects}
+
+    for review in reviews:
+        text = review.get("text", "").lower()
+        rating = review.get("rating", 0)
+        if not text or not rating:
+            continue
+        for aspect, keywords in aspects.items():
+            if any(re.search(rf"\b{k}\b", text) for k in keywords):
+                scores[aspect].append(rating)
+    aspect_ratings = {}
+    for aspect, vals in scores.items():
+        if isinstance(vals, (list, tuple)) and vals:
+            aspect_ratings[aspect] = round(statistics.mean(vals), 1)
+        else: 
+            aspect_ratings[aspect] = 2.5
+    
+    return aspect_ratings
+
+# fetch reviews for a place
+def fetch_google_reviews(place_name):
+    search_url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json"
+    params = {
+        "input": place_name,
+        "inputtype": "textquery",
+        "fields": "place_id",
+        "key": GOOGLE_PLACES_API_KEY
+    }
+
+    try:
+        res = requests.get(search_url, params=params)
+        data = res.json()
+        candidates = data.get("candidates", [])
+        if not candidates:
+            print(f"No Google place found for: {place_name}")
+            return None
+        place_id = candidates[0]["place_id"]
+        details_url = "https://maps.googleapis.com/maps/api/place/details/json"
+        details_params = {
+            "place_id": place_id,
+            "fields": "name,photos,reviews,rating",
+            "key": GOOGLE_PLACES_API_KEY
+        }
+        det_res = requests.get(details_url, params=details_params)
+        det_data = det_res.json()
+        result = det_data.get("result", {})
+        google_rating = result.get("rating", 1)
+        photos = result.get("photos", [])
+        photo_refs = [p.get("photo_reference") for p in photos if p.get("photo_reference")]
+        photo_urls = fetch_place_google_photos(photo_refs)
+        reviews = []
+        for r in result.get("reviews", []):
+            reviews.append({
+                "author": r.get("author_name"),
+                "profile_photo": r.get("profile_photo_url"),
+                "rating": r.get("rating"),
+                "text": r.get("text"),
+                "time": r.get("relative_time_description")
+            })
+        aspect_ratings = analyze_aspect_ratings(reviews)
+        mean_val = round(statistics.mean(aspect_ratings.values()), 1)
+        overall_rating = max(mean_val, google_rating)
+        
+        return { 
+            "reviews": reviews, 
+            "photos": photo_urls, 
+            "aspect_ratings": aspect_ratings, 
+            "overall_rating": overall_rating
+        }
+            
+    except Exception as e:
+        print("Error fetching Google reviews:", e)
+        return None

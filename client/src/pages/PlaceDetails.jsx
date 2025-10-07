@@ -25,7 +25,11 @@ function PlaceDetails() {
   const [activeLink, setActiveLink] = useState(sections[0]);
   const fetchedRef = useRef(false);
   const [load, setLoad] = useState(false);
-  const [data, setData] = useState({});
+  const [placeData, setPlaceData] = useState({});
+  const [ratings, setRatings] = useState({});
+  const [reviews, setReviews] = useState([]);
+  const [imageGallery, setImageGallery] = useState([]);
+  const [overallRating, setOverallRating] = useState(1);
 
   async function fetchPlaceData() {
     // console.log(id);
@@ -39,8 +43,17 @@ function PlaceDetails() {
         );
         return;
       }
-      // console.log(result.data);
-      setData(result.data || {});
+      if (result.data) {
+        console.log(result.data);
+        const { place_data, reviews, aspect_ratings, overall_rating } =
+          result.data;
+        if (place_data) setPlaceData(place_data);
+        if (place_data && Array.isArray(place_data.Place_images))
+          setImageGallery(place_data.Place_images);
+        if (reviews && Array.isArray(reviews)) setReviews(reviews);
+        if (aspect_ratings) setRatings(aspect_ratings);
+        if (overall_rating) setOverallRating(overall_rating);
+      }
     } catch (err) {
       toast.error(
         <p className="text-[11px] font-semibold">Failed to fetch data!</p>
@@ -85,11 +98,15 @@ function PlaceDetails() {
     <>
       <Header />
       <main className="grid grid-cols-1 xl:grid-cols-4">
-        <HeroSection data={data} />
+        <HeroSection data={placeData} />
         <AsideBar activeLink={activeLink} setActiveLink={setActiveLink} />
-        <DescriptionSection data={data} />
-        <RatingsReviewSection data={data} />
-        <PlaceImageGallery data={data} />
+        <DescriptionSection data={placeData} />
+        <RatingsReviewSection
+          reviews={reviews}
+          ratings={ratings}
+          overallRating={overallRating}
+        />
+        <PlaceImageGallery images={imageGallery} />
       </main>
 
       <AnimatePresence>{load && <LoaderBackdrop />}</AnimatePresence>
