@@ -22,10 +22,9 @@ def get_place_data_by_id():
         return jsonify({ "errMsg": "No data found!" }), 404    
     data = ut.formatted_data([cursor])
     place = data[0].get("Place")
-    place_review = ut.fetch_google_reviews(place)
     existing_photos = data[0].get("Place_images")
-    new_photos = place_review.get("photos")
-    photos = new_photos + existing_photos
+    place_review = ut.fetch_google_reviews(place, existing_photos)
+    photos = place_review.get("photos")
     # print("Updated place photos: ", photos)
     result = Places.update_one(
         { "_id": ObjectId(place_id) },
@@ -35,6 +34,7 @@ def get_place_data_by_id():
     reviews = place_review.get("reviews")
     aspect_ratings = place_review.get("aspect_ratings")
     overall_rating = place_review.get("overall_rating")
+    festivals = ut.fetch_festivals(data[0].get("City", place))
     
     return jsonify({ 
         "success": True, 
@@ -43,7 +43,8 @@ def get_place_data_by_id():
             "reviews": reviews,
             "overall_rating": overall_rating,
             "aspect_ratings": aspect_ratings,
-            "photos": photos
+            "photos": photos,
+            "festivals": festivals
         }
     }), 200
 
@@ -431,7 +432,31 @@ def get_place_recommendations():
         "msg": "Here are your best suggestions..."
     }), 200
 
-
+            
+# ======================================
+# GET COORDINATES OF SOURCE & DESTINATION FROM USER
+# ======================================
+@places_routes.route("/coords", methods=['POST'])
+def get_places_coordinates():
+    data = request.get_json()
+    source = data.get("source", "")
+    destination = data.get("destination", "")
+    budget = data.get("budget")
+    if not source or not destination:
+        return jsonify({ "errMsg": "Missing address values!" }), 400
+    
+    origin = ut.get_coordinates(source)
+    dest = ut.get_coordinates(destination)
+    if not origin or not dest:
+        return jsonify({ "errMsg": "coordinates missing!" }), 404
+    routes = ut.get_route_options(origin, dest)
+    results = ut.estimate_cost(routes, budget)
+    
+    return jsonify({
+        "origin": origin,
+        "destination": dest,
+        "route_options": results
+    }), 200
 
 # ===========================
 # Test API
@@ -446,19 +471,13 @@ def test_route():
         return jsonify({ "errMsg": "No data found!" }), 404    
     data = ut.formatted_data([cursor])
     place = data[0].get("Place")
-    img_urls = ut.fetch_place_unsplash_photos(place, 10)
-    if not img_urls:
-        return jsonify({ "errMsg": "No image Found!" }), 404
-    existing_photos = data[0].get("Place_images")
-    # result = Places.update_one(
-    #     { "Place": place },
-    #     {"$set": {"Place_images": [img_url]}}
-    # )
+    festivals = ut.fetch_festivals(data[0].get("City", place))
+    if not festivals:
+        return jsonify({ "errMsg": "No festivals Found!" }), 404
     
-    # print(f"Updated {result.modified_count} docs for Dalhousie")
     return jsonify({
-        "place": place,
-        # "count": result.modified_count
-        "new_images": img_urls,
-        "old_images": existing_photos
-    }), 200
+        "place": place, 
+        "city": data[0].get("City"),
+        "festivals": festivals 
+    })
+    

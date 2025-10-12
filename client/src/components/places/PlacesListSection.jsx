@@ -390,7 +390,17 @@ const PlacesListSection = () => {
                           }}
                           viewport={{ once: true }}
                           className="card relative group rounded-3xl h-[200px] py-4 px-5 shadow-lg cursor-pointer overflow-clip hover:shadow-xl hover:shadow-gray-500 hover:scale-101 hover:rotate-1 transition duration-300"
-                          onClick={() => navigate(p._id)}
+                          onClick={() =>
+                            navigate(p._id, {
+                              state: {
+                                Place: p?.Place ?? "",
+                                City: p?.City ?? "",
+                                budget: journeyData?.budget ?? null,
+                                journey_date: journeyData?.journey_date ?? null,
+                                return_date: journeyData?.return_date ?? null,
+                              },
+                            })
+                          }
                         >
                           <div
                             className="absolute bottom-0 left-0 w-full h-[200px] bg-blend-screen z-1"

@@ -138,7 +138,8 @@ body {
   }
 
   ::-webkit-calendar-picker-indicator {
-    filter: invert(0%) sepia(100%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%) !important;
+    filter: invert(0%) sepia(100%) saturate(0%) hue-rotate(0deg) brightness(0%)
+      contrast(100%) !important;
     cursor: pointer !important;
     opacity: 1 !important;
   }
@@ -481,6 +482,17 @@ body {
   .box-rating .rr--box {
     background: #1c3d51;
     margin-right: 3px;
+  }
+
+  .gm-style-iw-c {
+    padding: 0 !important;
+    background: var(--gray-800) !important;
+  }
+  .gm-style-iw-chr {
+    display: none !important;
+  }
+  .gm-style-iw-d {
+    overflow: hidden !important;
   }
 }
 

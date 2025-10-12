@@ -5,8 +5,8 @@ const navItems = [
   { name: "Description", to: "place-descr-intro" },
   { name: "Rating", to: "ratings" },
   { name: "Gallery", to: "place-img-gallery" },
-  { name: "Festivals", to: "festivals" },
   { name: "Journey-estimation & Budget", to: "estim-budget" },
+  { name: "Festivals", to: "festivals" },
 ];
 
 const AsideBar = ({ activeLink, setActiveLink, fixedClass }) => {
@@ -63,6 +63,7 @@ const AsideBar = ({ activeLink, setActiveLink, fixedClass }) => {
           </button>
         </div>
       </div>
+      <div className="absolute -bottom-8 -left-10 w-[650px] h-[200px] bg-[url('/images/sea_boat-vector.png')] transform -scale-x-100 bg-cover bg-center -z-1" />
     </aside>
   );
 };

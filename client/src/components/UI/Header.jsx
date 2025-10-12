@@ -16,6 +16,7 @@ const Header = () => {
   const [loading, setLoading] = useState(false);
   const [load, setLoad] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [placeData, setPlaceData] = useState({ Place: "", City: "" });
   const [suggestions, setSuggestions] = useState([]);
 
   async function handleChange(e) {
@@ -56,7 +57,7 @@ const Header = () => {
       }
       const id = result.id;
       // console.log(id);
-      navigate(`../../../places/${id}`);
+      navigate(`../../../places/${id}`, { state: placeData });
     } catch (err) {
       toast.error(
         <p className="text-[11px] font-semibold">Failed to fetch the data!</p>
@@ -110,6 +111,7 @@ const Header = () => {
                       className="relative flex flex-col hover:bg-gray-700 py-0.5 px-2 rounded-lg cursor-pointer transition duration-200"
                       onClick={() => {
                         setQuery(sg.Place);
+                        setPlaceData({ Place: sg.Place, City: sg.City });
                         setFocused(false);
                       }}
                     >

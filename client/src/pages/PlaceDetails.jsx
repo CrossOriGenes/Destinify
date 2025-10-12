@@ -9,6 +9,11 @@ import LoaderBackdrop from "../components/UI/LoaderBackdrop";
 import AsideBar from "../components/place-details/AsideBar";
 import RatingsReviewSection from "../components/place-details/RatingsReviewSection";
 import PlaceImageGallery from "../components/place-details/PlaceImageGallery";
+import BudgetMapSection from "../components/place-details/BudgetMapSection";
+import FestivalSection from "../components/place-details/FestivalSection";
+import GotoTopButton from "../components/UI/GotoTopButton";
+import EndLinks from "../components/places/EndLinks";
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -19,17 +24,18 @@ function PlaceDetails() {
     "place-descr-intro",
     "ratings",
     "place-img-gallery",
-    "festivals",
     "estim-budget",
+    "festivals",
   ];
   const [activeLink, setActiveLink] = useState(sections[0]);
   const fetchedRef = useRef(false);
   const [load, setLoad] = useState(false);
+  const [overallRating, setOverallRating] = useState(0);
   const [placeData, setPlaceData] = useState({});
   const [ratings, setRatings] = useState({});
   const [reviews, setReviews] = useState([]);
   const [imageGallery, setImageGallery] = useState([]);
-  const [overallRating, setOverallRating] = useState(1);
+  const [festivals, setFestivals] = useState([]);
 
   async function fetchPlaceData() {
     // console.log(id);
@@ -45,11 +51,12 @@ function PlaceDetails() {
       }
       if (result.data) {
         console.log(result.data);
-        const { place_data, reviews, aspect_ratings, overall_rating, photos } =
+        const { place_data, reviews, aspect_ratings, overall_rating, photos, festivals } =
           result.data;
         if (place_data) setPlaceData(place_data);
         if (photos && Array.isArray(photos)) setImageGallery(photos);
         if (reviews && Array.isArray(reviews)) setReviews(reviews);
+        if (festivals && Array.isArray(festivals)) setFestivals(festivals);
         if (aspect_ratings) setRatings(aspect_ratings);
         if (overall_rating) setOverallRating(overall_rating);
       }
@@ -106,7 +113,12 @@ function PlaceDetails() {
           overallRating={overallRating}
         />
         <PlaceImageGallery images={imageGallery} />
+        <BudgetMapSection data={placeData} />
+        <FestivalSection festivals={festivals} />
       </main>
+      <EndLinks />
+      
+      <GotoTopButton />
 
       <AnimatePresence>{load && <LoaderBackdrop />}</AnimatePresence>
     </>

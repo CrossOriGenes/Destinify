@@ -30,34 +30,52 @@ const PlaceImageGallery = ({ images }) => {
   return (
     <section
       id="place-img-gallery"
-      className="relative col-span-4 xl:p-[120px] p-[70px] min-h-screen bg-gray-800"
+      className="relative col-span-4 xl:p-[120px] p-[70px] min-h-screen bg-gray-800 overflow-hidden"
     >
-      <div className="w-full text-center -mt-3 mb-18">
+      <div className="absolute top-20 left-20 w-[162px] h-[160px] bg-[url('/images/icon-e.png')] bg-cover bg-center -rotate-15 opacity-25" />
+      <div className="w-full text-center -mt-3 mb-12">
         <h1 className="font-extrabold text-white text-6xl text-wrap capitalize">
           Some shots of <span className="text-indigo-500">the scene</span>
         </h1>
       </div>
-      <Masonry
-        breakpointCols={breakpointColumnsObj}
-        className="flex gap-4"
-        columnClassName="bg-clip-padding"
+      <p
+        className="font-medium text-lg text-gray-400 mb-8"
+        data-aos="fade-left"
       >
-        {images.map((img, idx) => (
-          <motion.div
-            key={idx}
-            layoutId={`img-${idx}`}
-            onClick={() => setSelectedImg({ src: img, id: idx })}
-            className="mb-4 cursor-pointer hover:shadow-lg shadow-gray-600 transition-shadow duration-200 group"
-            transition={{ type: "spring", stiffness: 200, damping: 15 }}
-          >
-            <img
-              src={img}
-              alt=""
-              className="w-full rounded-xl object-cover group-hover:scale-103 transition-transform duration-300"
-            />
-          </motion.div>
-        ))}
-      </Masonry>
+        Nothing is much better than visually experiencing the scenic beauties of
+        your chosen destination! But how is that possible without you being
+        physically present? Thus keeping your desires in mind, destinify
+        promises you to provide a short glimpse of the place you opt to travel
+        by providing some of the best snaps captured in the lenses by our fellow
+        travellers. Hope you enjoy watching them for now atleast...
+      </p>
+      <div className="mb-6">
+        <Masonry
+          breakpointCols={breakpointColumnsObj}
+          className="flex gap-4"
+          columnClassName="bg-clip-padding"
+        >
+          {images.map((img, idx) => (
+            <motion.div
+              key={idx}
+              layoutId={`img-${idx}`}
+              onClick={() => setSelectedImg({ src: img, id: idx })}
+              className="mb-4 cursor-pointer hover:shadow-lg shadow-gray-600 transition-shadow duration-200 group"
+              transition={{ type: "spring", stiffness: 200, damping: 15 }}
+            >
+              <img
+                src={img}
+                alt=""
+                className="w-full rounded-xl object-cover group-hover:scale-103 transition-transform duration-300"
+              />
+            </motion.div>
+          ))}
+        </Masonry>
+      </div>
+      <div
+        className="absolute bottom-0 left-0 w-full h-[100px] bg-blend-screen z-3"
+        style={{ background: "linear-gradient(to top, #101828, transparent)" }}
+      />
 
       <AnimatePresence>
         {selectedImg && (
@@ -68,6 +86,10 @@ const PlaceImageGallery = ({ images }) => {
             exit={{ opacity: 0 }}
             onClick={() => setSelectedImg(null)}
           >
+            <div className="absolute top-0 left-0 w-full flex items-center justify-end p-4 gap-3">
+              <i className="fa-solid fa-magnifying-glass-plus text-gray-300 text-xl" />
+              <i className="fa-solid fa-magnifying-glass-minus text-gray-300 text-xl" />
+            </div>
             <motion.img
               src={selectedImg.src}
               alt=""

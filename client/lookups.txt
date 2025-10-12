@@ -1,0 +1,9 @@
+
+  // const [index, setIndex] = useState(0);
+  // useEffect(() => {
+  //   if (!reviews || reviews.length === 0) return;
+  //   const interval = setInterval(() => {
+  //     setIndex((prev) => (prev + 1) % reviews.length);
+  //   }, 7000);
+  //   return () => clearInterval(interval);
+  // }, [reviews]);

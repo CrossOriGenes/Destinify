@@ -3,13 +3,13 @@ const DescriptionSection = ({ data }) => {
   return (
     <section
       id="place-descr-intro"
-      className="relative lg:col-span-3 col-span-4 xl:px-[100px] xl:py-[60px] pt-0 p-[60px] text-right"
+      className="relative lg:col-span-3 col-span-4 xl:px-[100px] xl:py-[70px] pt-0 p-[60px] text-right overflow-hidden"
     >
       <h1 className="text-6xl font-extrabold" data-aos="fade-up">
         About the <span className="text-indigo-500">place</span>
       </h1>
       <p
-        className="font-medium text-lg text-gray-600 leading-6 mt-6 xl:pl-20 pl-0"
+        className="font-medium text-lg text-gray-600 leading-6 mt-6 mb-12 xl:pl-20 pl-0"
         data-aos="fade-in"
       >
         {Place_Desc ||

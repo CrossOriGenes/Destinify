@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { RatingStarSticker, RatingsStarBox } from "../UI/RatingsStar";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
 
 // const RATINGS = [
 //   { rating_label: "Climate", rating_val: 4.5 },
@@ -35,14 +39,6 @@ import { RatingStarSticker, RatingsStarBox } from "../UI/RatingsStar";
 // ];
 
 const RatingsReviewSection = ({ reviews, ratings, overallRating }) => {
-  const [index, setIndex] = useState(0);
-  useEffect(() => {
-    if (!reviews || reviews.length === 0) return;
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % reviews.length);
-    }, 7000);
-    return () => clearInterval(interval);
-  }, [reviews]);
   // useEffect(() => {
   //   console.log("Updated reviews state: ", reviews);
   // }, [reviews]);
@@ -50,8 +46,9 @@ const RatingsReviewSection = ({ reviews, ratings, overallRating }) => {
   return (
     <section
       id="ratings"
-      className="relative col-span-4 xl:p-[120px] p-[70px] min-h-[150vh] bg-gray-300"
+      className="relative col-span-4 xl:p-[120px] p-[70px] min-h-screen bg-gray-300 overflow-clip"
     >
+      <div className="absolute top-9 left-9 w-[160px] h-[160px] rounded-b-full bg-[url('/images/dots.png')] bg-cover bg-center rotation-animate" />
       <h1 className="text-6xl font-extrabold w-full text-center -mt-2 mb-5">
         Ratings and <span className="text-indigo-500">Reviews</span>
       </h1>
@@ -106,58 +103,63 @@ const RatingsReviewSection = ({ reviews, ratings, overallRating }) => {
             ))}
           </ul>
         </div>
-        <div className="lg:w-[50%] w-full lg:pl-30 lg:py-10 py-20 z-1 overflow-hidden">
+        <div className="relative lg:w-[50%] w-full lg:pl-30 lg:py-10 py-20">
           {reviews.length > 0 ? (
-            <div
-              className="relative flex flex-col items-center justify-center w-full h-full"
-              data-aos="fade-left"
-            >
-              <i className="fa-solid fa-quote-left absolute lg:top-5 -top-10 -left-[60px] text-[9rem] opacity-20" />
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={index}
-                  initial={{ y: "100%", opacity: 0, rotateX: 90 }}
-                  animate={{ y: "0%", opacity: 1, rotateX: 0 }}
-                  exit={{ y: "-100%", opacity: 0, rotateX: -90 }}
-                  transition={{ duration: 0.6, ease: "easeInOut" }}
-                  className="w-full bg-transparent flex flex-col items-center"
-                >
-                  <div className="relative flex flex-col gap-6 lg:mt-0 mt-6">
-                    <p className="font-medium h-[260px] overflow-hidden text-ellipsis text-lg italic leading-5">
-                      {reviews[index]?.text ?? ""}
-                    </p>
-                    <div className="w-full flex items-center justify-center gap-3">
-                      <img
-                        src={reviews[index]?.profile_photo ?? null}
-                        alt=""
-                        className="w-10 h-10 rounded-full bg-cover bg-no-repeat object-cover"
-                      />
-                      <div className="flex flex-col">
-                        <h4 className="font-extrabold uppercase tracking-wider text-sm">
-                          {reviews[index]?.author ?? ""}
-                        </h4>
-                        <RatingStarSticker
-                          style={{ maxWidth: 80 }}
-                          value={reviews[index]?.rating ?? null}
+            <>
+              <i className="fa-solid fa-quote-left absolute lg:-top-4 -top-10 left-15 text-[9rem] opacity-20" />
+              <Swiper
+                modules={[Autoplay, Navigation]}
+                spaceBetween={30}
+                slidesPerView={1}
+                loop={true}
+                autoplay={{
+                  delay: 7000,
+                  disableOnInteraction: false,
+                }}
+                navigation={true}
+                className="w-full h-full relative"
+              >
+                {reviews.map((rev, idx) => (
+                  <SwiperSlide key={idx}>
+                    <div className="relative flex flex-col justify-between gap-6 lg:mt-0 mt-6 select-none">
+                      <p className="font-medium h-[200px] text-ellipsis text-lg italic leading-5 overflow-hidden">
+                        {rev?.text ?? ""}
+                      </p>
+                      <div className="w-full flex items-center justify-center gap-3">
+                        <img
+                          src={rev?.profile_photo ?? ""}
+                          alt=""
+                          className="w-10 h-10 rounded-full bg-cover bg-no-repeat object-cover"
                         />
-                        <span className="text-xs italic">
-                          ({reviews[index]?.time ?? ""})
-                        </span>
+                        <div className="flex flex-col">
+                          <h4 className="font-extrabold uppercase tracking-wider text-sm">
+                            {rev?.author ?? ""}
+                          </h4>
+                          <RatingStarSticker
+                            style={{ maxWidth: 80 }}
+                            value={rev?.rating ?? 0}
+                          />
+                          <span className="text-xs italic">
+                            ({rev?.time ?? ""})
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </>
           ) : (
-            <p className="font-semibold text-2xl text-orange-500">
-              No reviews available!
-            </p>
+            <div className="w-full text-center">
+              <p className="font-semibold text-xl text-gray-800">
+                No reviews available!
+              </p>
+            </div>
           )}
         </div>
       </div>
       <div
-        className="absolute bottom-0 left-0 w-full h-[50px] bg-blend-screen"
+        className="absolute bottom-0 left-0 w-full h-[200px] bg-blend-screen"
         style={{
           background: "linear-gradient(to top, #1e2939, transparent)",
         }}

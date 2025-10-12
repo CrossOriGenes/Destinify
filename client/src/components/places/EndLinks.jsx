@@ -21,36 +21,41 @@ const EndLinks = () => {
             className="w-[250px] h-[150px] object-cover"
           />
           <div className="flex gap-2">
-            <a
-              href="#0"
+            <Link
+              to="../../#"
+              target="_blank"
               className="group w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-cyan-700 transition duration-300"
             >
               <i className="text-lg text-gray-900 fa-brands group-hover:text-white fa-snapchat" />
-            </a>
-            <a
-              href="#0"
+            </Link>
+            <Link
+              to="../../#"
+              target="_blank"
               className="group w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-cyan-700 transition duration-300"
             >
               <i className="text-lg text-gray-900 fa-brands group-hover:text-white fa-youtube" />
-            </a>
-            <a
-              href="#0"
+            </Link>
+            <Link
+              to="../../#"
+              target="_blank"
               className="group w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-cyan-700 transition duration-300"
             >
               <i className="text-lg text-gray-900 fa-brands group-hover:text-white fa-facebook-f" />
-            </a>
-            <a
-              href="#0"
+            </Link>
+            <Link
+              to="../../#"
+              target="_blank"
               className="group w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-cyan-700 transition duration-300"
             >
               <i className="text-lg text-gray-900 fa-brands group-hover:text-white fa-instagram" />
-            </a>
-            <a
-              href="#0"
+            </Link>
+            <Link
+              to="../../#"
+              target="_blank"
               className="group w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-cyan-700 transition duration-300"
             >
               <i className="text-lg text-gray-900 fa-brands group-hover:text-white fa-x-twitter" />
-            </a>
+            </Link>
           </div>
         </div>
         <h4 className="text-xl text-indigo-300 font-bold pt-3 pb-1">
@@ -72,16 +77,16 @@ const EndLinks = () => {
         <hr className="w-full h-0.5 bg-zinc-700" />
         <div className="w-full text-center">
           <p className="text-[15px] font-semibold text-gray-500 py-4">
-            <a
-              href="#0"
+            <Link
+              to="../../policies"
               className="hover:text-pink-300 transition duration-300"
             >
               Privacy Policy{" "}
-            </a>
+            </Link>
             &nbsp;&nbsp;|&nbsp;&nbsp;
-            <a href="#0" className="hover:text-pink-300">
+            <Link to="../../terms" className="hover:text-pink-300">
               Terms & Conditions
-            </a>
+            </Link>
           </p>
         </div>
         <p className="w-full text-center text-[13px] font-medium text-gray-500 pt-3 pb-1">

@@ -2,8 +2,8 @@
 import os
 from dotenv import load_dotenv
 from bson import ObjectId, Decimal128
-from datetime import datetime, timedelta
-import requests
+from datetime import datetime, timedelta, timezone
+import requests 
 import re
 import statistics
 
@@ -53,17 +53,78 @@ def formatted_data(documents):
         processed.append(new_doc)
     return processed
 
-# def apply_month_filter(data):
-#     current_month = datetime.now().month
-#     filtered = []
-#     for place in data:
-#         best_time = place.get("Best_Time_To_Visit", [])
-#         # place["month_boost"] = current_month in best_time
-#         if current_month in best_time:
-#             place["month_boost"] = True
-#             filtered.append(place)
-#     # return sorted(data, key=lambda x: not x["month_boost"])
-#     return filtered
+# fetch a single image for a query
+def fetch_1_unsplash_image(query):
+    try:
+        url = f"https://api.unsplash.com/search/photos?query={query}&per_page=1"
+        headers = {"Authorization": f"Client-ID {UNSPLASH_KEY}"}
+        r = requests.get(url, headers=headers, timeout=6)
+        data = r.json()
+        if "results" in data and len(data["results"]) > 0:
+            return data["results"][0]["urls"]["regular"]
+    except Exception as e:
+        print("Unsplash image fetch error:", e)
+    return "https://source.unsplash.com/800x600/?festival,india"
+
+# fetch 3-4 festivals for a specific place
+def fetch_festivals(city_name):
+    try:
+        url = "https://en.wikipedia.org/w/api.php"
+        query = f"{city_name} festivals"
+        params = {
+            "action": "query",
+            "list": "search",
+            "srsearch": query,
+            "format": "json",
+            "srlimit": 4,
+        }
+        headers = {"User-Agent": "TravelRecommender/1.0"}
+        res = requests.get(url=url, params=params, headers=headers, timeout=6)
+        if res.status_code != 200:
+            return get_fallback_festivals(city_name)
+        data = res.json().get("query", {}).get("search", [])
+        if not data:
+            return get_fallback_festivals(city_name)
+
+        festivals = []
+        for item in data[:4]:
+            title = item.get("title", "Unknown Festival")
+            snippet = item.get("snippet", "").replace("<span class=\"searchmatch\">", "").replace("</span>", "")
+            img = fetch_1_unsplash_image(title)
+            festivals.append({
+                "title": title,
+                "description": snippet or f"A popular festival of {city_name}.",
+                "image": img,
+                "place": city_name
+            })
+        return festivals or get_fallback_festivals(city_name)
+
+    except Exception:
+        return get_fallback_festivals(city_name)
+
+# fallback festivals helper
+def get_fallback_festivals(place_name):
+    sample_data = [
+        {
+            "name": f"{place_name} Cultural Fest",
+            "description": f"A vibrant local celebration showcasing {place_name}'s art, dance, and cuisine.",
+            "location": place_name,
+            "image": f"https://source.unsplash.com/random/800x600/?festival,{place_name}"
+        },
+        {
+            "name": f"{place_name} Food Carnival",
+            "description": f"A paradise for foodies visiting {place_name}, offering local delicacies and street flavors.",
+            "location": place_name,
+            "image": f"https://source.unsplash.com/random/800x600/?food,festival,{place_name}"
+        },
+        {
+            "name": f"{place_name} Heritage Parade",
+            "description": f"A cultural event honoring the traditions and history of {place_name}.",
+            "location": place_name,
+            "image": f"https://source.unsplash.com/random/800x600/?parade,{place_name}"
+        },
+    ]
+    return sample_data
 
 # Boost output-list by current festivals
 def apply_festival_boost(data, festival_place_ids):
@@ -174,7 +235,7 @@ def match_places_by_event(event, places):
     return results
 
 # fetch images of place from google places API
-def fetch_place_google_photos(photo_refs, MAX=10):
+def fetch_place_google_photos(photo_refs, MAX):
     photo_urls = []
     for ref in photo_refs[:MAX]:
         try:
@@ -217,8 +278,23 @@ def analyze_aspect_ratings(reviews):
     
     return aspect_ratings
 
+# fetch combined photos
+def fetch_place_photos(place_name, photo_refs, existing_photos):
+    photos = []
+    google_photos = fetch_place_google_photos(photo_refs, 10)
+    if google_photos:
+        photos.extend(google_photos)
+    if len(photos) < 19:
+        unsplash_photos = fetch_place_unsplash_photos(place_name, 9)
+        photos.extend(unsplash_photos)
+    if existing_photos:
+        photos.extend(existing_photos[:1])
+    photos = list(dict.fromkeys(photos))
+    photo_urls = photos[:20]    
+    return photo_urls
+
 # fetch reviews for a place
-def fetch_google_reviews(place_name):
+def fetch_google_reviews(place_name, existing_photos):
     search_url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json"
     params = {
         "input": place_name,
@@ -247,11 +323,7 @@ def fetch_google_reviews(place_name):
         google_rating = result.get("rating", 1)
         photos = result.get("photos", [])
         photo_refs = [p.get("photo_reference") for p in photos if p.get("photo_reference")]
-        photo_urls = fetch_place_google_photos(photo_refs)
-        # print(photo_urls)
-        if not photo_urls or len(photo_urls) == 0:
-            print(f"No google photos found for {place_name}!\nUsing Unsplash fallback to generate new photos...")
-            photo_urls = fetch_place_unsplash_photos(place_name, 10)
+        photo_urls = fetch_place_photos(place_name, photo_refs, existing_photos) if len(existing_photos) == 1 else existing_photos
         reviews = []
         for r in result.get("reviews", []):
             reviews.append({
@@ -275,3 +347,66 @@ def fetch_google_reviews(place_name):
     except Exception as e:
         print("Error fetching Google reviews:", e)
         return None
+
+# fetch coordinates of a place
+def get_coordinates(address: str):
+    # print(address)
+    url = f"https://maps.googleapis.com/maps/api/geocode/json"
+    params = { "address": address, "key": GOOGLE_PLACES_API_KEY }
+    res = requests.get(url, params=params).json()
+    if res["status"] == "OK" and res["results"]:
+        loc = res["results"][0]["geometry"]["location"]
+        return loc["lat"], loc["lng"]
+    return None, None
+
+# fetch possible travel options according to source & destination
+def get_route_options(origin, destination):
+    url = "https://maps.googleapis.com/maps/api/directions/json"
+    modes = ["driving", "train", "transit", "walking", "bicycling"]
+    routes_data = []
+
+    for mode in modes:
+        params = {
+            "origin": f"{origin[0]},{origin[1]}",
+            "destination": f"{destination[0]},{destination[1]}",
+            "mode": mode,
+            "key": GOOGLE_PLACES_API_KEY
+        }
+        res = requests.get(url, params=params).json()
+
+        if res["status"] == "OK" and res["routes"]:
+            route = res["routes"][0]["legs"][0]
+            polyline_points = res["routes"][0].get("overview_polyline", {}).get("points", None)
+            dist_text = route["distance"]["text"]
+            dur_text = route["duration"]["text"]
+            dist_val = route["distance"]["value"] / 1000  # in km
+            dur_val = route["duration"]["value"] / 3600  # in hours
+
+            routes_data.append({
+                "mode": mode.capitalize(),
+                "distance": dist_text,
+                "duration": dur_text,
+                "distance_km": dist_val,
+                "duration_hr": dur_val,
+                "polyline": polyline_points
+            })
+
+    return routes_data
+
+# Cost chart for various travel options
+COST_TABLE = {
+    "Driving": 8,
+    "Train": 1.5,
+    "Transit": 2.5,
+    "Bicycling": 0,
+    "Walking": 0,
+}
+# estimate cost and add to existing route options
+def estimate_cost(routes_data, user_budget=None):
+    for r in routes_data:
+        cost = round(r["distance_km"] * COST_TABLE.get(r["mode"], 5))
+        r["estimated_cost"] = cost
+        if user_budget:
+            r["within_budget"] = cost <= user_budget
+    
+    return sorted(routes_data, key=lambda x: x["estimated_cost"] if user_budget else x["duration_hr"])
