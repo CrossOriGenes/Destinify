@@ -4,8 +4,10 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from flask_jwt_extended import JWTManager
 # routes
 from routes.places import places_routes
+from routes.auth import auth_routes
 
 
 load_dotenv() # initiate .env
@@ -13,6 +15,10 @@ load_dotenv() # initiate .env
 app = Flask(__name__)
 
 CORS(app)
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET")
+app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 60 * 60 * 12
+JWTManager(app)
 PORT = int(os.getenv("PORT"))
 MONGO_URI = os.getenv("MONGO_URI", "")
 DB_NAME = os.getenv("DB_NAME", "")
@@ -23,6 +29,7 @@ def home():
     return { "msg": "Server running successfully 🚀" }
 # Utility routes
 app.register_blueprint(places_routes, url_prefix="/api/places")
+app.register_blueprint(auth_routes, url_prefix="/api/auth")
 
 
 # Connection to DB

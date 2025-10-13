@@ -4,3 +4,6 @@ pandas
 python-dotenv
 requests
 pymongo
+authlib
+flask-bcrypt
+flask-jwt-extended

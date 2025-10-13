@@ -16,21 +16,21 @@ Places = get_places_collection()
 
 # Schema for Places:
 # {
-#     "Place": str(),
-#     "City": str(),
-#     "Place_Desc": str(),
-#     "Place_images": list(),
-#     "Budget": list(),
-#     "Duration": str(),
-#     "City_Rating": float(),
-#     "Ideal_Duration": Date(),
-#     "Best_Time_To_Visit": list(),
-#     "City_Desc": str(),
-#     "Place": str(),
-#     "Place_Rating": float(),
-#     "Distance": int(),
-#     "Place_Desc": str(),
-#     "Duration": str(),
-#     "Place_images": list(),
-#     "Budget": list()
+#     "Place": str,
+#     "City": str,
+#     "Place_Desc": str,
+#     "Place_images": list,
+#     "Budget": list,
+#     "Duration": str,
+#     "City_Rating": float,
+#     "Ideal_Duration": datetime,
+#     "Best_Time_To_Visit": list,
+#     "City_Desc": str,
+#     "Place": str,
+#     "Place_Rating": float,
+#     "Distance": int,
+#     "Place_Desc": str,
+#     "Duration": str,
+#     "Place_images": list,
+#     "Budget": list
 # }

@@ -12,13 +12,20 @@ def get_users_collection():
     return db["Users"]
 
 # Export schema as 'User'
-User = get_users_collection() 
+Users = get_users_collection() 
 
 # Schema for User:
 # {
-#     "u_name": str(),
-#     "dob": date(),
-#     "age": int(),
-#     "email": str(),
-#     "preferences": list(),
+#     "username": str,
+#     "age": int,
+#     "dob": datetime,
+#     "email": str,
+#     "password": str, 
+#     "preferences": {
+#          "modes": list,
+#          "interested_themes": list,
+#      },
+#     "recent_searches": [str],
+#     "wishlist": list,
+#     "picture": str
 # }

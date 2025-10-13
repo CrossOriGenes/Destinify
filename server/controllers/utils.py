@@ -16,6 +16,27 @@ EVENTBRITE_TOKEN = os.getenv("EVENTBRITE_TOKEN")
 GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY")
 
 
+# data formatter
+def formatted_data(documents):   
+    processed = []
+    for doc in documents:
+        new_doc = {}
+        for key, value in doc.items():
+            if isinstance(value, ObjectId):
+                new_doc[key] = str(value)
+            elif isinstance(value, Decimal128):
+                new_doc[key] = float(value.to_decimal())
+            elif isinstance(value, datetime):
+                new_doc[key] = value.isoformat()
+            else:
+                new_doc[key] = value
+        processed.append(new_doc)
+    return processed
+
+
+# ================================
+# Places helpers
+# ================================
 # image fetcher for a particular place
 def fetch_place_unsplash_photos(query, counts):
     url = f"https://api.unsplash.com/search/photos?query={query}&per_page={counts}"
@@ -35,23 +56,6 @@ def fetch_place_unsplash_photos(query, counts):
     except Exception as e:
         print("Image fetch error: ", e)
         return []
-
-# data formatter
-def formatted_data(documents):   
-    processed = []
-    for doc in documents:
-        new_doc = {}
-        for key, value in doc.items():
-            if isinstance(value, ObjectId):
-                new_doc[key] = str(value)
-            elif isinstance(value, Decimal128):
-                new_doc[key] = float(value.to_decimal())
-            elif isinstance(value, datetime):
-                new_doc[key] = value.isoformat()
-            else:
-                new_doc[key] = value
-        processed.append(new_doc)
-    return processed
 
 # fetch a single image for a query
 def fetch_1_unsplash_image(query):
@@ -410,3 +414,8 @@ def estimate_cost(routes_data, user_budget=None):
             r["within_budget"] = cost <= user_budget
     
     return sorted(routes_data, key=lambda x: x["estimated_cost"] if user_budget else x["duration_hr"])
+
+
+# ====================================
+# Users Helpers
+# ====================================
