@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
-from flask_jwt_extended import create_access_token, set_access_cookies
+from flask_jwt_extended import create_access_token
 from models.user_model import Users
 import controllers.utils as ut 
 import re
