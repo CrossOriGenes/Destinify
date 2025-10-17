@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AnimatePresence } from "framer-motion";
@@ -13,11 +13,13 @@ import BudgetMapSection from "../components/place-details/BudgetMapSection";
 import FestivalSection from "../components/place-details/FestivalSection";
 import GotoTopButton from "../components/UI/GotoTopButton";
 import EndLinks from "../components/places/EndLinks";
-
+import { AppContext } from "../components/store/AppContext";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function PlaceDetails() {
+  const { addPreferredTheme, addSearchedPlaceToList, addToWishlist } =
+    useContext(AppContext);
   const { id } = useParams();
   const { pathname } = useLocation();
   const sections = [
@@ -50,10 +52,20 @@ function PlaceDetails() {
         return;
       }
       if (result.data) {
-        console.log(result.data);
-        const { place_data, reviews, aspect_ratings, overall_rating, photos, festivals } =
-          result.data;
-        if (place_data) setPlaceData(place_data);
+        // console.log(result.data);
+        const {
+          place_data,
+          reviews,
+          aspect_ratings,
+          overall_rating,
+          photos,
+          festivals,
+        } = result.data;
+        if (place_data) {
+          setPlaceData(place_data);
+          addPreferredTheme(place_data.Category[0]);
+          addSearchedPlaceToList(place_data.Place);
+        }
         if (photos && Array.isArray(photos)) setImageGallery(photos);
         if (reviews && Array.isArray(reviews)) setReviews(reviews);
         if (festivals && Array.isArray(festivals)) setFestivals(festivals);
@@ -68,6 +80,15 @@ function PlaceDetails() {
     } finally {
       setLoad(false);
     }
+  }
+  function addPlaceToWishlistHandler() {
+    addToWishlist({
+      id: placeData._id,
+      place: placeData.Place,
+      description: placeData.Place_Desc,
+      rating: placeData.Place_Rating,
+      picture: placeData.Place_images[0],
+    });
   }
 
   useEffect(() => {
@@ -114,10 +135,13 @@ function PlaceDetails() {
         />
         <PlaceImageGallery images={imageGallery} />
         <BudgetMapSection data={placeData} />
-        <FestivalSection festivals={festivals} />
+        <FestivalSection
+          festivals={festivals}
+          onAddToWishlist={addPlaceToWishlistHandler}
+        />
       </main>
       <EndLinks />
-      
+
       <GotoTopButton />
 
       <AnimatePresence>{load && <LoaderBackdrop />}</AnimatePresence>

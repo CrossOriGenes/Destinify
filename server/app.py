@@ -16,7 +16,7 @@ app = Flask(__name__)
 
 CORS(app)
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET")
-app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+app.config["JWT_TOKEN_LOCATION"] = ["cookies", "headers"]
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 60 * 60 * 12
 JWTManager(app)
 PORT = int(os.getenv("PORT"))

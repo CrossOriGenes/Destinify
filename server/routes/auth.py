@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, verify_jwt_in_request
 from models.user_model import Users
 import controllers.utils as ut 
 import re
@@ -66,7 +66,7 @@ def manual_signup():
         return jsonify({ "errMsg": "Failed to insert data into Database!" }), 400
     
     print("User successfully registered into database.")
-    print("Registered User data: ", user_data)
+    print("Registered data for user- ", username)
     return jsonify({
         "success": True,
         "msg": "Registered successfully",
@@ -93,11 +93,8 @@ def manual_signin():
     if not is_pwd_same:
         return jsonify({ "errMsg": "Password invalid/mismatch!" }), 400
     
-    payload = { 
-        "id": data[0].get("_id"),
-        "name": data[0].get("username") 
-    }
-    token = create_access_token(identity=payload, expires_delta=timedelta(minutes=12))  # generate token
+    # generate token via user email
+    token = create_access_token(identity=data[0].get("email"), expires_delta=timedelta(minutes=12))
     response = jsonify({
         "msg": "Login Successful",
         "description": "Welcome back to destinify...",
@@ -107,4 +104,18 @@ def manual_signin():
     response.set_cookie("access_token", token)
     
     return response, 200
-    
+
+# ==================================
+# VERIFY TOKEN
+# ==================================
+@auth_routes.route("/verify")
+@jwt_required(optional=True)
+def verify_token():
+    try:
+        verify_jwt_in_request(optional=True)
+        token_info = get_jwt_identity()
+        if not token_info:
+            return jsonify({ "success": False, "msg": "Token missing or invalid!" }), 401
+        return jsonify({ "success": True, "user": token_info })
+    except Exception as e:
+        return jsonify({ "success": False, "msg": str(e) }), 401

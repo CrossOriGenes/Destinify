@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 
-const FestivalSection = ({ festivals }) => {
+const FestivalSection = ({ festivals, onAddToWishlist }) => {
   // useEffect(() => {
   //   console.log(festivals);
   // }, [festivals]);
@@ -74,7 +74,7 @@ const FestivalSection = ({ festivals }) => {
               Post a comment
             </span>
           </button>
-          <button type="button" className="btn z-2">
+          <button type="button" className="btn z-2" onClick={onAddToWishlist}>
             <span className="font-semibold text-white text-sm">
               Add to Favlist
             </span>

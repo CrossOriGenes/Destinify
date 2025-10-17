@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Menu from "./Menu";
 import Wishlist from "./Wishlist";
@@ -11,6 +11,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const Header = () => {
   const fetchedRef = useRef(false);
   const navigate = useNavigate();
+  const { id } = useParams();
   const [open, setOpen] = useState("");
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -78,65 +79,67 @@ const Header = () => {
           className="xl:w-[150px] xl:h-[80px] w-[100px] h-[50px] bg-cover"
         />
         <div className="relative flex items-center gap-3">
-          <div className="relative flex flex-col w-[220px]">
-            <form
-              onSubmit={searchBarFormHandler}
-              className="relative w-full border-2 border-gray-600 rounded-3xl overflow-clip mr-1"
-            >
-              <input
-                type="text"
-                value={query}
-                className="relative text-sm font-semibold text-gray-950 placeholder:text-gray-600 py-1.5 px-3 outline-none"
-                placeholder="Search by City/Place..."
-                onChange={handleChange}
-                onFocus={() => setFocused(true)}
-              />
-              <button className="absolute top-0 right-0 w-8 h-8 p-3 bg-gray-700 hover:bg-gray-600 cursor-pointer transition-colors duration-300 flex justify-center items-center">
-                <i className="fa-solid fa-magnifying-glass text-gray-300 text-sm" />
-              </button>
-            </form>
-            {focused && query && (
-              <ul className="absolute w-full min-h-30 top-10 left-0 bg-gray-900 shadow-2xl rounded-2xl z-3 p-2 flex flex-col gap-1.5">
-                {loading && (
-                  <>
-                    <ListSkeleton />
-                    <ListSkeleton />
-                    <ListSkeleton />
-                  </>
-                )}
-                {!loading &&
-                  suggestions.map((sg, idx) => (
-                    <li
-                      key={idx}
-                      className="relative flex flex-col hover:bg-gray-700 py-0.5 px-2 rounded-lg cursor-pointer transition duration-200"
-                      onClick={() => {
-                        setQuery(sg.Place);
-                        setPlaceData({ Place: sg.Place, City: sg.City });
-                        setFocused(false);
-                      }}
-                    >
-                      <h5 className="font-bold text-white text-[14px] w-full overflow-hidden text-ellipsis whitespace-nowrap">
-                        {sg.Place}
-                      </h5>
-                      <p className="font-medium text-indigo-400 text-xs leading-3">
-                        {sg.City}
-                      </p>
-                    </li>
-                  ))}
-                {!loading && suggestions.length === 0 && (
-                  <span className="text-lg text-red-400 font-semibold text-center mt-2.5">
-                    No match found!
-                  </span>
-                )}
-              </ul>
-            )}
-          </div>
+          {!id && (
+            <div className="relative flex flex-col w-[220px]">
+              <form
+                onSubmit={searchBarFormHandler}
+                className="relative w-full border-2 border-gray-600 rounded-3xl overflow-clip mr-1"
+              >
+                <input
+                  type="text"
+                  value={query}
+                  className="relative text-sm font-semibold text-gray-950 placeholder:text-gray-600 py-1.5 px-3 outline-none"
+                  placeholder="Search by City/Place..."
+                  onChange={handleChange}
+                  onFocus={() => setFocused(true)}
+                />
+                <button className="absolute top-0 right-0 w-8 h-8 p-3 bg-gray-700 hover:bg-gray-600 cursor-pointer transition-colors duration-300 flex justify-center items-center">
+                  <i className="fa-solid fa-magnifying-glass text-gray-300 text-sm" />
+                </button>
+              </form>
+              {focused && query && (
+                <ul className="absolute w-full min-h-30 top-10 left-0 bg-gray-900 shadow-2xl rounded-2xl z-3 p-2 flex flex-col gap-1.5">
+                  {loading && (
+                    <>
+                      <ListSkeleton />
+                      <ListSkeleton />
+                      <ListSkeleton />
+                    </>
+                  )}
+                  {!loading &&
+                    suggestions.map((sg, idx) => (
+                      <li
+                        key={idx}
+                        className="relative flex flex-col hover:bg-gray-700 py-0.5 px-2 rounded-lg cursor-pointer transition duration-200"
+                        onClick={() => {
+                          setQuery(sg.Place);
+                          setPlaceData({ Place: sg.Place, City: sg.City });
+                          setFocused(false);
+                        }}
+                      >
+                        <h5 className="font-bold text-white text-[14px] w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                          {sg.Place}
+                        </h5>
+                        <p className="font-medium text-indigo-400 text-xs leading-3">
+                          {sg.City}
+                        </p>
+                      </li>
+                    ))}
+                  {!loading && suggestions.length === 0 && (
+                    <span className="text-lg text-red-400 font-semibold text-center mt-2.5">
+                      No match found!
+                    </span>
+                  )}
+                </ul>
+              )}
+            </div>
+          )}
           <div
             className="w-10 h-10 relative rounded-full border-2 border-white overflow-hidden hover:ring-5 hover:ring-gray-700 transition duration-300"
             onClick={() => setOpen("menu")}
           >
             <img
-              src="/images/user3.jpg"
+              src="/images/avatar_default.png"
               alt=""
               className="absolute top-0 left-0 w-full h-full object-cover"
             />

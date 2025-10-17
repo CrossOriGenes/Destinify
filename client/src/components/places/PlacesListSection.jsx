@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "react-toastify";
@@ -7,7 +7,7 @@ import RatingsStar from "../UI/RatingsStar";
 import LoaderBackdrop from "../UI/LoaderBackdrop";
 import Modal from "../UI/Modal";
 import FilterListForm from "./FilterListForm";
-import { useAppContext } from "../store/AppContext";
+import { AppContext } from "../store/AppContext";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 // const PLACES = [
@@ -86,7 +86,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 // ];
 
 const PlacesListSection = () => {
-  const { pageReqCnt, setRequestCount } = useAppContext();
+  const { pageReqCnt, setRequestCount } = useContext(AppContext);
   const [cnt, setCnt] = useState(pageReqCnt);
   const fetchedRef = useRef(false);
   const [loading, setLoading] = useState("");
