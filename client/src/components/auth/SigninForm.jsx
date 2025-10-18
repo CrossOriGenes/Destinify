@@ -1,7 +1,22 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 
-const SigninForm = ({ isActive, onToggle, errMsg, isLoading }) => {
+const SigninForm = ({ isActive, onToggle, errMsg, isLoading, onSubmit }) => {
+  const unameRef = useRef();
+  const pswrdRef = useRef();
+  const [show, setShow] = useState(false);
+
+  function submitFormHandler(e) {
+    e.preventDefault();
+    if (!unameRef.current.value.trim() || !pswrdRef.current.value.trim())
+      return;
+    const signInData = {
+      username: unameRef.current.value,
+      password: pswrdRef.current.value,
+    };
+    onSubmit(signInData);
+  }
+
   return (
     <motion.div
       animate={{ opacity: isActive ? 1 : 0 }}
@@ -24,7 +39,11 @@ const SigninForm = ({ isActive, onToggle, errMsg, isLoading }) => {
         <h1 className="font-extrabold capitalize text-gray-100 z-2 mb-3">
           Sign<span className="text-indigo-500">In</span>
         </h1>
-        <form className="relative w-full flex flex-col items-center px-4 z-2 my-6">
+        <form
+          className="relative w-full flex flex-col items-center px-4 z-2 mt-6"
+          autoComplete="off"
+          onSubmit={submitFormHandler}
+        >
           <div className="relative w-[80%] flex flex-col mb-3">
             <label
               htmlFor="username"
@@ -33,6 +52,7 @@ const SigninForm = ({ isActive, onToggle, errMsg, isLoading }) => {
               Username
             </label>
             <input
+              ref={unameRef}
               type="text"
               id="username"
               className="outline-none w-full border-3 border-gray-500 py-2 px-4 rounded-3xl focus:ring-3 ring-indigo-300 transition duration-400 text-md text-gray-200 placeholder:text-gray-600 font-medium"
@@ -50,7 +70,8 @@ const SigninForm = ({ isActive, onToggle, errMsg, isLoading }) => {
               Password
             </label>
             <input
-              type="password"
+              ref={pswrdRef}
+              type={show ? "text" : "password"}
               id="password"
               className="outline-none w-full border-3 border-gray-500 py-2 px-4 rounded-3xl focus:ring-3 ring-indigo-300 transition duration-400 text-md text-gray-200 placeholder:text-gray-600 font-medium"
               placeholder="Abc#12"
@@ -58,14 +79,28 @@ const SigninForm = ({ isActive, onToggle, errMsg, isLoading }) => {
               required
             />
             <div className="absolute top-7 right-2 flex items-center justify-center w-8 h-8">
-              <input type="checkbox" id="pass_1" hidden />
+              <input
+                type="checkbox"
+                id="pass_1"
+                hidden
+                onChange={() => setShow((prev) => !prev)}
+              />
               <label
                 htmlFor="pass_1"
                 className="text-lg text-gray-400 font-semibold"
               >
-                <i className="fa-solid fa-eye" />
+                {show ? (
+                  <i className="fa-solid fa-eye-slash" />
+                ) : (
+                  <i className="fa-solid fa-eye" />
+                )}
               </label>
             </div>
+          </div>
+          <div className="relative w-[75%] flex justify-end">
+            <span className="font-medium text-[13px] text-cyan-400 hover:text-cyan-200 cursor-default capitalize mt-1.5 transition duration-300">
+              Forgot password?
+            </span>
           </div>
           <button
             className={`btn-dark z-2 flex items-center justify-center mt-7 ${

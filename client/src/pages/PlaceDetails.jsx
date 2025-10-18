@@ -18,7 +18,7 @@ import { AppContext } from "../components/store/AppContext";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function PlaceDetails() {
-  const { addPreferredTheme, addSearchedPlaceToList, addToWishlist } =
+  const { addPreferredTheme, addSearchedPlaceToList, addToWishlist, token } =
     useContext(AppContext);
   const { id } = useParams();
   const { pathname } = useLocation();
@@ -32,6 +32,7 @@ function PlaceDetails() {
   const [activeLink, setActiveLink] = useState(sections[0]);
   const fetchedRef = useRef(false);
   const [load, setLoad] = useState(false);
+  const [addToWishlistLoad, setAddtoWishlistLoad] = useState(false);
   const [overallRating, setOverallRating] = useState(0);
   const [placeData, setPlaceData] = useState({});
   const [ratings, setRatings] = useState({});
@@ -81,14 +82,42 @@ function PlaceDetails() {
       setLoad(false);
     }
   }
-  function addPlaceToWishlistHandler() {
-    addToWishlist({
+  async function addPlaceToWishlistHandler() {
+    const wishlistDataObj = {
       id: placeData._id,
       place: placeData.Place,
       description: placeData.Place_Desc,
       rating: placeData.Place_Rating,
       picture: placeData.Place_images[0],
-    });
+    };
+    addToWishlist(wishlistDataObj);
+    try {
+      setAddtoWishlistLoad(true);
+      const res = await fetch(`${BASE_URL}/users/add_to_wishlist`, {
+        method: "POST",
+        body: JSON.stringify({ place_data: wishlistDataObj }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      toast.success(
+        <div className="flex flex-col px-1.5">
+          <h3 className="font-bold text-white text-[16px]">{data.msg}</h3>
+          <p className="text-xs text-gray-500 font-medium">
+            {data.description}
+          </p>
+        </div>
+      );
+    } catch (err) {
+      toast.error(
+        <p className="text-[11px] font-semibold">Failed to fetch data!</p>
+      );
+      console.error("Something went wrong, try again later!", err);
+    } finally {
+      setAddtoWishlistLoad(false);
+    }
   }
 
   useEffect(() => {
@@ -136,6 +165,7 @@ function PlaceDetails() {
         <PlaceImageGallery images={imageGallery} />
         <BudgetMapSection data={placeData} />
         <FestivalSection
+          isLoading={addToWishlistLoad}
           festivals={festivals}
           onAddToWishlist={addPlaceToWishlistHandler}
         />

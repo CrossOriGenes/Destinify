@@ -364,7 +364,13 @@ def suggest_places():
     
     regex = re.compile(query, re.IGNORECASE)
     cursor = Places.find(
-        {"$or": [{"Place": regex}, {"City": regex}]},
+        {"$or": 
+            [
+                {"Place": regex}, 
+                {"City": regex}, 
+                {"City_Desc": regex}
+            ]
+        },
         {"Place": 1, "City": 1, "_id": 0}
     ).limit(5)
     suggestions = list(cursor)

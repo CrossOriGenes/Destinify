@@ -91,12 +91,11 @@ def manual_signin():
     hashed_pwd = data[0].get("password")
     is_pwd_same = bcrypt.check_password_hash(hashed_pwd, password)
     if not is_pwd_same:
-        return jsonify({ "errMsg": "Password invalid/mismatch!" }), 400
-    
+        return jsonify({ "errMsg": "Password invalid/mismatch!" }), 400    
     # generate token via user email
-    token = create_access_token(identity=data[0].get("email"), expires_delta=timedelta(minutes=12))
+    token = create_access_token(identity=data[0].get("email"), expires_delta=timedelta(hours=12))
     response = jsonify({
-        "msg": "Login Successful",
+        "msg": f"Hi {username}",
         "description": "Welcome back to destinify...",
         "user_data": data[0],
         "token": token

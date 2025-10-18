@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 
-const FestivalSection = ({ festivals, onAddToWishlist }) => {
+const FestivalSection = ({ festivals, onAddToWishlist, isLoading }) => {
   // useEffect(() => {
   //   console.log(festivals);
   // }, [festivals]);
@@ -74,10 +74,23 @@ const FestivalSection = ({ festivals, onAddToWishlist }) => {
               Post a comment
             </span>
           </button>
-          <button type="button" className="btn z-2" onClick={onAddToWishlist}>
-            <span className="font-semibold text-white text-sm">
-              Add to Favlist
-            </span>
+          <button
+            type="button"
+            className="btn z-2 flex items-center justify-center"
+            onClick={onAddToWishlist}
+          >
+            {isLoading ? (
+              <>
+                <strong className="font-semibold text-white text-sm">
+                  Adding...
+                </strong>
+                <span className="block w-4 h-4 border-t-3 border-r-3 border-amber-200 ml-2 rounded-full animate-spin" />
+              </>
+            ) : (
+              <strong className="font-semibold text-white text-sm">
+                Add to Favlist
+              </strong>
+            )}
           </button>
         </div>
       </div>

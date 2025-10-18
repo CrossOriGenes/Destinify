@@ -9,11 +9,12 @@ import { AppContext } from "../components/store/AppContext";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function Auth() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(null);
   const [err, setErr] = useState("");
   const { search } = useLocation();
   const mode = new URLSearchParams(search).get("mode");
-  const { preferredThemes, searchList, wishlist } = useContext(AppContext);
+  const { preferredThemes, searchList, wishlist, setAccessToken, setUser } =
+    useContext(AppContext);
   const navigate = useNavigate();
 
   async function handleSignupRequest(formData) {
@@ -25,7 +26,7 @@ function Auth() {
     };
     // console.log(newData);
     try {
-      setLoading(true);
+      setLoading("signup");
       const res = await fetch(`${BASE_URL}/auth/signup`, {
         method: "POST",
         body: JSON.stringify(newData),
@@ -39,23 +40,58 @@ function Auth() {
         return;
       }
       setErr("");
-      // console.log(data);
       toast.success(
-        <div className="flex flex-col p-1.5">
-          <h3 className="font-bold text-white text-lg">{data.msg}</h3>
+        <div className="flex flex-col px-1.5">
+          <h3 className="font-bold text-white text-[16px]">{data.msg}</h3>
           <p className="text-xs text-gray-500 font-medium">
             {data.description}
           </p>
         </div>
       );
       navigate("../auth?mode=signin");
+      // console.log(data);
     } catch (err) {
       toast.error(
         <p className="text-[11px] font-semibold">Failed to register!</p>
       );
       console.error(err);
     } finally {
-      setLoading(false);
+      setLoading(null);
+    }
+  }
+  async function handleSigninRequest(formData) {
+    // console.log(formData);
+    try {
+      setLoading("signin");
+      const res = await fetch(`${BASE_URL}/auth/login`, {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      if (res.status === 400) {
+        setErr(data.errMsg);
+        return;
+      }
+      setErr("");
+      setAccessToken(data.token);
+      setUser(data.user_data);
+      toast.success(
+        <div className="flex flex-col px-1.5">
+          <h3 className="font-bold text-white text-[16px]">{data.msg}</h3>
+          <p className="text-xs text-gray-500 font-medium">
+            {data.description}
+          </p>
+        </div>
+      );
+      navigate("../home");
+    } catch (err) {
+      toast.error(
+        <p className="text-[11px] font-semibold">Failed to register!</p>
+      );
+      console.error(err);
+    } finally {
+      setLoading(null);
     }
   }
 
@@ -125,14 +161,17 @@ function Auth() {
 
           <SignupForm
             errMsg={err}
-            isLoading={loading}
+            isLoading={loading === "signup"}
             isActive={mode === "signup"}
             onToggle={() => navigate("../auth?mode=signin")}
             onSubmit={handleSignupRequest}
           />
           <SigninForm
+            errMsg={err}
+            isLoading={loading === "signin"}
             isActive={mode === "signin"}
             onToggle={() => navigate("../auth?mode=signup")}
+            onSubmit={handleSigninRequest}
           />
         </section>
       </main>

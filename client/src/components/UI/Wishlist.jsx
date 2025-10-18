@@ -47,36 +47,38 @@ const Wishlist = ({ onClose }) => {
         >
           {wishlist.map((item, i) => (
             <li
-              className="w-full flex items-start justify-between py-4 px-1 border-b-1 border-gray-400"
+              className="w-full flex flex-col items-start justify-between py-4 px-1 border-b-1 border-gray-400"
               key={item.id}
             >
-              <img
-                src={item.picture}
-                alt=""
-                className="w-[90px] h-[80px] bg-cover rounded-md"
-              />
-              <div className="w-full flex flex-col ml-2.5">
-                <h4 className="w-[60%] font-bold text-indigo-200 truncate">
-                  {item.place}
-                </h4>
-                <p className="w-[66%] text-xs py-1 text-white truncate">
-                  {item.description}
-                </p>
-                <RatingHeart value={item.rating} style={{ maxWidth: 80 }} />
-                <div className="flex items-center justify-between w-[68%] mt-4 -mb-1.5">
-                  <button
-                    type="button"
-                    className="w-[100px] text-center font-semibold text-sm text-blue-400 hover:text-blue-300 border-r border-gray-500 cursor-pointer transition duration-300"
-                  >
-                    View
-                  </button>
-                  <button
-                    type="button"
-                    className="w-[100px] text-center font-semibold text-sm text-red-400 hover:text-red-300 cursor-pointer transition duration-300"
-                  >
-                    Remove
-                  </button>
+              <div className="w-full flex items-start">
+                <img
+                  src={item.picture}
+                  alt=""
+                  className="w-[90px] h-[80px] bg-cover bg-center rounded-md"
+                />
+                <div className="w-full flex flex-col ml-2.5">
+                  <h4 className="w-[60%] font-bold text-indigo-200 truncate">
+                    {item.place}
+                  </h4>
+                  <p className="w-[66%] text-xs py-1 text-white truncate">
+                    {item.description}
+                  </p>
+                  <RatingHeart value={item.rating} style={{ maxWidth: 80 }} />
                 </div>
+              </div>
+              <div className="flex items-end justify-end gap-x-2 w-full -mt-2 -mb-1">
+                <button
+                  type="button"
+                  className="w-[30px] h-[30px] text-center font-semibold text-cyan-500 hover:text-blue-300 cursor-pointer transition duration-300"
+                >
+                  <i className="fa-solid fa-eye text-[17px]" />
+                </button>
+                <button
+                  type="button"
+                  className="w-[30px] h-[30px] text-center font-semibold border-2 border-red-500 text-red-500 hover:border-red-400 hover:bg-red-400 hover:text-white cursor-pointer transition duration-300"
+                >
+                  <i className="fa-solid fa-trash text-[15px]" />
+                </button>
               </div>
             </li>
           ))}

@@ -8,6 +8,7 @@ from flask_jwt_extended import JWTManager
 # routes
 from routes.places import places_routes
 from routes.auth import auth_routes
+from routes.users import users_routes
 
 
 load_dotenv() # initiate .env
@@ -30,6 +31,7 @@ def home():
 # Utility routes
 app.register_blueprint(places_routes, url_prefix="/api/places")
 app.register_blueprint(auth_routes, url_prefix="/api/auth")
+app.register_blueprint(users_routes, url_prefix="/api/users")
 
 
 # Connection to DB

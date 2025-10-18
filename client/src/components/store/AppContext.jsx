@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useReducer,
-  useState,
-  useEffect,
-} from "react";
+import { createContext, useReducer, useState, useEffect } from "react";
 
 const initialState = {
   user: {},
@@ -101,7 +95,7 @@ export const AppContextProvider = ({ children }) => {
   }
   function setAccessToken(token) {
     setToken(token);
-    localStorage.setItem("token", token);
+    localStorage.setItem("token", JSON.stringify(token));
   }
 
   return (

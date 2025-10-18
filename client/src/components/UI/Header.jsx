@@ -1,14 +1,17 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useContext, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { ListSkeleton } from "../UI/LoaderSkeletons";
+import { AppContext } from "../store/AppContext";
 import Menu from "./Menu";
 import Wishlist from "./Wishlist";
 import LoaderBackdrop from "./LoaderBackdrop";
-import { ListSkeleton } from "../UI/LoaderSkeletons";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Header = () => {
+  const { user, token } = useContext(AppContext);
   const fetchedRef = useRef(false);
   const navigate = useNavigate();
   const { id } = useParams();
@@ -69,6 +72,9 @@ const Header = () => {
       setQuery("");
     }
   }
+  useEffect(() => {
+    console.log(token);
+  }, []);
 
   return (
     <>
@@ -139,7 +145,7 @@ const Header = () => {
             onClick={() => setOpen("menu")}
           >
             <img
-              src="/images/avatar_default.png"
+              src={user?.pic ?? "/images/avatar_default.png"}
               alt=""
               className="absolute top-0 left-0 w-full h-full object-cover"
             />
