@@ -1,10 +1,12 @@
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const SigninForm = ({ isActive, onToggle, errMsg, isLoading, onSubmit }) => {
   const unameRef = useRef();
   const pswrdRef = useRef();
   const [show, setShow] = useState(false);
+  const navigate = useNavigate();
 
   function submitFormHandler(e) {
     e.preventDefault();
@@ -97,7 +99,10 @@ const SigninForm = ({ isActive, onToggle, errMsg, isLoading, onSubmit }) => {
               </label>
             </div>
           </div>
-          <div className="relative w-[75%] flex justify-end">
+          <div
+            className="relative w-[75%] flex justify-end"
+            onClick={() => navigate("../forgot-password")}
+          >
             <span className="font-medium text-[13px] text-cyan-400 hover:text-cyan-200 cursor-default capitalize mt-1.5 transition duration-300">
               Forgot password?
             </span>

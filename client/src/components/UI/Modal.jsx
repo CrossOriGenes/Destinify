@@ -17,7 +17,7 @@ const Modal = ({ onClose, children }) => {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -60 }}
         transition={{ type: "spring", damping: 15, stiffness: 800 }}
-        className="fixed top-[5vh] w-[30rem] max-w-[90%] mt-8 mx-auto border-none outline-none p-2 rounded-xl shadow-lg z-100 bg-gray-800"
+        className="fixed top-[5vh] w-[26rem] max-w-[90%] mt-8 mx-auto border-none outline-none p-2 rounded-xl shadow-lg z-100 bg-gray-800"
         open
       >
         {children}

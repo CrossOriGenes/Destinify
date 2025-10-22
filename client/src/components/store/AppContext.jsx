@@ -1,5 +1,6 @@
 import { createContext, useReducer, useState, useEffect } from "react";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const initialState = {
   user: {},
   pageRequestCount: JSON.parse(localStorage.getItem("request_count")) || 1,
@@ -50,7 +51,7 @@ export const AppContextProvider = ({ children }) => {
     JSON.parse(localStorage.getItem("search_list")) || []
   );
   const [token, setToken] = useState(
-    JSON.parse(localStorage.getItem("token")) || ""
+    JSON.parse(localStorage.getItem("token")) || null
   );
 
   function setUser(user) {
@@ -71,7 +72,7 @@ export const AppContextProvider = ({ children }) => {
   function resetRequestCount() {
     dispatch({ type: "RESET_REQUEST" });
   }
-  function addPreferredTheme(val) {
+  async function addPreferredTheme(val) {
     setPreferredThemes((prev) => {
       const exists = prev.some(
         (t) => t.toLowerCase().trim() === val.toLowerCase().trim()
@@ -81,8 +82,26 @@ export const AppContextProvider = ({ children }) => {
       localStorage.setItem("preferred_themes", JSON.stringify(updated));
       return updated;
     });
+    if (token) {
+      try {
+        // console.log(110, val)
+        const res = await fetch(`${BASE_URL}/users/update_preferred_themes`, {
+          method: "POST",
+          body: JSON.stringify({ category: val }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        console.log(data.msg);
+      } catch (e) {
+        console.error("Failed to update search list! ", e);
+        return;
+      }
+    }
   }
-  function addSearchedPlaceToList(placeName) {
+  async function addSearchedPlaceToList(placeName) {
     setSearchList((prev) => {
       const exists = prev.some(
         (t) => t.toLowerCase().trim() === placeName.toLowerCase().trim()
@@ -92,11 +111,80 @@ export const AppContextProvider = ({ children }) => {
       localStorage.setItem("search_list", JSON.stringify(updated));
       return updated;
     });
+    if (token) {
+      try {
+        // console.log(110, placeName)
+        const res = await fetch(`${BASE_URL}/users/update_searchlist`, {
+          method: "POST",
+          body: JSON.stringify({ placename: placeName }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        console.log(data.msg);
+      } catch (e) {
+        console.error("Failed to update search list! ", e);
+        return;
+      }
+    }
   }
   function setAccessToken(token) {
     setToken(token);
     localStorage.setItem("token", JSON.stringify(token));
   }
+  function removeAccessToken() {
+    setToken(null);
+    localStorage.removeItem("token");
+  }
+  async function getUserData(token) {
+    try {
+      const res = await fetch(`${BASE_URL}/users/get_user`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        console.log("User data fetched successfully.✔️");
+        console.log(data);
+        const { _id, username, email, picture } = data.user;
+        setUser({
+          id: _id,
+          username,
+          email,
+          picture: picture ? picture : null,
+        });
+        if (!JSON.parse(localStorage.getItem("preferred_themes"))) {
+          localStorage.setItem(
+            "preferred_themes",
+            JSON.stringify(data.user.preferred_themes)
+          );
+          console.log("preferred themes set to localstorage");
+        }
+        if (!JSON.parse(localStorage.getItem("search_list"))) {
+          localStorage.setItem(
+            "search_list",
+            JSON.stringify(data.user.recent_searches)
+          );
+          console.log("search list set to localstorage");
+        }
+        if (!JSON.parse(localStorage.getItem("wishlist"))) {
+          localStorage.setItem("wishlist", JSON.stringify(data.user.wishlist));
+          console.log("wishlist set to localstorage");
+        }
+      } else {
+        console.log("User data not found due to token issues.❌ \n", data);
+        setUser({});
+      }
+    } catch (err) {
+      console.error("Failed to fetch user data!", err);
+      return;
+    }
+  }
+  useEffect(() => {
+    if (!token) return;
+    getUserData(token);
+  }, [window.location.pathname]);
 
   return (
     <AppContext.Provider
@@ -110,6 +198,7 @@ export const AppContextProvider = ({ children }) => {
         setUser,
         setRequestCount,
         setAccessToken,
+        removeAccessToken,
         addToWishlist,
         removeFromWishlist,
         removeUser,

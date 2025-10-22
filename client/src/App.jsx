@@ -4,12 +4,17 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import Error404 from "./components/UI/Error404";
 import AppLoader from "./components/UI/AppLoader";
+import RouteProtector from "./components/store/RouteProtector";
 
 const Root = lazy(() => import("./pages/Root"));
 const Home = lazy(() => import("./pages/Home"));
+const HomeRoot = lazy(() => import("./pages/HomeRoot"));
 const Places = lazy(() => import("./pages/Places"));
 const PlaceDetails = lazy(() => import("./pages/PlaceDetails"));
 const Auth = lazy(() => import("./pages/Auth"));
+const ResetPswrdRoot = lazy(() => import("./pages/ResetPswrdRoot"));
+const VerifyOtp = lazy(() => import("./components/auth/VerifyOtp"));
+const ForgotPswrd = lazy(() => import("./components/auth/ForgotPswrd"));
 
 const router = createBrowserRouter([
   {
@@ -18,10 +23,26 @@ const router = createBrowserRouter([
     index: true,
     element: <Root />,
   },
-  { path: "home", element: <Home /> },
   { path: "places", element: <Places /> },
   { path: "places/:id", element: <PlaceDetails /> },
   { path: "auth", element: <Auth /> },
+  {
+    path: "home",
+    element: (
+      <RouteProtector>
+        <HomeRoot />
+      </RouteProtector>
+    ),
+    children: [{ index: true, element: <Home /> }],
+  },
+  {
+    path: "forgot-password",
+    element: <ResetPswrdRoot />,
+    children: [
+      { index: true, element: <ForgotPswrd /> },
+      { path: "verify-otp", element: <VerifyOtp /> },
+    ],
+  },
 ]);
 
 function App() {

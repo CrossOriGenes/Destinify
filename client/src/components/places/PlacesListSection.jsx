@@ -129,7 +129,7 @@ const PlacesListSection = () => {
           );
           setTotalRecords(result.total);
         }
-        console.log(result);
+        // console.log(result);
         return;
       }
       if (response.status === 403) {
@@ -174,7 +174,7 @@ const PlacesListSection = () => {
           );
           setTotalRecords(result.total);
         }
-        console.log(result);
+        // console.log(result);
         return;
       }
       if (response.status === 403) {
@@ -219,7 +219,7 @@ const PlacesListSection = () => {
         toast.success(
           <p className="text-[12.5px] font-semibold">{result.msg}</p>
         );
-        console.log(result);
+        // console.log(result);
         return;
       }
       if (response.status === 400) {

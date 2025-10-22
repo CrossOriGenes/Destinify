@@ -7,3 +7,4 @@ pymongo
 authlib
 flask-bcrypt
 flask-jwt-extended
+flask-mail

@@ -192,7 +192,7 @@ const Quickies = () => {
         </div>
         <div className="relative mt-30">
           <h1 className="text-white pt-10" data-aos="fade-left">
-            Opt for <span className="text-indigo-500">Hiking</span>?
+            Want some <span className="text-indigo-500">fresh air</span>?
           </h1>
           <p className="text-gray-400 mt-3 mb-20 text-lg" data-aos="fade-up">
             Our mission is to make meaningful travel accessible, safe, and

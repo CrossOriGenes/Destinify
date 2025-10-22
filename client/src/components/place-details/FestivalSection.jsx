@@ -11,12 +11,12 @@ const FestivalSection = ({ festivals, onAddToWishlist, isLoading }) => {
     >
       <div className="flex items-start justify-between gap-4">
         <p className="text-gray-500 font-medium lg:text-lg text-sm">
-          Somewhere in between enjoyment and leisure, the one thing that acts
-          often as a bridge is nothing but festivals. Explore some of the
-          peek-in festives from the vast ocean of them...
+          Each and every place on the earth possess an unique and undiscovered
+          story! From destinify we bring you the best places, festivals, events,
+          dishes or even celebrities famous from this place...
         </p>
         <h2 className="text-right lg:text-5xl text-3xl font-extrabold text-wrap text-white lg:leading-12 leading-10 ml-12">
-          Popular Events<span className="text-indigo-500"> & Festivals</span>
+          Sneak<span className="text-indigo-500"> Peeks</span>
         </h2>
       </div>
       <div className="relative w-full flex flex-col mt-12">

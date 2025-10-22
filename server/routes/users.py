@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime, timedelta
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, verify_jwt_in_request
+from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from models.user_model import Users
 import controllers.utils as ut 
 import re
@@ -8,16 +8,33 @@ import re
 users_routes = Blueprint('users-routes', __name__)
 
 
+
+# ==================================
+# GET USER'S DATA 
+# ==================================
+@users_routes.route("/get_user")
+def get_user_data():
+    try:
+        verify_jwt_in_request()
+        email = get_jwt_identity()
+        cursor = Users.find_one({ "email": email })
+        data = ut.formatted_data([cursor])                
+        return jsonify({ 
+            "success": True, 
+            "user": ut.serialize_user(data[0]) 
+        })
+    except Exception as e:
+        return jsonify({ "success": False, "msg": str(e) }), 401
+
+
 # ==================================
 # ADD PLACE TO WISHLIST 
 # ==================================
 @users_routes.route("/add_to_wishlist", methods=['POST'])
-@jwt_required()
 def update_wishlist():
     try:
+        verify_jwt_in_request()
         email = get_jwt_identity()
-        if not email:
-            return jsonify({ "success": False, "msg": "Token invalid or expired!" }), 401
         body = request.get_json()
         new_val = body.get("place_data")
         if not new_val:
@@ -33,6 +50,60 @@ def update_wishlist():
             "success": True,
             "msg": "Favs Updated...",
             "description": "Place successfully added to your Wishlist"
+        })
+    except Exception as e:
+        return jsonify({ "success": False, "msg": str(e) }), 401
+    
+
+# ==================================
+# UPDATE SEARCHLIST 
+# ==================================
+@users_routes.route("/update_searchlist", methods=['POST'])
+def update_searchlist():
+    try:
+        verify_jwt_in_request()
+        email = get_jwt_identity()
+        body = request.get_json()
+        new_val = body.get("placename")
+        if not new_val:
+            return jsonify({ "errMsg": "Data Unavailable!" }), 400
+        result = Users.update_one(
+            { "email": email },
+            { "$addToSet": { "recent_searches": new_val } }
+        )
+        if result.matched_count == 0:
+            return jsonify({ "errMsg": "User not found!" }), 400
+        
+        return jsonify({
+            "success": True,
+            "msg": "Recent-searches Updated...",
+        })
+    except Exception as e:
+        return jsonify({ "success": False, "msg": str(e) }), 401
+    
+
+# ==================================
+# UPDATE SEARCHLIST 
+# ==================================
+@users_routes.route("/update_preferred_themes", methods=['POST'])
+def update_preferred_themes():
+    try:
+        verify_jwt_in_request()
+        email = get_jwt_identity()
+        body = request.get_json()
+        new_val = body.get("category")
+        if not new_val:
+            return jsonify({ "errMsg": "Data Unavailable!" }), 400
+        result = Users.update_one(
+            { "email": email },
+            { "$addToSet": { "preferred_themes": new_val } }
+        )
+        if result.matched_count == 0:
+            return jsonify({ "errMsg": "User not found!" }), 400
+        
+        return jsonify({
+            "success": True,
+            "msg": "Preferred-themes list Updated...",
         })
     except Exception as e:
         return jsonify({ "success": False, "msg": str(e) }), 401

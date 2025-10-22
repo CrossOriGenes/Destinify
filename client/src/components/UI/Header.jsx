@@ -6,12 +6,13 @@ import { ListSkeleton } from "../UI/LoaderSkeletons";
 import { AppContext } from "../store/AppContext";
 import Menu from "./Menu";
 import Wishlist from "./Wishlist";
+import Modal from "./Modal";
 import LoaderBackdrop from "./LoaderBackdrop";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Header = () => {
-  const { user, token } = useContext(AppContext);
+  const { user, token, removeAccessToken, setUser } = useContext(AppContext);
   const fetchedRef = useRef(false);
   const navigate = useNavigate();
   const { id } = useParams();
@@ -19,6 +20,7 @@ const Header = () => {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [load, setLoad] = useState(false);
+  const [loadM, setLoadM] = useState(false);
   const [focused, setFocused] = useState(false);
   const [placeData, setPlaceData] = useState({ Place: "", City: "" });
   const [suggestions, setSuggestions] = useState([]);
@@ -72,9 +74,50 @@ const Header = () => {
       setQuery("");
     }
   }
-  useEffect(() => {
-    console.log(token);
-  }, []);
+  async function logout() {
+    try {
+      setLoadM(true);
+      const res = await fetch(`${BASE_URL}/auth/logout`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        toast.error(
+          <div className="flex flex-col px-1.5">
+            <h3 className="font-bold text-white text-[16px]">
+              Failed to Logout! ⚠️
+            </h3>
+            <p className="text-xs text-gray-500 font-medium w-full truncate">
+              {result.msg}
+            </p>
+          </div>
+        );
+        return;
+      }
+      toast.success(
+        <div className="flex flex-col px-1.5">
+          <h3 className="font-bold text-white text-[16px]">Logged out</h3>
+          <p className="text-xs text-gray-500 font-medium w-full truncate">
+            {result.msg}
+          </p>
+        </div>
+      );
+      removeAccessToken();
+      setUser({});
+      navigate("../../..");
+    } catch (err) {
+      toast.error(
+        <p className="text-[11px] font-semibold">Failed to logout!</p>
+      );
+      console.error("Something went wrong, try later!", err);
+    } finally {
+      setLoadM(false);
+      setOpen("");
+    }
+  }
+  // useEffect(() => {
+  //   console.log(token);
+  // }, []);
 
   return (
     <>
@@ -144,11 +187,19 @@ const Header = () => {
             className="w-10 h-10 relative rounded-full border-2 border-white overflow-hidden hover:ring-5 hover:ring-gray-700 transition duration-300"
             onClick={() => setOpen("menu")}
           >
-            <img
-              src={user?.pic ?? "/images/avatar_default.png"}
-              alt=""
-              className="absolute top-0 left-0 w-full h-full object-cover"
-            />
+            {user ? (
+              <img
+                src={user?.picture ?? "/images/avatar_default.png"}
+                alt=""
+                className="absolute top-0 left-0 w-full h-full object-cover"
+              />
+            ) : (
+              <img
+                src="/images/avatar_default.png"
+                alt=""
+                className="absolute top-0 left-0 w-full h-full object-cover"
+              />
+            )}
           </div>
           <motion.div
             whileTap={{ scale: 0.8 }}
@@ -168,13 +219,69 @@ const Header = () => {
           </motion.div>
 
           <AnimatePresence>
-            {open === "menu" && <Menu onClose={() => setOpen("")} />}
+            {open === "menu" && (
+              <Menu
+                onClose={() => setOpen("")}
+                openLogoutModal={() => setOpen("logout_prompt")}
+              />
+            )}
           </AnimatePresence>
         </div>
       </header>
 
       <AnimatePresence>
         {open === "wishlist" && <Wishlist onClose={() => setOpen("")} />}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {open === "logout_prompt" && (
+          <Modal onClose={() => setOpen("")}>
+            <header className="flex items-center justify-start bg-violet-700 py-1 px-2 rounded-lg">
+              <h2 className="text-2xl text-white font-extrabold capitalize pl-1.5">
+                Logout?
+              </h2>
+            </header>
+            <div className="flex flex-col p-2">
+              <div className="flex items-center mt-1.5 mb-3 gap-2">
+                <i className="fa-solid fa-question-circle text-3xl text-blue-400" />
+                <p className="text-gray-400 text-md leading-5 mt-2 mb-3">
+                  Do you really wish to logout from Destinify?
+                </p>
+              </div>
+              <div className="flex items-end justify-end pt-1.5">
+                <button
+                  type="button"
+                  className={`${
+                    loadM ? "w-30" : "w-20"
+                  } h-10 py-2 px-4 me-2 flex items-center justify-center bg-gray-950 border-2 border-gray-950 hover:bg-gray-700 hover:border-gray-700 rounded-md transition duration-300 group`}
+                  onClick={logout}
+                >
+                  {loadM ? (
+                    <>
+                      <strong className="font-bold text-xs text-white">
+                        Signing Out...
+                      </strong>
+                      <span className="block w-4 h-4 border-t-3 border-r-3 border-amber-200 ml-2 rounded-full animate-spin" />
+                    </>
+                  ) : (
+                    <strong className="font-bold text-sm text-white">
+                      Yes
+                    </strong>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="w-20 h-10 py-2 px-4 flex items-center justify-center border-2 border-gray-950 hover:bg-gray-700 hover:border-gray-700 rounded-md transition duration-300 group"
+                  onClick={() => setOpen("")}
+                >
+                  <span className="font-bold text-sm text-gray-950 group-hover:text-white">
+                    Cancel
+                  </span>
+                </button>
+              </div>
+            </div>
+          </Modal>
+        )}
       </AnimatePresence>
 
       <AnimatePresence>{load && <LoaderBackdrop />}</AnimatePresence>

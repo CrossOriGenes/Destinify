@@ -1,11 +1,17 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { RatingHeart } from "./RatingsStar";
 import Drawer from "./Drawer";
 import { AppContext } from "../store/AppContext";
 
 const Wishlist = ({ onClose }) => {
-  const { wishlist, token } = useContext(AppContext);
+  const { wishlist, token, user } = useContext(AppContext);
+  const navigate = useNavigate();
+  // useEffect(() => {
+  //   console.log(user);
+  // }, []);
+
   return (
     <Drawer
       titleText={
@@ -26,19 +32,31 @@ const Wishlist = ({ onClose }) => {
           </p>
         </div>
       )}
-      {!token && !wishlist && (
+      {!token && wishlist && (
         <div className="w-full h-full flex items-center justify-center flex-col -mt-10 px-4">
           <h3 className="font-extrabold text-[26px] text-gray-300">
             Wishlist is Empty!😢
           </h3>
           <div className="w-54 h-54 relative bg-[url('/images/empty-bag-fallback.png')] bg-center bg-cover" />
-          <p className="font-semibold text-md leading-4.5 text-gray-500">
+          <p className="font-semibold text-sm leading-5 text-gray-400 mb-6">
             Your Favlist bag is empty! Please login/signup & add some places to
             Favlist.
           </p>
+          <button
+            type="button"
+            className="btn-dark z-1 w-[130px]"
+            onClick={() => {
+              onClose();
+              navigate("../../auth?mode=signin");
+            }}
+          >
+            <span className="font-bold tracking-wide text-gray-200 uppercase">
+              Login
+            </span>
+          </button>
         </div>
       )}
-      {wishlist && (
+      {wishlist && token && (
         <motion.ul
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

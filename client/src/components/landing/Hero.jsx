@@ -36,11 +36,11 @@ const Hero = () => {
   const [slide, setSlide] = useState(0);
   const [ready, setReady] = useState(false);
   const videoRef = useRef(null);
-  
+
   useEffect(() => {
     const interval = setInterval(() => {
       setSlide((prev) => (prev + 1) % SLIDES.length);
-    }, 12000); 
+    }, 12000);
 
     return () => clearInterval(interval);
   }, []);
@@ -80,7 +80,7 @@ const Hero = () => {
           {currentSlide.title}
         </h1>
         <h5
-          className="text-lg font-bold tracking-wide text-indigo-800 mt-2 mb-1"
+          className="text-lg font-bold tracking-wide text-indigo-500 mt-2 mb-1"
           data-aos="fade-in"
         >
           {currentSlide.subtitle}

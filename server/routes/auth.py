@@ -1,13 +1,17 @@
 from flask import Blueprint, request, jsonify
 from flask_bcrypt import Bcrypt
-from datetime import datetime, timedelta
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, verify_jwt_in_request
+from datetime import datetime, timedelta, UTC
+from flask_jwt_extended import create_access_token, get_jwt_identity, verify_jwt_in_request, unset_jwt_cookies
 from models.user_model import Users
+from models.otps_model import OTPs
+from controllers.mailings import send_mail
 import controllers.utils as ut 
-import re
+import re, random
+
 
 auth_routes = Blueprint('auth-routes', __name__)
 bcrypt = Bcrypt()
+
 
 
 # ==================================
@@ -73,6 +77,7 @@ def manual_signup():
         "description": "Please login to continue..."
     })
 
+
 # ==================================
 # LOG IN USER (SIGNIN)
 # ==================================
@@ -104,17 +109,128 @@ def manual_signin():
     
     return response, 200
 
+
+# ==================================
+# LOGOUT USER
+# ==================================
+@auth_routes.route("/logout")
+def logout_user():
+    try:
+        verify_jwt_in_request()
+        email = get_jwt_identity()
+        response = jsonify({ 
+            "success": True, 
+            "msg": "User logged-out successfully..." 
+        })
+        unset_jwt_cookies(response)
+        print(f"User with email-'{email}' logged out successfully")
+
+        return response, 200
+    except Exception as e:
+        return jsonify({ "success": False, "msg": str(e) }), 401
+        
+
 # ==================================
 # VERIFY TOKEN
 # ==================================
 @auth_routes.route("/verify")
-@jwt_required(optional=True)
 def verify_token():
     try:
-        verify_jwt_in_request(optional=True)
+        verify_jwt_in_request()
         token_info = get_jwt_identity()
-        if not token_info:
-            return jsonify({ "success": False, "msg": "Token missing or invalid!" }), 401
-        return jsonify({ "success": True, "user": token_info })
+        return jsonify({ "verified": True, "data": token_info })
     except Exception as e:
-        return jsonify({ "success": False, "msg": str(e) }), 401
+        return jsonify({ "verified": False, "msg": str(e) }), 401
+    
+
+# =========================================
+# FORGOT PASSWORD (generate OTP)
+# =========================================
+@auth_routes.route("/generate_otp", methods=['POST'])
+def generate_otp_to_mail():
+    body = request.get_json()
+    email = body.get("email")
+    if not email:
+        return jsonify({ "errMsg": "Email Missing!" }), 400
+    email = email.lower()
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        return jsonify({ "errMsg": "Invalid email format!" }), 400
+    
+    otp = str(random.randint(100000, 999999))
+    hashed_otp = bcrypt.generate_password_hash(otp).decode("utf-8")
+    now = datetime.now(UTC)
+    expiery = now + timedelta(minutes=15)
+    result = OTPs.update_one(
+        {"email": email},
+        {
+            "$set": {
+                "email": email,
+                "otp": hashed_otp,
+                "created_at": now,
+                "expires_at": expiery
+            }
+        },
+        upsert=True
+    )
+    if not result.did_upsert:
+        return jsonify({ "success": False, "errMsg": "Failed to upsert into DB!" })
+    print("Data upsurted successfully...")
+    sent = send_mail(
+        reciever=email,
+        subject="OTP for password-reset verification request",
+        otp=otp
+    )
+    if not sent:
+        return jsonify({ 
+            "success":False,
+            "msg": "Email not sent!",
+        }), 400
+    
+    return jsonify({
+        "success": True,
+        "msg": "OTP sent",
+        "description": "OTP has been sent to email."
+    })
+    
+    
+# =========================================
+# FORGOT PASSWORD (verify OTP)
+# =========================================
+@auth_routes.route("/verify_otp", methods=['POST'])
+def verify_otp():
+    body = request.get_json()
+    email = body.get("email")
+    otp = body.get("otp")
+    if not otp:
+        return jsonify({ "errMsg": "OTP missing!" }), 400
+
+    cursor = OTPs.find_one({ "email": email })
+    if not cursor:
+        return jsonify({ 
+            "success": False, 
+            "msg": "Invalid OTP!",
+            "description": "The OTP given either doesn't exists or is expired." 
+        }), 422
+    data = ut.formatted_data([cursor])
+    hashed_otp = data[0].get("otp")
+    isSame = bcrypt.check_password_hash(hashed_otp, otp)
+    if not isSame:
+        return jsonify({ 
+            "success": False, 
+            "msg": "OTP doesn't match!",
+            "description": "OTP provided doesn't match, please try something else." 
+        }), 400
+    
+    return jsonify({
+        "success": True,
+        "msg": "Verification successfull",
+        "description": "OTP verified, continue resetting with a new password"
+    })    
+    
+    
+# =========================================
+# TEST ROUTE
+# =========================================
+@auth_routes.route("/test")
+def test():
+    pass

@@ -48,7 +48,7 @@ function Auth() {
           </p>
         </div>
       );
-      navigate("../auth?mode=signin");
+      navigate("../auth?mode=signin", { replace: true });
       // console.log(data);
     } catch (err) {
       toast.error(
@@ -84,7 +84,7 @@ function Auth() {
           </p>
         </div>
       );
-      navigate("../home");
+      navigate("../home", { replace: true });
     } catch (err) {
       toast.error(
         <p className="text-[11px] font-semibold">Failed to register!</p>
