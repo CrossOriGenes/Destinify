@@ -95,7 +95,7 @@ const Header = () => {
         return;
       }
       toast.success(
-        <div className="flex flex-col px-1.5">
+        <div className="w-full flex flex-col px-1.5">
           <h3 className="font-bold text-white text-[16px]">Logged out</h3>
           <p className="text-xs text-gray-500 font-medium w-full truncate">
             {result.msg}
@@ -104,12 +104,13 @@ const Header = () => {
       );
       removeAccessToken();
       setUser({});
-      navigate("../../..");
+      return navigate("/");
     } catch (err) {
       toast.error(
         <p className="text-[11px] font-semibold">Failed to logout!</p>
       );
       console.error("Something went wrong, try later!", err);
+      return;
     } finally {
       setLoadM(false);
       setOpen("");
@@ -252,7 +253,7 @@ const Header = () => {
                 <button
                   type="button"
                   className={`${
-                    loadM ? "w-30" : "w-20"
+                    loadM ? "w-40" : "w-20"
                   } h-10 py-2 px-4 me-2 flex items-center justify-center bg-gray-950 border-2 border-gray-950 hover:bg-gray-700 hover:border-gray-700 rounded-md transition duration-300 group`}
                   onClick={logout}
                 >

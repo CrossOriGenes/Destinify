@@ -1,6 +1,9 @@
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const SigninForm = ({ isActive, onToggle, errMsg, isLoading, onSubmit }) => {
   const unameRef = useRef();
@@ -17,6 +20,37 @@ const SigninForm = ({ isActive, onToggle, errMsg, isLoading, onSubmit }) => {
       password: pswrdRef.current.value,
     };
     onSubmit(signInData);
+  }
+  async function forgotPasswordRequest() {
+    try {
+      const res = await fetch(
+        `${BASE_URL}/users/get_user_mail?u_name=${unameRef.current.value}`
+      );
+      const result = await res.json();
+      if (res.status === 400) {
+        toast.error(
+          <h3 className="font-medium text-red-200 text-[11px]">
+            {result.errMsg}
+          </h3>
+        );
+        return;
+      }
+      // console.log(result.email);
+      navigate("../forgot-password", { state: { email: result.email } });
+    } catch (err) {
+      toast.error(
+        <div className="flex flex-col px-1.5">
+          <h3 className="font-bold text-red-100 text-[16px]">
+            Failed to redirect!
+          </h3>
+          <p className="text-xs text-red-500 font-medium">
+            Something went wrong! Please try later.
+          </p>
+        </div>
+      );
+      console.log("Failed to redirect to reset-password page!\n", err);
+      return;
+    }
   }
 
   return (
@@ -101,7 +135,7 @@ const SigninForm = ({ isActive, onToggle, errMsg, isLoading, onSubmit }) => {
           </div>
           <div
             className="relative w-[75%] flex justify-end"
-            onClick={() => navigate("../forgot-password")}
+            onClick={forgotPasswordRequest}
           >
             <span className="font-medium text-[13px] text-cyan-400 hover:text-cyan-200 cursor-default capitalize mt-1.5 transition duration-300">
               Forgot password?

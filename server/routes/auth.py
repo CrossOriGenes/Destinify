@@ -161,7 +161,7 @@ def generate_otp_to_mail():
     now = datetime.now(UTC)
     expiery = now + timedelta(minutes=15)
     result = OTPs.update_one(
-        {"email": email},
+        { "email": email },
         {
             "$set": {
                 "email": email,
@@ -173,7 +173,7 @@ def generate_otp_to_mail():
         upsert=True
     )
     if not result.did_upsert:
-        return jsonify({ "success": False, "errMsg": "Failed to upsert into DB!" })
+        return jsonify({ "errMsg": "Failed to upsert into DB!" }), 400
     print("Data upsurted successfully...")
     sent = send_mail(
         reciever=email,
@@ -181,10 +181,7 @@ def generate_otp_to_mail():
         otp=otp
     )
     if not sent:
-        return jsonify({ 
-            "success":False,
-            "msg": "Email not sent!",
-        }), 400
+        return jsonify({ "errMsg": "Email not sent!" }), 400
     
     return jsonify({
         "success": True,
@@ -202,7 +199,11 @@ def verify_otp():
     email = body.get("email")
     otp = body.get("otp")
     if not otp:
-        return jsonify({ "errMsg": "OTP missing!" }), 400
+        return jsonify({ 
+            "success": False,
+            "msg": "OTP missing!",
+            "description": "Please fill in the OTP to continue." 
+        }), 400
 
     cursor = OTPs.find_one({ "email": email })
     if not cursor:
@@ -210,7 +211,7 @@ def verify_otp():
             "success": False, 
             "msg": "Invalid OTP!",
             "description": "The OTP given either doesn't exists or is expired." 
-        }), 422
+        }), 400
     data = ut.formatted_data([cursor])
     hashed_otp = data[0].get("otp")
     isSame = bcrypt.check_password_hash(hashed_otp, otp)
@@ -225,6 +226,44 @@ def verify_otp():
         "success": True,
         "msg": "Verification successfull",
         "description": "OTP verified, continue resetting with a new password"
+    })    
+
+    
+# =========================================
+# RESET PASSWORD 
+# =========================================
+@auth_routes.route("/resetpw", methods=['POST'])
+def reset_password():
+    body = request.get_json()
+    email = body.get("email")
+    new_pass = body.get("password")
+    if not email or not new_pass:
+        return jsonify({ 
+            "success": False,
+            "msg": "Parameters missing!",
+            "description": "Email / password missing." 
+        }), 400
+
+    cursor = Users.find_one({ "email": email })
+    if not cursor:
+        return jsonify({ 
+            "success": False, 
+            "msg": "Invalid email address!",
+            "description": "The email given either doesn't exists or has been removed." 
+        }), 400
+    hashed_pw = bcrypt.generate_password_hash(new_pass).decode("utf-8")
+    result = Users.update_one({ "email": email }, { "$set": { "password": hashed_pw } })
+    if result.modified_count == 0:
+        return jsonify({ 
+            "success": False, 
+            "msg": "Updation failed!",
+            "description": "Failed to reset password, please try again later." 
+        }), 400
+    
+    return jsonify({
+        "success": True,
+        "msg": "Password Changed",
+        "description": "Your new password has been updated. Re-login to continue"
     })    
     
     

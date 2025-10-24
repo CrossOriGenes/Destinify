@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -8,15 +8,18 @@ const ForgotPswrd = () => {
   const mailRef = useRef();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const {
+    state: { email },
+  } = useLocation();
 
   async function getOTPinMailHandler(e) {
     e.preventDefault();
     const value = mailRef.current.value;
     if (!value.trim()) return;
+    // console.log(value);
     try {
-      // console.log(value);
       setIsLoading(true);
-      const res = await fetch(`${BASE_URL}/auth/forgot_password`, {
+      const res = await fetch(`${BASE_URL}/auth/generate_otp`, {
         method: "POST",
         body: JSON.stringify({ email: value }),
         headers: { "Content-Type": "application/json" },
@@ -25,36 +28,39 @@ const ForgotPswrd = () => {
       if (res.status === 400) {
         toast.error(
           <div className="flex flex-col px-1.5">
-            <h3 className="font-bold text-white text-[16px]">Input error!</h3>
-            <p className="text-xs text-gray-500 font-medium">{result.errMsg}</p>
+            <h3 className="font-bold text-red-100 text-[16px]">Error!</h3>
+            <p className="text-xs text-red-500 font-medium leading-3 mt-1.5">
+              {result.errMsg}
+            </p>
           </div>
         );
         return;
       }
       toast.success(
-        <div className="flex flex-col px-1.5">
+        <div className="w-full flex flex-col px-1.5">
           <h3 className="font-bold text-white text-[16px]">{result.msg}</h3>
-          <p className="text-xs text-gray-500 font-medium">
+          <p className="text-xs text-gray-500 font-medium leading-3 mt-1.5">
             {result.description}
           </p>
         </div>
       );
       navigate("verify-otp", {
-        state: { email: value },
+        state: { otp_mail: value, email },
         replace: true,
       });
     } catch (err) {
       toast.error(
         <div className="flex flex-col px-1.5">
-          <h3 className="font-bold text-white text-[16px]">
-            Failed to send data!
+          <h3 className="font-bold text-red-100 text-[16px]">
+            Failed to send email!
           </h3>
-          <p className="text-xs text-gray-500 font-medium">
+          <p className="text-xs text-red-500 font-medium">
             Something went wrong! Please try later.
           </p>
         </div>
       );
       console.log("Failed to send email!\n", err);
+      return;
     } finally {
       setIsLoading(false);
     }
@@ -67,11 +73,11 @@ const ForgotPswrd = () => {
           Forgot <span className="text-indigo-500">password</span>?
         </h1>
         <div className="w-[35rem] mx-auto my-8 card bg-gray-700 p-5">
-          <div className="relative flex items-center p-2 bg-blue-900 border-2 border-blue-600 rounded-sm">
-            <i className="fa-solid fa-info-circle text-blue-500 text-lg ml-2 mr-3" />
+          <div className="relative flex items-start p-2 bg-blue-900 border-2 border-blue-600 rounded-sm">
+            <i className="fa-solid fa-info-circle text-blue-500 text-lg ml-2 mr-3 mt-1.5" />
             <p className="text-sm font-medium text-blue-300">
               Enter any valid email to get an OTP. Use that to verify & reset
-              your password in the next step.
+              your password in the next steps.
             </p>
           </div>
           <form

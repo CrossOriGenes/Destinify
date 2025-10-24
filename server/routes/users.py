@@ -10,7 +10,7 @@ users_routes = Blueprint('users-routes', __name__)
 
 
 # ==================================
-# GET USER'S DATA 
+# GET USER'S DATA (using Token)
 # ==================================
 @users_routes.route("/get_user")
 def get_user_data():
@@ -107,3 +107,28 @@ def update_preferred_themes():
         })
     except Exception as e:
         return jsonify({ "success": False, "msg": str(e) }), 401
+
+
+# ==================================
+# GET USER'S MAIL (using Username)
+# ==================================
+@users_routes.route("/get_user_mail")
+def get_user_email_by_name():
+    u_name = request.args.get("u_name")
+    if not u_name:
+        return jsonify({ 
+            "success": False, 
+            "errMsg": "Username is required to reset password!"
+        }), 400
+    
+    cursor = Users.find_one({ "username": u_name }, { "email": 1 })
+    if not cursor:
+        return jsonify({
+            "success": False,
+            "errMsg": "No records exists with this username!"
+        }), 400
+        
+    return jsonify({ 
+        "success": True, 
+        "email": cursor['email'] 
+    })

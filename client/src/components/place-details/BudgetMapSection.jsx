@@ -203,60 +203,67 @@ const BudgetMapSection = ({ data }) => {
                 Estimations 💰
               </h3>
               {options.length > 0 ? (
-                <table
-                  className="w-full border-collapse mt-4"
-                  data-aos="fade-down"
-                >
-                  <thead>
-                    <tr className="bg-cyan-800 border-y-3 border-white uppercase">
-                      <th className="font-extrabold text-cyan-100 p-3">Mode</th>
-                      <th className="font-extrabold text-cyan-100 p-3">
-                        Distance
-                      </th>
-                      <th className="font-extrabold text-cyan-100 p-3">
-                        Duration
-                      </th>
-                      <th className="font-extrabold text-cyan-100 p-3">
-                        Cost (₹)
-                      </th>
-                      {state.budget && (
+                <>
+                  <table
+                    className="w-full border-collapse mt-4"
+                    data-aos="fade-down"
+                  >
+                    <thead>
+                      <tr className="bg-cyan-800 border-y-3 border-white uppercase">
                         <th className="font-extrabold text-cyan-100 p-3">
-                          Within Budget
+                          Mode
                         </th>
-                      )}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {options.map((opt, idx) => (
-                      <tr
-                        key={idx}
-                        className="nth-of-type-[odd]:bg-gray-800 border-b-1 border-gray-400 text-center"
-                      >
-                        <td className="text-sm font-medium text-gray-300 py-2 px-4">
-                          {opt.mode}
-                        </td>
-                        <td className="text-sm font-medium text-gray-300 py-2 px-4">
-                          {opt.distance}
-                        </td>
-                        <td className="text-sm font-medium text-gray-300 py-2 px-4">
-                          {opt.duration}
-                        </td>
-                        <td className="text-sm font-medium text-gray-300 py-2 px-4">
-                          {opt.estimated_cost}
-                        </td>
-                        {(state.budget || state.budget > 0) && (
-                          <td className="text-sm font-medium text-gray-300 py-2 px-4">
-                            {opt.within_budget ? (
-                              <i className="fa-solid fa-check text-green-600" />
-                            ) : (
-                              <i className="fa-solid fa-xmark text-red-600" />
-                            )}
-                          </td>
+                        <th className="font-extrabold text-cyan-100 p-3">
+                          Distance
+                        </th>
+                        <th className="font-extrabold text-cyan-100 p-3">
+                          Duration
+                        </th>
+                        <th className="font-extrabold text-cyan-100 p-3">
+                          Cost (₹)
+                        </th>
+                        {state.budget && (
+                          <th className="font-extrabold text-cyan-100 p-3">
+                            Within Budget
+                          </th>
                         )}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {options.map((opt, idx) => (
+                        <tr
+                          key={idx}
+                          className="nth-of-type-[odd]:bg-gray-800 border-b-1 border-gray-400 text-center"
+                        >
+                          <td className="text-sm font-medium text-gray-300 py-2 px-4">
+                            {opt.mode}
+                          </td>
+                          <td className="text-sm font-medium text-gray-300 py-2 px-4">
+                            {opt.distance}
+                          </td>
+                          <td className="text-sm font-medium text-gray-300 py-2 px-4">
+                            {opt.duration}
+                          </td>
+                          <td className="text-sm font-medium text-gray-300 py-2 px-4">
+                            {opt.estimated_cost}
+                          </td>
+                          {(state.budget || state.budget > 0) && (
+                            <td className="text-sm font-medium text-gray-300 py-2 px-4">
+                              {opt.within_budget ? (
+                                <i className="fa-solid fa-check text-green-600" />
+                              ) : (
+                                <i className="fa-solid fa-xmark text-red-600" />
+                              )}
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <p className="font-medium text-xs text-red-400 tracking-wide">
+                    *All the rates shown are limited to 1 person/day.
+                  </p>
+                </>
               ) : (
                 <div className="w-full flex justify-center mt-6">
                   <p className="text-xl font-medium text-amber-400">

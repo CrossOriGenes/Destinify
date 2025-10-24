@@ -202,7 +202,7 @@ const Quickies = () => {
             family holiday, we're here to guide you from inspiration to boooking
             and beyond. Browser through hand-picked destinations, read real
             travel stories, and choose from curated packages that go beyond the
-            usual. Here we present you the top-3 picked hill-stations to enjoy
+            usual. Here we present you the top-3 selected hill-stations, to enjoy
             the best of your trips be it either of a short or a long one...
           </p>
           <div className="grid xl:grid-cols-3 grid-cols-1 gap-8 my-9">

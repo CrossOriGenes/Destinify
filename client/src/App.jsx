@@ -15,6 +15,7 @@ const Auth = lazy(() => import("./pages/Auth"));
 const ResetPswrdRoot = lazy(() => import("./pages/ResetPswrdRoot"));
 const VerifyOtp = lazy(() => import("./components/auth/VerifyOtp"));
 const ForgotPswrd = lazy(() => import("./components/auth/ForgotPswrd"));
+const ResetPassword = lazy(() => import("./components/auth/ResetPassword"));
 
 const router = createBrowserRouter([
   {
@@ -41,6 +42,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <ForgotPswrd /> },
       { path: "verify-otp", element: <VerifyOtp /> },
+      { path: "reset-password", element: <ResetPassword /> },
     ],
   },
 ]);
