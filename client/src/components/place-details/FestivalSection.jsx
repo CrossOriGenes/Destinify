@@ -15,11 +15,11 @@ const FestivalSection = ({ festivals, onAddToWishlist, isLoading }) => {
           story! From destinify we bring you the best places, festivals, events,
           dishes or even celebrities famous from this place...
         </p>
-        <h2 className="text-right lg:text-5xl text-3xl font-extrabold text-wrap text-white lg:leading-12 leading-10 ml-12">
-          Sneak<span className="text-indigo-500"> Peeks</span>
+        <h2 className="text-right lg:text-5xl text-5xl font-extrabold text-wrap text-white lg:leading-12 leading-10 ml-12">
+          Sneak<span className="text-indigo-500 text-7xl"> Peeks</span>
         </h2>
       </div>
-      <div className="relative w-full flex flex-col mt-12">
+      <div className="relative w-full flex flex-col mt-8">
         {festivals.map((fest, idx) => (
           <motion.div
             key={idx}
