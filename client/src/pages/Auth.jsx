@@ -1,16 +1,23 @@
-import { useEffect, useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
+import { AppContext } from "../components/store/AppContext";
 import SigninForm from "../components/auth/SigninForm";
 import SignupForm from "../components/auth/SignupForm";
-import { AppContext } from "../components/store/AppContext";
+import LoaderBackdrop2 from "../components/UI/LoaderBackdrop2";
+import NewUserAuthModal from "../components/auth/NewUserAuthModal";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const ORIGIN_URL = import.meta.env.VITE_API_ORIGIN;
 
 function Auth() {
   const [loading, setLoading] = useState(null);
+  const [open, setOpen] = useState(false);
   const [err, setErr] = useState("");
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [picture, setPicture] = useState("");
   const { search } = useLocation();
   const mode = new URLSearchParams(search).get("mode");
   const { preferredThemes, searchList, wishlist, setAccessToken, setUser } =
@@ -60,12 +67,18 @@ function Auth() {
     }
   }
   async function handleSigninRequest(formData) {
+    const newData = {
+      ...formData,
+      preferred_themes: preferredThemes,
+      recent_searches: searchList,
+      wishlist,
+    };
     // console.log(formData);
     try {
       setLoading("signin");
       const res = await fetch(`${BASE_URL}/auth/login`, {
         method: "POST",
-        body: JSON.stringify(formData),
+        body: JSON.stringify(newData),
         headers: { "Content-Type": "application/json" },
       });
       const data = await res.json();
@@ -90,6 +103,151 @@ function Auth() {
         <p className="text-[11px] font-semibold">Failed to register!</p>
       );
       console.error(err);
+    } finally {
+      setLoading(null);
+    }
+  }
+  async function handleGoogleAuth() {
+    const popup = window.open(
+      `${BASE_URL}/auth/google`,
+      "googleLoginPopup",
+      "width=500,height=600,left=350,top=100,toolbar=no,menubar=no,resizable=no,scrollbar=no,status=no"
+    );
+    if (!popup) {
+      toast.info(
+        <div className="w-full flex flex-col px-1.5">
+          <h3 className="font-bold text-white text-[16px]">
+            Popup Permission blocked!
+          </h3>
+          <p className="text-xs text-blue-500 font-medium">
+            Please allow popups for this site to continue.
+          </p>
+        </div>
+      );
+      return;
+    }
+    window.addEventListener("message", async (e) => {
+      if (!ORIGIN_URL.includes(e.origin)) {
+        toast.warning(
+          <p className="text-[11px] font-semibold">
+            Unauthorized message origin!
+          </p>
+        );
+        console.warn("Unauthorized origin: ", e.origin);
+        return;
+      }
+      const data = e.data;
+      if (data.isNew) {
+        console.log("New user with username-" + data.username + " Logged in");
+        setUsername(data.username);
+        setEmail(data.email);
+        setPicture(data.picture);
+        setOpen((prev) => !prev);
+      } else {
+        console.log("Old user with email-" + data.email + " Logged in");
+        setUsername("");
+        const tempData = {
+          email: data.email,
+          picture: data.picture,
+        };
+        await handleOldUserAuth(tempData);
+      }
+    });
+  }
+  async function handleNewUserAuth(userData) {
+    const newUserData = {
+      username: userData.username === "" ? username : userData.username,
+      dob: userData.dob,
+      picture,
+      email,
+      preferred_themes: preferredThemes,
+      recent_searches: searchList,
+      wishlist,
+    };
+    // console.log(newUserData);
+    try {
+      setLoading("new-user-auth");
+      const res = await fetch(`${BASE_URL}/auth/google_auth/new_user_auth`, {
+        method: "POST",
+        body: JSON.stringify(newUserData),
+        headers: { "Content-Type": "application/json" },
+      });
+      const result = await res.json();
+      if (res.status === 400) {
+        setErr(result.errMsg);
+        return;
+      }
+      setErr("");
+      setAccessToken(result.token);
+      setUser(result.user_data);
+      toast.success(
+        <div className="flex flex-col px-1.5">
+          <h3 className="font-bold text-white text-[16px]">{result.msg}</h3>
+          <p className="text-xs text-gray-500 font-medium">
+            {result.description}
+          </p>
+        </div>
+      );
+      navigate("../home", { replace: true });
+      console.log(result);
+    } catch (err) {
+      toast.error(
+        <p className="text-[11px] font-semibold">Failed to authenticate!</p>
+      );
+      setOpen(false);
+      console.error(err);
+      return;
+    } finally {
+      setLoading(null);
+    }
+  }
+  async function handleOldUserAuth(tempData) {
+    const userData = {
+      ...tempData,
+      wishlist,
+      preferred_themes: preferredThemes,
+      recent_searches: searchList,
+    };
+    // console.log(userData);
+    try {
+      setLoading("old-user-auth");
+      const res = await fetch(`${BASE_URL}/auth/google_auth/old_user_auth`, {
+        method: "POST",
+        body: JSON.stringify(userData),
+        headers: { "Content-Type": "application/json" },
+      });
+      const result = await res.json();
+      if (res.status === 400) {
+        toast.error(
+          <div className="flex flex-col px-1.5">
+            <h3 className="font-bold text-red-100 text-[16px]">
+              {result.errMsg}
+            </h3>
+            <p className="text-xs text-red-500 font-medium leading-3 mt-1.5">
+              {result.description}
+            </p>
+          </div>
+        );
+        console.error(result.description);
+        return;
+      }
+      setAccessToken(result.token);
+      setUser(result.user_data);
+      toast.success(
+        <div className="flex flex-col px-1.5">
+          <h3 className="font-bold text-white text-[16px]">{result.msg}</h3>
+          <p className="text-xs text-gray-500 font-medium">
+            {result.description}
+          </p>
+        </div>
+      );
+      navigate("../home", { replace: true });
+    } catch (err) {
+      toast.error(
+        <p className="text-[11px] font-semibold">Failed to authenticate!</p>
+      );
+      console.error(err);
+      return;
     } finally {
       setLoading(null);
     }
@@ -172,9 +330,25 @@ function Auth() {
             isActive={mode === "signin"}
             onToggle={() => navigate("../auth?mode=signup")}
             onSubmit={handleSigninRequest}
+            onGoogleLogin={handleGoogleAuth}
           />
         </section>
       </main>
+
+      <AnimatePresence>
+        {loading === "old-user-auth" && <LoaderBackdrop2 />}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {open && (
+          <NewUserAuthModal
+            onClose={() => setOpen(false)}
+            onSubmit={handleNewUserAuth}
+            isLoading={loading === "new-user-auth"}
+            errMsg={err}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }

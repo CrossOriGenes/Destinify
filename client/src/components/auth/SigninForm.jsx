@@ -5,7 +5,14 @@ import { toast } from "react-toastify";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const SigninForm = ({ isActive, onToggle, errMsg, isLoading, onSubmit }) => {
+const SigninForm = ({
+  isActive,
+  onToggle,
+  errMsg,
+  isLoading,
+  onSubmit,
+  onGoogleLogin,
+}) => {
   const unameRef = useRef();
   const pswrdRef = useRef();
   const [show, setShow] = useState(false);
@@ -167,6 +174,7 @@ const SigninForm = ({ isActive, onToggle, errMsg, isLoading, onSubmit }) => {
               <button
                 type="button"
                 className="w-11 h-11 border-2 border-gray-500 flex justify-center items-center hover:bg-gray-300 hover:border-gray-300 group transition-colors duration-300"
+                onClick={onGoogleLogin}
               >
                 <i className="fa-brands fa-google text-2xl text-gray-300 group-hover:text-gray-950" />
               </button>

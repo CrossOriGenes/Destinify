@@ -18,6 +18,7 @@ app = Flask(__name__)
 
 CORS(app)
 init_mail(app)
+app.config["SECRET_KEY"] = os.getenv("APP_SECRET_KEY")
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET")
 app.config["JWT_TOKEN_LOCATION"] = ["cookies", "headers"]
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 60 * 60 * 12

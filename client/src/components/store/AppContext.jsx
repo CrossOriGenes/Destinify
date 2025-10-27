@@ -51,7 +51,7 @@ export const AppContextProvider = ({ children }) => {
     JSON.parse(localStorage.getItem("search_list")) || []
   );
   const [token, setToken] = useState(
-    JSON.parse(localStorage.getItem("token")) || null
+    JSON.parse(localStorage.getItem("token")) || ""
   );
 
   function setUser(user) {

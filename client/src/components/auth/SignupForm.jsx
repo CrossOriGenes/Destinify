@@ -1,25 +1,20 @@
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 
-function getTodaysDate() {
+export function getTodaysDate() {
   const dt = new Date();
   const yyyy = dt.getFullYear();
   const mm = String(dt.getMonth() + 1).padStart(2, "0");
   const dd = String(dt.getDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
 }
-function getFormattedDate(date) {
-  const dt = new Date(date);
-  const yyyy = dt.getFullYear();
-  const mm = String(dt.getMonth() + 1).padStart(2, "0");
-  const dd = String(dt.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
-}
-function calculateAge(date) {
-  const currYr = new Date().getFullYear();
-  const dobYr = new Date(date).getFullYear();
-  return currYr - dobYr;
-}
+// function getFormattedDate(date) {
+//   const dt = new Date(date);
+//   const yyyy = dt.getFullYear();
+//   const mm = String(dt.getMonth() + 1).padStart(2, "0");
+//   const dd = String(dt.getDate()).padStart(2, "0");
+//   return `${yyyy}-${mm}-${dd}`;
+// }
 
 const SignupForm = ({ isActive, onToggle, errMsg, onSubmit, isLoading }) => {
   const usernameRef = useRef();

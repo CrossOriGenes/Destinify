@@ -1,19 +1,21 @@
 # import pandas as pd
-import os
+import os, requests, re, statistics
 from dotenv import load_dotenv
 from bson import ObjectId, Decimal128
-from datetime import datetime, timedelta, timezone
-import requests 
-import re
-import statistics
+from datetime import datetime, timedelta
+from flask import Flask
+from authlib.integrations.flask_client import OAuth
+
 
 
 load_dotenv()
-
+app = Flask(__name__)
+oauth = OAuth(app)
 UNSPLASH_KEY = os.getenv("UNSPLASH_ACCESS_KEY")
 CALENDARIFIC_API_KEY = os.getenv("CALENDARIFIC_API_KEY")
 EVENTBRITE_TOKEN = os.getenv("EVENTBRITE_TOKEN")
 GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY")
+
 
 
 # data formatter
@@ -430,3 +432,8 @@ def serialize_user(user_doc):
         "preferred_themes": user_doc.get("preferred_themes"),
         "recent_searches": user_doc.get("recent_searches")
     }
+    
+
+# ====================================
+# OAuth helpers
+# ====================================
