@@ -10,6 +10,7 @@ import NewUserAuthModal from "../components/auth/NewUserAuthModal";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const ORIGIN_URL = import.meta.env.VITE_API_ORIGIN;
+const ORIGIN_URL_2 = import.meta.env.VITE_API_ORIGIN_2;
 
 function Auth() {
   const [loading, setLoading] = useState(null);
@@ -154,6 +155,53 @@ function Auth() {
       }
     });
   }
+  async function handleGithubAuth() {
+    const popup = window.open(
+      `${BASE_URL}/auth/github`,
+      "githubLoginPopup",
+      "width=500,height=600,left=350,top=100,toolbar=no,menubar=no,resizable=no,scrollbar=no,status=no"
+    );
+    if (!popup) {
+      toast.info(
+        <div className="w-full flex flex-col px-1.5">
+          <h3 className="font-bold text-white text-[16px]">
+            Popup Permission blocked!
+          </h3>
+          <p className="text-xs text-blue-500 font-medium">
+            Please allow popups for this site to continue.
+          </p>
+        </div>
+      );
+      return;
+    }
+    window.addEventListener("message", async (e) => {
+      if (!ORIGIN_URL_2.includes(e.origin)) {
+        toast.warning(
+          <p className="text-[11px] font-semibold">
+            Unauthorized message origin!
+          </p>
+        );
+        console.warn("Unauthorized origin: ", e.origin);
+        return;
+      }
+      const data = e.data;
+      if (data.isNew) {
+        console.log("New user with username-" + data.username + " Logged in");
+        setUsername(data.username);
+        setEmail(data.email);
+        setPicture(data.picture);
+        setOpen((prev) => !prev);
+      } else {
+        console.log("Old user with email-" + data.email + " Logged in");
+        setUsername("");
+        const tempData = {
+          email: data.email,
+          picture: data.picture,
+        };
+        await handleOldUserAuth(tempData);
+      }
+    });
+  }
   async function handleNewUserAuth(userData) {
     const newUserData = {
       username: userData.username === "" ? username : userData.username,
@@ -167,7 +215,7 @@ function Auth() {
     // console.log(newUserData);
     try {
       setLoading("new-user-auth");
-      const res = await fetch(`${BASE_URL}/auth/google_auth/new_user_auth`, {
+      const res = await fetch(`${BASE_URL}/auth/new_user_auth`, {
         method: "POST",
         body: JSON.stringify(newUserData),
         headers: { "Content-Type": "application/json" },
@@ -211,7 +259,7 @@ function Auth() {
     // console.log(userData);
     try {
       setLoading("old-user-auth");
-      const res = await fetch(`${BASE_URL}/auth/google_auth/old_user_auth`, {
+      const res = await fetch(`${BASE_URL}/auth/old_user_auth`, {
         method: "POST",
         body: JSON.stringify(userData),
         headers: { "Content-Type": "application/json" },
@@ -331,6 +379,7 @@ function Auth() {
             onToggle={() => navigate("../auth?mode=signup")}
             onSubmit={handleSigninRequest}
             onGoogleLogin={handleGoogleAuth}
+            onGithubLogin={handleGithubAuth}
           />
         </section>
       </main>

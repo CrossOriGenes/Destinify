@@ -13,7 +13,9 @@ auth_routes = Blueprint('auth-routes', __name__)
 bcrypt = Bcrypt()
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-REDIRECT_URI = "http://127.0.0.1:5000/api/auth/google/callback"
+GOOGLE_REDIRECT_URI = "http://127.0.0.1:5000/api/auth/google/callback"
+GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
+GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
 
 
 
@@ -145,7 +147,7 @@ def google_login():
         "https://accounts.google.com/o/oauth2/v2/auth"
         "?response_type=code"
         f"&client_id={GOOGLE_CLIENT_ID}"
-        f"&redirect_uri={REDIRECT_URI}"
+        f"&redirect_uri={GOOGLE_REDIRECT_URI}"
         "&scope=openid%20email%20profile"
         "&access_type=offline"
     )
@@ -161,7 +163,7 @@ def google_callback():
         "code": code,
         "client_id": GOOGLE_CLIENT_ID,
         "client_secret": GOOGLE_CLIENT_SECRET,
-        "redirect_uri": REDIRECT_URI,
+        "redirect_uri": GOOGLE_REDIRECT_URI,
         "grant_type": "authorization_code",
     }
     token_res = requests.post(token_url, data=data)
@@ -173,7 +175,10 @@ def google_callback():
     userinfo = userinfo_res.json()
     email = userinfo.get("email")
     picture = userinfo.get("picture")
-    existing_user = Users.find_one({ "email": email })
+    existing_user = Users.find_one(
+        { "email": email }, 
+        { "email": 1, "username": 1, "_id": 0 }
+    )
     
     if existing_user:    
         userData = json.dumps({
@@ -181,18 +186,6 @@ def google_callback():
             "picture": picture,
             "isNew": False
         })
-        html = f"""
-            <script>
-                if (window.opener && window.opener !== window) {{
-                    window.opener.postMessage({ userData }, "*");
-                    window.close();
-                }} else {{
-                    console.log("No opener found, printing data instead...");
-                    console.log({ userData });
-                    document.write("<h3>Login successful. You can close this tab.</h3>");
-                }}
-            </script>
-        """
     else:
         username = userinfo.get("name")
         userData = json.dumps({
@@ -201,22 +194,106 @@ def google_callback():
             "picture": picture,
             "isNew": True
         })
-        html = f"""
-            <script>
-                if (window.opener && window.opener !== window) {{
-                    window.opener.postMessage({ userData }, "*");
-                    window.close();
-                }} else {{
-                    console.log("No opener found, printing data instead...");
-                    console.log({ userData });
-                    document.write("<h3>Login successful. You can close this tab.</h3>");
-                }}
-            </script>
-        """
+    html = f"""
+        <script>
+            if (window.opener && window.opener !== window) {{
+                window.opener.postMessage({ userData }, "*");
+                window.close();
+            }} else {{
+                console.log("No opener found, printing data instead...");
+                console.log({ userData });
+                document.write("<h3>Login successful. You can close this tab.</h3>");
+            }}
+        </script>
+    """
                 
     return Response(html, mimetype="text/html")
 
-@auth_routes.route("/google_auth/old_user_auth", methods=['POST'])
+
+# ==================================
+# GITHUB SIGN-IN
+# ==================================
+@auth_routes.route("/github")
+def github_login():
+    redirect_uri = "http://localhost:5000/api/auth/github/callback"
+    github_url = (
+        "https://github.com/login/oauth/authorize"
+        f"?client_id={GITHUB_CLIENT_ID}&redirect_uri={redirect_uri}&scope=user:email"
+    )
+    return redirect(github_url)
+
+@auth_routes.route("/github/callback")
+def github_callback():
+    code = request.args.get("code")
+    token_res = requests.post(
+        "https://github.com/login/oauth/access_token",
+        headers={"Accept": "application/json"},
+        data={
+            "client_id": GITHUB_CLIENT_ID,
+            "client_secret": GITHUB_CLIENT_SECRET,
+            "code": code,
+        },
+    )
+    token_res.raise_for_status()
+    token_data = token_res.json()
+    access_token = token_data.get("access_token")
+
+    user_res = requests.get(
+        "https://api.github.com/user",
+        headers={"Authorization": f"Bearer {access_token}"}
+    )
+    user_res.raise_for_status()
+    user = user_res.json()
+    email = user.get("email")
+    if not email:
+        email_res = requests.get(
+            "https://api.github.com/user/emails",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+        email_res.raise_for_status()
+        emails = email_res.json()
+        primary_email = next((e["email"] for e in emails if e.get("primary")), None)
+        email = primary_email
+    name = user.get("name") or user.get("login")
+    avatar = user.get("avatar_url")
+    existing_user = Users.find_one(
+        { "email": email }, 
+        { "email": 1, "username": 1, "_id": 0 }
+    )
+        
+    if existing_user:
+        userData = json.dumps({
+            "email": email,
+            "picture": avatar,
+            "isNew": False
+        })
+    else:
+        userData = json.dumps({
+            "username": name,
+            "email": email,
+            "picture": avatar,
+            "isNew": True
+        })
+    html = f"""
+        <script>
+            if (window.opener && window.opener !== window) {{
+                window.opener.postMessage({ userData }, "*");
+                window.close();
+            }} else {{
+                console.log("No opener found, printing data instead...");
+                console.log({ userData });
+                document.write("<h3>Login successful. You can close this tab.</h3>");
+            }}
+        </script>
+    """
+        
+    return Response(html, mimetype='text/html')
+
+
+# ========================================
+# SOCIAL AUTH APIs FOR OLD & NEW USER
+# ========================================
+@auth_routes.route("/old_user_auth", methods=['POST'])
 def old_user_auth_google():
     body = request.get_json()
     email = body.get("email")
@@ -262,7 +339,7 @@ def old_user_auth_google():
     
     return response, 200
 
-@auth_routes.route("/google_auth/new_user_auth", methods=['POST'])
+@auth_routes.route("/new_user_auth", methods=['POST'])
 def new_user_auth_google():
     body = request.get_json()
     email = body.get("email")
@@ -314,7 +391,6 @@ def new_user_auth_google():
     response.set_cookie("access_token", token)
     
     return response, 200
-    
 
 
 # ==================================

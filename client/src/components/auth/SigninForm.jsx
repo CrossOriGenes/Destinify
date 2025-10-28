@@ -12,6 +12,7 @@ const SigninForm = ({
   isLoading,
   onSubmit,
   onGoogleLogin,
+  onGithubLogin,
 }) => {
   const unameRef = useRef();
   const pswrdRef = useRef();
@@ -181,6 +182,7 @@ const SigninForm = ({
               <button
                 type="button"
                 className="w-11 h-11 border-2 border-gray-500 flex justify-center items-center hover:bg-gray-300 hover:border-gray-300 group transition-colors duration-300"
+                onClick={onGithubLogin}
               >
                 <i className="fa-brands fa-github text-2xl text-gray-300 group-hover:text-gray-950" />
               </button>
