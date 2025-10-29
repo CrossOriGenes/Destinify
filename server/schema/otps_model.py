@@ -8,7 +8,7 @@ def get_otps_collection():
     client = MongoClient(os.getenv("MONGO_URI"))
     db = client.get_database()
     if db is None:
-        raise Exception('Database not initialized!')
+        raise Exception('Database not found!')
     return db["OTPs"]
 
 # Export schema as 'OTPs'

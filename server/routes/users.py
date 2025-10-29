@@ -1,9 +1,8 @@
 from flask import Blueprint, request, jsonify
-from datetime import datetime, timedelta
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
-from models.user_model import Users
+from schema.user_model import Users
 import controllers.utils as ut 
-import re
+
 
 users_routes = Blueprint('users-routes', __name__)
 

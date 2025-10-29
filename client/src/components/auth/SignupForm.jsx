@@ -16,7 +16,15 @@ export function getTodaysDate() {
 //   return `${yyyy}-${mm}-${dd}`;
 // }
 
-const SignupForm = ({ isActive, onToggle, errMsg, onSubmit, isLoading }) => {
+const SignupForm = ({
+  isActive,
+  onToggle,
+  errMsg,
+  onSubmit,
+  isLoading,
+  onGoogleSignup,
+  onGithubSignUp,
+}) => {
   const usernameRef = useRef();
   const mailRef = useRef();
   const dobRef = useRef();
@@ -56,7 +64,7 @@ const SignupForm = ({ isActive, onToggle, errMsg, onSubmit, isLoading }) => {
         } flex-col justify-center items-center -ml-6 mr-12 px-6 transition-all duration-300`}
       >
         {errMsg && (
-          <div className="max-w-[300px] flex items-center justify-center py-1.5 px-3 text-wrap bg-red-900 border-2 border-red-400 rounded-sm mb-3">
+          <div className="max-w-[380px] flex items-center justify-center py-1.5 px-3 text-wrap bg-red-900 border-2 border-red-400 rounded-sm mb-3">
             <p className="text-[13px] font-semibold text-red-300">{errMsg}</p>
           </div>
         )}
@@ -185,12 +193,14 @@ const SignupForm = ({ isActive, onToggle, errMsg, onSubmit, isLoading }) => {
               <button
                 type="button"
                 className="w-11 h-11 border-2 border-gray-500 flex justify-center items-center hover:bg-gray-300 hover:border-gray-300 group transition-colors duration-300"
+                onClick={onGoogleSignup}
               >
                 <i className="fa-brands fa-google text-2xl text-gray-300 group-hover:text-gray-950" />
               </button>
               <button
                 type="button"
                 className="w-11 h-11 border-2 border-gray-500 flex justify-center items-center hover:bg-gray-300 hover:border-gray-300 group transition-colors duration-300"
+                onClick={onGithubSignUp}
               >
                 <i className="fa-brands fa-github text-2xl text-gray-300 group-hover:text-gray-950" />
               </button>

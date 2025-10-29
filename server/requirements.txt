@@ -1,10 +1,11 @@
 flask
 flask-cors
-pandas
 python-dotenv
 requests
 pymongo
-authlib
 flask-bcrypt
 flask-jwt-extended
 flask-mail
+torch
+scikit-learn
+numpy

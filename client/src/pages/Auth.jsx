@@ -14,7 +14,7 @@ const ORIGIN_URL_2 = import.meta.env.VITE_API_ORIGIN_2;
 
 function Auth() {
   const [loading, setLoading] = useState(null);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState("");
   const [err, setErr] = useState("");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -101,7 +101,7 @@ function Auth() {
       navigate("../home", { replace: true });
     } catch (err) {
       toast.error(
-        <p className="text-[11px] font-semibold">Failed to register!</p>
+        <p className="text-[11px] font-semibold">Failed to login!</p>
       );
       console.error(err);
     } finally {
@@ -143,7 +143,7 @@ function Auth() {
         setUsername(data.username);
         setEmail(data.email);
         setPicture(data.picture);
-        setOpen((prev) => !prev);
+        setOpen("signin");
       } else {
         console.log("Old user with email-" + data.email + " Logged in");
         setUsername("");
@@ -152,6 +152,57 @@ function Auth() {
           picture: data.picture,
         };
         await handleOldUserAuth(tempData);
+      }
+    });
+  }
+  async function handleGoogleSignup() {
+    const popup = window.open(
+      `${BASE_URL}/auth/signup/google`,
+      "googleSignUpPopup",
+      "width=500,height=600,left=350,top=100,toolbar=no,menubar=no,resizable=no,scrollbar=no,status=no"
+    );
+    if (!popup) {
+      toast.info(
+        <div className="w-full flex flex-col px-1.5">
+          <h3 className="font-bold text-white text-[16px]">
+            Popup Permission blocked!
+          </h3>
+          <p className="text-xs text-blue-500 font-medium">
+            Please allow popups for this site to continue.
+          </p>
+        </div>
+      );
+      return;
+    }
+    window.addEventListener("message", async (e) => {
+      if (!ORIGIN_URL.includes(e.origin)) {
+        toast.warning(
+          <p className="text-[11px] font-semibold">
+            Unauthorized message origin!
+          </p>
+        );
+        console.warn("Unauthorized origin: ", e.origin);
+        return;
+      }
+      const data = e.data;
+      if (data.isNew) {
+        console.log("New user with username-" + data.username + " registered.");
+        setUsername(data.username);
+        setEmail(data.email);
+        setPicture(data.picture);
+        setOpen("signup");
+      } else {
+        console.log("Existing user found!");
+        setErr(data.description);
+        toast.warning(
+          <div className="w-full flex flex-col px-1.5">
+            <h3 className="font-bold text-amber-100 text-lg">{data.errMsg}</h3>
+            <p className="text-xs text-amber-500 font-medium leading-3.5 mt-1.5">
+              {data.description}
+            </p>
+          </div>
+        );
+        return;
       }
     });
   }
@@ -190,7 +241,7 @@ function Auth() {
         setUsername(data.username);
         setEmail(data.email);
         setPicture(data.picture);
-        setOpen((prev) => !prev);
+        setOpen("signin");
       } else {
         console.log("Old user with email-" + data.email + " Logged in");
         setUsername("");
@@ -199,6 +250,57 @@ function Auth() {
           picture: data.picture,
         };
         await handleOldUserAuth(tempData);
+      }
+    });
+  }
+  async function handleGithubSignup() {
+    const popup = window.open(
+      `${BASE_URL}/auth/github`,
+      "githubSignUpPopup",
+      "width=500,height=600,left=350,top=100,toolbar=no,menubar=no,resizable=no,scrollbar=no,status=no"
+    );
+    if (!popup) {
+      toast.info(
+        <div className="w-full flex flex-col px-1.5">
+          <h3 className="font-bold text-white text-[16px]">
+            Popup Permission blocked!
+          </h3>
+          <p className="text-xs text-blue-500 font-medium">
+            Please allow popups for this site to continue.
+          </p>
+        </div>
+      );
+      return;
+    }
+    window.addEventListener("message", async (e) => {
+      if (!ORIGIN_URL_2.includes(e.origin)) {
+        toast.warning(
+          <p className="text-[11px] font-semibold">
+            Unauthorized message origin!
+          </p>
+        );
+        console.warn("Unauthorized origin: ", e.origin);
+        return;
+      }
+      const data = e.data;
+      if (data.isNew) {
+        console.log("New user with username-" + data.username + " registered.");
+        setUsername(data.username);
+        setEmail(data.email);
+        setPicture(data.picture);
+        setOpen("signup");
+      } else {
+        console.log("Existing user found!");
+        setErr(data.description);
+        toast.warning(
+          <div className="w-full flex flex-col px-1.5">
+            <h3 className="font-bold text-amber-100 text-lg">{data.errMsg}</h3>
+            <p className="text-xs text-amber-500 font-medium leading-3.5 mt-1.5">
+              {data.description}
+            </p>
+          </div>
+        );
+        return;
       }
     });
   }
@@ -241,6 +343,51 @@ function Auth() {
     } catch (err) {
       toast.error(
         <p className="text-[11px] font-semibold">Failed to authenticate!</p>
+      );
+      setOpen(false);
+      console.error(err);
+      return;
+    } finally {
+      setLoading(null);
+    }
+  }
+  async function handleNewUserAuth2(userData) {
+    const newUserData = {
+      username: userData.username === "" ? username : userData.username,
+      dob: userData.dob,
+      picture,
+      email,
+      preferred_themes: preferredThemes,
+      recent_searches: searchList,
+      wishlist,
+    };
+    // console.log(newUserData);
+    try {
+      setLoading("new-user-auth");
+      const res = await fetch(`${BASE_URL}/auth/signup/new_user_auth`, {
+        method: "POST",
+        body: JSON.stringify(newUserData),
+        headers: { "Content-Type": "application/json" },
+      });
+      const result = await res.json();
+      if (res.status === 400) {
+        setErr(result.errMsg);
+        return;
+      }
+      setErr("");
+      toast.success(
+        <div className="flex flex-col px-1.5">
+          <h3 className="font-bold text-white text-[16px]">{data.msg}</h3>
+          <p className="text-xs text-gray-500 font-medium">
+            {data.description}
+          </p>
+        </div>
+      );
+      navigate("../auth?mode=signin", { replace: true });
+      // console.log(data);
+    } catch (err) {
+      toast.error(
+        <p className="text-[11px] font-semibold">Failed to signup!</p>
       );
       setOpen(false);
       console.error(err);
@@ -371,6 +518,8 @@ function Auth() {
             isActive={mode === "signup"}
             onToggle={() => navigate("../auth?mode=signin")}
             onSubmit={handleSignupRequest}
+            onGoogleSignup={handleGoogleSignup}
+            onGithubSignUp={handleGithubSignup}
           />
           <SigninForm
             errMsg={err}
@@ -389,10 +538,19 @@ function Auth() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {open && (
+        {open === "signin" && (
           <NewUserAuthModal
-            onClose={() => setOpen(false)}
+            onClose={() => setOpen("")}
             onSubmit={handleNewUserAuth}
+            isLoading={loading === "new-user-auth"}
+            errMsg={err}
+          />
+        )}
+
+        {open === "signup" && (
+          <NewUserAuthModal
+            onClose={() => setOpen("")}
+            onSubmit={handleNewUserAuth2}
             isLoading={loading === "new-user-auth"}
             errMsg={err}
           />

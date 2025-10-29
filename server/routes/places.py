@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 import controllers.utils as ut
-from models.place_model import Places
+from schema.place_model import Places
 from bson import ObjectId
 from datetime import datetime
 import re

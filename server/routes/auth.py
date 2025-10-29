@@ -2,8 +2,8 @@ from flask import Blueprint, request, jsonify, Response, redirect
 from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta, UTC
 from flask_jwt_extended import create_access_token, get_jwt_identity, verify_jwt_in_request, unset_jwt_cookies
-from models.user_model import Users
-from models.otps_model import OTPs
+from schema.user_model import Users
+from schema.otps_model import OTPs
 from controllers.mailings import send_mail
 import controllers.utils as ut 
 import re, random, os, requests, json
@@ -13,7 +13,8 @@ auth_routes = Blueprint('auth-routes', __name__)
 bcrypt = Bcrypt()
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-GOOGLE_REDIRECT_URI = "http://127.0.0.1:5000/api/auth/google/callback"
+GOOGLE_REDIRECT_URI_1 = "http://127.0.0.1:5000/api/auth/google/callback"
+GOOGLE_REDIRECT_URI_2 = "http://127.0.0.1:5000/api/auth/signup/google/callback"
 GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
 GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
 
@@ -139,7 +140,7 @@ def manual_signin():
 
 
 # ==================================
-# GOOGLE SIGN-IN
+# GOOGLE AUTHs
 # ==================================
 @auth_routes.route("/google")
 def google_login():
@@ -147,7 +148,7 @@ def google_login():
         "https://accounts.google.com/o/oauth2/v2/auth"
         "?response_type=code"
         f"&client_id={GOOGLE_CLIENT_ID}"
-        f"&redirect_uri={GOOGLE_REDIRECT_URI}"
+        f"&redirect_uri={GOOGLE_REDIRECT_URI_1}"
         "&scope=openid%20email%20profile"
         "&access_type=offline"
     )
@@ -163,7 +164,7 @@ def google_callback():
         "code": code,
         "client_id": GOOGLE_CLIENT_ID,
         "client_secret": GOOGLE_CLIENT_SECRET,
-        "redirect_uri": GOOGLE_REDIRECT_URI,
+        "redirect_uri": GOOGLE_REDIRECT_URI_1,
         "grant_type": "authorization_code",
     }
     token_res = requests.post(token_url, data=data)
@@ -209,9 +210,86 @@ def google_callback():
                 
     return Response(html, mimetype="text/html")
 
+@auth_routes.route("/signup/google")
+def google_signup():
+    google_auth_url = (
+        "https://accounts.google.com/o/oauth2/v2/auth"
+        "?response_type=code"
+        f"&client_id={GOOGLE_CLIENT_ID}"
+        f"&redirect_uri={GOOGLE_REDIRECT_URI_2}"
+        "&scope=openid%20email%20profile"
+        "&access_type=offline"
+    )
+    return redirect(google_auth_url)
+
+@auth_routes.route("/signup/google/callback")
+def google_signup_callback():
+    code = request.args.get("code")
+    if not code:
+        return jsonify({"error": "Missing code"}), 400
+    token_url = "https://oauth2.googleapis.com/token"
+    data = {
+        "code": code,
+        "client_id": GOOGLE_CLIENT_ID,
+        "client_secret": GOOGLE_CLIENT_SECRET,
+        "redirect_uri": GOOGLE_REDIRECT_URI_2,
+        "grant_type": "authorization_code",
+    }
+    token_res = requests.post(token_url, data=data)
+    tokens = token_res.json()
+    userinfo_res = requests.get(
+        "https://www.googleapis.com/oauth2/v3/userinfo",
+        headers={"Authorization": f"Bearer {tokens['access_token']}"}
+    )
+    userinfo = userinfo_res.json()
+    email = userinfo.get("email")
+    picture = userinfo.get("picture")
+    existing_user = Users.find_one({ "email": email })
+    
+    if existing_user:    
+        result = json.dumps({
+            "errMsg": "User exists!",
+            "description": "An user already exists with this account.",
+            "isNew": False
+        })
+        html = f"""
+            <script>
+                if (window.opener && window.opener !== window) {{
+                    window.opener.postMessage({ result }, "*");
+                    window.close();
+                }} else {{
+                    console.log("No opener found, printing data instead...");
+                    console.log({ result });
+                    document.write("<h3 style='color: yellow;'>Registration Not allowed as user already exists!</h3>");
+                }}
+            </script>
+        """
+    else:
+        username = userinfo.get("name")
+        userData = json.dumps({
+            "username": username,
+            "email": email,
+            "picture": picture,
+            "isNew": True
+        })
+        html = f"""
+            <script>
+                if (window.opener && window.opener !== window) {{
+                    window.opener.postMessage({ userData }, "*");
+                    window.close();
+                }} else {{
+                    console.log("No opener found, printing data instead...");
+                    console.log({ userData });
+                    document.write("<h3>Signup successful. You can close this tab.</h3>");
+                }}
+            </script>
+        """
+                
+    return Response(html, mimetype="text/html")
+ 
 
 # ==================================
-# GITHUB SIGN-IN
+# GITHUB AUTHs
 # ==================================
 @auth_routes.route("/github")
 def github_login():
@@ -289,12 +367,100 @@ def github_callback():
         
     return Response(html, mimetype='text/html')
 
+@auth_routes.route("/signup/github")
+def github_signup():
+    redirect_uri = "http://localhost:5000/api/auth/signup/github/callback"
+    github_url = (
+        "https://github.com/login/oauth/authorize"
+        f"?client_id={GITHUB_CLIENT_ID}&redirect_uri={redirect_uri}&scope=user:email"
+    )
+    return redirect(github_url)
+
+@auth_routes.route("/signup/github/callback")
+def github_callback():
+    code = request.args.get("code")
+    token_res = requests.post(
+        "https://github.com/login/oauth/access_token",
+        headers={"Accept": "application/json"},
+        data={
+            "client_id": GITHUB_CLIENT_ID,
+            "client_secret": GITHUB_CLIENT_SECRET,
+            "code": code,
+        },
+    )
+    token_res.raise_for_status()
+    token_data = token_res.json()
+    access_token = token_data.get("access_token")
+
+    user_res = requests.get(
+        "https://api.github.com/user",
+        headers={"Authorization": f"Bearer {access_token}"}
+    )
+    user_res.raise_for_status()
+    user = user_res.json()
+    email = user.get("email")
+    if not email:
+        email_res = requests.get(
+            "https://api.github.com/user/emails",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+        email_res.raise_for_status()
+        emails = email_res.json()
+        primary_email = next((e["email"] for e in emails if e.get("primary")), None)
+        email = primary_email
+    name = user.get("name") or user.get("login")
+    avatar = user.get("avatar_url")
+    existing_user = Users.find_one(
+        { "email": email }, 
+        { "email": 1, "_id": 0 }
+    )
+        
+    if existing_user:
+        result = json.dumps({
+            "errMsg": "User exists!",
+            "description": "An user already exists with this account.",
+            "isNew": False
+        })
+        html = f"""
+            <script>
+                if (window.opener && window.opener !== window) {{
+                    window.opener.postMessage({ result }, "*");
+                    window.close();
+                }} else {{
+                    console.log("No opener found, printing data instead...");
+                    console.log({ result });
+                    document.write("<h3 style='color: yellow;'>Registration Not allowed as user already exists!</h3>");
+                }}
+            </script>
+        """
+    else:
+        userData = json.dumps({
+            "username": name,
+            "email": email,
+            "picture": avatar,
+            "isNew": True
+        })
+        html = f"""
+            <script>
+                if (window.opener && window.opener !== window) {{
+                    window.opener.postMessage({ userData }, "*");
+                    window.close();
+                }} else {{
+                    console.log("No opener found, printing data instead...");
+                    console.log({ userData });
+                    document.write("<h3>Login successful. You can close this tab.</h3>");
+                }}
+            </script>
+        """
+        
+    return Response(html, mimetype='text/html')
+    
 
 # ========================================
 # SOCIAL AUTH APIs FOR OLD & NEW USER
 # ========================================
 @auth_routes.route("/old_user_auth", methods=['POST'])
-def old_user_auth_google():
+def old_user_auth():
     body = request.get_json()
     email = body.get("email")
     picture = body.get("picture")
@@ -340,7 +506,7 @@ def old_user_auth_google():
     return response, 200
 
 @auth_routes.route("/new_user_auth", methods=['POST'])
-def new_user_auth_google():
+def new_user_auth():
     body = request.get_json()
     email = body.get("email")
     picture = body.get("picture")
@@ -392,6 +558,55 @@ def new_user_auth_google():
     
     return response, 200
 
+@auth_routes.route("/signup/new_user_auth", methods=['POST'])
+def signup_new_user_auth():
+    body = request.get_json()
+    email = body.get("email")
+    picture = body.get("picture")
+    username = body.get("username")
+    dob = body.get("dob")
+    preferred_themes = body.get("preferred_themes", [])
+    recent_searches = body.get("recent_searches", [])
+    wishlist = body.get("wishlist", [])
+    
+    if not username: 
+        return jsonify({ "errMsg": "Username is required!" }), 400
+    existing_name = Users.find_one({ "username": { "$regex": f"^{username}$", "$options": "i" } })
+    if existing_name:
+        return jsonify({ 
+            "errMsg": f"A record already exists with the same username-'{username}'! Try some other combinations" 
+        }), 400
+    try:
+        dob_val = datetime.strptime(dob, "%Y-%m-%d")
+        today = datetime.today()
+        age = today.year - dob_val.year - ((today.month, today.day) < (dob_val.month, dob_val.day))
+        if age <= 5 or age > 99:
+            return jsonify({ "errMsg": "Inappropriate DOB for registration!" }), 400
+    except Exception as e:
+        print(e)
+        return jsonify({ "errMsg": "Invalid date format (expected 'YYYY-MM-DD')" }), 400    
+    user = {
+        "username": username,
+        "email": email,
+        "picture": picture,
+        "dob": dob_val,
+        "age": age,
+        "wishlist": wishlist,
+        "preferred_themes": preferred_themes,
+        "recent_searches": recent_searches
+    }
+    db_res = Users.insert_one(user)
+    if not db_res.acknowledged:
+        return jsonify({ "errMsg": "Failed to insert data into Database!" }), 400
+    
+    print("User successfully registered into database.")
+    print("Registered data for user- ", username)
+    return jsonify({
+        "success": True,
+        "msg": "Registered successfully",
+        "description": "Please login to continue..."
+    })
+   
 
 # ==================================
 # LOGOUT USER

@@ -8,7 +8,7 @@ def get_places_collection():
     client = MongoClient(os.getenv("MONGO_URI"))
     db = client.get_database()
     if db is None:
-        raise Exception('Database not initialized!')
+        raise Exception('Database not found!')
     return db["Places"]
 
 # Export schema as 'Places'

@@ -4,13 +4,12 @@ from dotenv import load_dotenv
 from bson import ObjectId, Decimal128
 from datetime import datetime, timedelta
 from flask import Flask
-from authlib.integrations.flask_client import OAuth
-
 
 
 load_dotenv()
+
 app = Flask(__name__)
-oauth = OAuth(app)
+
 UNSPLASH_KEY = os.getenv("UNSPLASH_ACCESS_KEY")
 CALENDARIFIC_API_KEY = os.getenv("CALENDARIFIC_API_KEY")
 EVENTBRITE_TOKEN = os.getenv("EVENTBRITE_TOKEN")
