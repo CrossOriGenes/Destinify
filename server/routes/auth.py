@@ -2,15 +2,17 @@ from flask import Blueprint, request, jsonify, Response, redirect
 from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta, UTC
 from flask_jwt_extended import create_access_token, get_jwt_identity, verify_jwt_in_request, unset_jwt_cookies
-from schema.user_model import Users
-from schema.otps_model import OTPs
+from schemas.user_schema import Users
+from schemas.otps_schema import OTPs
 from controllers.mailings import send_mail
 import controllers.utils as ut 
 import re, random, os, requests, json
 
 
 auth_routes = Blueprint('auth-routes', __name__)
+
 bcrypt = Bcrypt()
+
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI_1 = "http://127.0.0.1:5000/api/auth/google/callback"
@@ -377,7 +379,7 @@ def github_signup():
     return redirect(github_url)
 
 @auth_routes.route("/signup/github/callback")
-def github_callback():
+def github_signup_callback():
     code = request.args.get("code")
     token_res = requests.post(
         "https://github.com/login/oauth/access_token",

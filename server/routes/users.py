@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
-from schema.user_model import Users
+from schemas.user_schema import Users, Users_dummy
 import controllers.utils as ut 
 
 
@@ -130,4 +130,19 @@ def get_user_email_by_name():
     return jsonify({ 
         "success": True, 
         "email": cursor['email'] 
+    })
+
+    
+# =========================================
+# TEST ROUTE
+# =========================================
+@users_routes.route("/test")
+def test():
+    cursor = list(Users_dummy.find({}).limit(10))
+    users = ut.formatted_data(cursor)
+    
+    return jsonify({ 
+        "success": True,
+        "users": users,
+        "size": len(cursor) 
     })
