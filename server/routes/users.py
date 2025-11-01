@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from schemas.user_schema import Users, Users_dummy
+from neurals.travel_recommender_predict import predict_category
 import controllers.utils as ut 
 
 
@@ -24,6 +25,36 @@ def get_user_data():
         })
     except Exception as e:
         return jsonify({ "success": False, "msg": str(e) }), 401
+
+
+# ==================================
+# GET USER'S DURATION PREDICTION (by preference & age)
+# ==================================
+@users_routes.route("/predict_duration", methods=['POST'])
+def predict_duration():
+    body = request.get_json()
+    age = body.get("age")
+    preferred_themes = body.get("preferred_themes")
+    if not age or not preferred_themes or len(preferred_themes) == 0:
+        return jsonify({
+            "success": False, 
+            "msg": "Age / preferences missing!",
+            "description": "Both age and preferred categories are required to get suggestions." 
+        }), 400    
+    if not isinstance(age, int):
+        return jsonify({
+            "success": False, 
+            "msg": "Invalid age!",
+            "description": "Provided age is either invalid or not a proper number value!" 
+        }), 400        
+        
+    result = predict_category(age, preferred_themes)
+    
+    return jsonify({
+        "success": True,
+        "msg": "place duration type predicted based on users age and preferences.",
+        "result": result 
+    })
 
 
 # ==================================
