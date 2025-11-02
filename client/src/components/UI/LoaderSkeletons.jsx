@@ -47,6 +47,23 @@ export const PlaceCardSkeleton3 = () => {
   );
 };
 
+export const PlaceCardSkeleton4 = () => {
+  return (
+    <div className="card relative group rounded-3xl h-[250px] py-4 px-5 bg-gray-800 pointer-events-none select-none">
+      <div className="w-full h-full relative flex items-end justify-between">
+        <div className="flex flex-col gap-2.5">
+          <div className="w-[130px] h-4 rounded-sm bg-gray-700 animate-pulse" />
+          <div className="flex items-baseline">
+            <div className="w-[100px] h-[24px] me-2 rounded-lg bg-gray-500 animate-pulse" />
+            <div className="w-[200px] h-3 rounded-md bg-gray-700 animate-pulse" />
+          </div>
+          <div className="w-[270px] h-[11px] rounded-md bg-gray-600 animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const ListSkeleton = () => {
   return (
     <li className="relative w-full flex flex-col gap-1.5 p-2 rounded-lg overflow-ellipsis">

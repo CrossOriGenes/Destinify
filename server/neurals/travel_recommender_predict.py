@@ -52,7 +52,8 @@ def predict_category(age, preferred_themes):
             if t in theme_classes:
                 input_vector[theme_classes.index(t)] = 1.0
                 
-        input_tensor = torch.tensor([input_vector], dtype=torch.float32)
+        input_arr = np.array(input_vector)
+        input_tensor = torch.tensor(input_arr, dtype=torch.float32)
         with torch.no_grad():
             prediction = model(input_tensor).numpy()[0]
         group = categorize_age(age)

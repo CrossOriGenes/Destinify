@@ -424,6 +424,7 @@ def serialize_user(user_doc):
     if not user_doc: return None
     return {
         "_id": str(user_doc.get("_id")),
+        "age": int(user_doc.get("age")),
         "username": user_doc.get("username"),
         "email": user_doc.get("email"),
         "picture": user_doc.get("picture"),

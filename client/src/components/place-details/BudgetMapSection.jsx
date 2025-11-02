@@ -260,8 +260,8 @@ const BudgetMapSection = ({ data }) => {
                       ))}
                     </tbody>
                   </table>
-                  <p className="font-medium text-xs text-red-400 mt-1.5 tracking-wide">
-                    *All the rates shown are limited to 1 person/day.
+                  <p className="font-medium text-xs text-amber-400 mt-2 tracking-wide">
+                    &#8270; All the rates shown above are limited to each person/day.
                   </p>
                 </>
               ) : (

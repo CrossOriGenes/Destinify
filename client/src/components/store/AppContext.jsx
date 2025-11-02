@@ -147,10 +147,11 @@ export const AppContextProvider = ({ children }) => {
       if (res.ok) {
         console.log("User data fetched successfully.✔️");
         console.log(data);
-        const { _id, username, email, picture } = data.user;
+        const { _id, username, email, picture, age } = data.user;
         setUser({
           id: _id,
           username,
+          age,
           email,
           picture: picture ? picture : null,
         });

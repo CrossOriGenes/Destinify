@@ -21,6 +21,7 @@
     "react": "^19.1.0",
     "react-countup": "^6.5.3",
     "react-dom": "^19.1.0",
+    "react-fast-marquee": "^1.6.5",
     "react-masonry-css": "^1.0.16",
     "react-router-dom": "^7.7.0",
     "react-scroll": "^1.9.3",
