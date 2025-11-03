@@ -4,7 +4,7 @@ from schemas.user_schema import Users, Users_dummy
 from schemas.place_schema import Places
 from neurals.travel_recommender_predict import predict_category
 import controllers.utils as ut 
-import random
+import random, re
 
 
 users_routes = Blueprint('users-routes', __name__)
@@ -169,9 +169,60 @@ def suggest_place_from_model():
      
     return jsonify({
         "success": True,
-        "msg": "place duration type predicted based on users age and preferences.",
+        "msg": "places recommended based on users age and preferences and travellers choice.",
         "result": result,
         "places": places
+    })
+
+
+# ==================================
+# GET USER'S DURATION PREDICTION (by preference & age)
+# ==================================
+@users_routes.route("/revisit_searched_places", methods=['POST'])
+def revisit_places():
+    data = request.get_json()
+    search_history = data.get("search_history", [])
+    if not search_history or not isinstance(search_history, list):
+        return jsonify({ "errMsg": "Search history doesn't exists!" }), 400
+    
+    visited_places = []
+    similar_places = []
+    # Fetch places based on search history
+    for place_name in search_history:
+        cursor = Places.find_one(
+            { "Place": { "$regex": f"^{re.escape(place_name)}$", "$options": "i" }},
+            { "City": 1, "Place": 1, "Place_Rating": 1, "Place_Desc": 1, "Place_images": 1 }
+        )
+        if cursor:
+            temp = ut.formatted_data([cursor])
+            place = temp[0]
+            visited_places.append(place)
+        
+    total_visited = len(visited_places)
+    remaining = max(1, 15 - total_visited)
+    # Fetch places based on category/city
+    random_places_cursor = Places.aggregate([
+        { "$sample": { "size": remaining } },
+        { "$project": { "City": 1, "Place": 1, "Place_Rating": 1, "Place_Desc": 1, "Place_images": 1 }}
+    ])
+    random_places = ut.formatted_data(list(random_places_cursor))
+    similar_places.extend(random_places)
+    
+    all_places = visited_places + similar_places
+    combined = []
+    seen = set()
+    for p in all_places:
+        name = p.get("Place", "").strip().lower()
+        if name not in seen:
+            seen.add(name)
+            combined.append(p)
+    random.shuffle(combined)
+    final_places = combined[:15]
+    
+    return jsonify({ 
+        "success": True, 
+        "msg": "places recommended based on users search-history and similarities.",
+        "places": final_places
     })
 
     

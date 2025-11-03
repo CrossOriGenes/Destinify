@@ -28,11 +28,11 @@ const MarqueeAreas = ({
     <div className="relative w-full mt-5">
       <header className="flex flex-col items-start gap-3 lg:p-[100px] p-[70px]">
         {areaTitle}
-        <p className="font-medium text-xl text-gray-600 mt-1.5">
+        <p className="font-medium text-lg text-gray-600 mt-1.5">
           {areaSubtitle}
         </p>
       </header>
-      <div className="relative w-full flex -mt-12 mb-24">
+      <div className="relative w-full flex -mt-18 mb-24">
         {loading ? (
           <PlaceLoader />
         ) : (

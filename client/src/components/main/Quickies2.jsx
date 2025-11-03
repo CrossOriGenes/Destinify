@@ -80,13 +80,15 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const Quickies2 = () => {
   const { preferredThemes, searchList, user } = useContext(AppContext);
   const fetchedRef1 = useRef(false);
+  const fetchedRef2 = useRef(false);
   const [places, setPlaces] = useState([]);
-  const [isLoading, setLoading] = useState(false);
+  const [places2, setPlaces2] = useState([]);
+  const [isLoading, setLoading] = useState(0);
 
   async function getAIRecommendedPlaces() {
     //   console.log(user.age, preferredThemes);
     try {
-      setLoading(true);
+      setLoading(1);
       const res = await fetch(`${BASE_URL}/users/suggest_place_from_model`, {
         method: "POST",
         body: JSON.stringify({
@@ -98,10 +100,12 @@ const Quickies2 = () => {
       const result = await res.json();
 
       if (res.status === 400) {
-        toast.error(
+        toast.warning(
           <div className="flex flex-col px-1.5">
-            <h3 className="font-bold text-red-100 text-[16px]">{result.msg}</h3>
-            <p className="text-xs text-red-500 font-medium leading-3 mt-1.5">
+            <h3 className="font-bold text-amber-100 text-[16px]">
+              {result.msg}
+            </h3>
+            <p className="text-xs text-amber-500 font-medium leading-3 mt-1.5">
               {result.description}
             </p>
           </div>
@@ -115,17 +119,48 @@ const Quickies2 = () => {
       console.error("Failed to fetch place recommendations from AI!\n", err);
       return;
     } finally {
-      setLoading(false);
+      setLoading(0);
+    }
+  }
+  async function getSearchHistoryBasedPlaces() {
+    // console.log(searchList);
+    try {
+      setLoading(2);
+      const res = await fetch(`${BASE_URL}/users/revisit_searched_places`, {
+        method: "POST",
+        body: JSON.stringify({ search_history: searchList }),
+        headers: { "Content-Type": "application/json" },
+      });
+      const result = await res.json();
+      if (res.status === 400) {
+        toast.warning(
+          <p className="text-[11px] text-amber-500 font-medium leading-3">
+            {result.errMsg}
+          </p>
+        );
+        return;
+      }
+      setPlaces2(result.places);
+      console.log(result.msg);
+    } catch (err) {
+      console.error(
+        "Failed to fetch place recommendations from search-history!\n",
+        err
+      );
+      return;
+    } finally {
+      setLoading(0);
     }
   }
   useEffect(() => {
-    if (
-      preferredThemes.length > 0 &&
-      searchList.length > 0 &&
-      !fetchedRef1.current
-    ) {
+    if (preferredThemes.length > 0 && !fetchedRef1.current) {
       getAIRecommendedPlaces();
       fetchedRef1.current = true;
+    }
+
+    if (searchList.length > 0 && !fetchedRef2.current) {
+      getSearchHistoryBasedPlaces();
+      fetchedRef2.current = true;
     }
   }, []);
 
@@ -136,18 +171,37 @@ const Quickies2 = () => {
     >
       {/* place recommendations from travellers choices */}
       <MarqueeAreas
+        key="recommendations_list_1"
         places={places}
-        loading={isLoading}
+        loading={isLoading === 1}
         areaTitle={
-          <h1 className="text-white font-extrabold text-7xl w-sm text-wrap leading-20">
+          <h1 className="text-white font-extrabold text-5xl w-sm text-wrap leading-12">
             Travellers{" "}
-            <span className="text-indigo-500 text-[88px]">Recommendations</span>
+            <span className="text-indigo-500 text-7xl">Recommendations</span>
           </h1>
         }
         areaSubtitle="Places recommended for you from fellow travellers:"
         marqueeProps={{
-          speed: 50,
+          speed: 25,
           pauseOnHover: true,
+        }}
+      />
+
+      {/* place recommendations from user's search-history */}
+      <MarqueeAreas
+        key="recommendations_list_2"
+        places={places2}
+        loading={isLoading === 2}
+        areaTitle={
+          <h1 className="text-white font-extrabold text-7xl w-sm text-wrap leading-12 -mt-20">
+            Visit <span className="text-indigo-500">Again</span>
+          </h1>
+        }
+        areaSubtitle="Suggestions on places based on your recent searches:"
+        marqueeProps={{
+          speed: 25,
+          pauseOnHover: true,
+          direction: "right",
         }}
       />
     </section>
