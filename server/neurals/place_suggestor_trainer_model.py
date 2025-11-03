@@ -1,9 +1,10 @@
 import os, torch
 import torch.nn as nn
 import torch.optim as optim
-import numpy as np
 from sklearn.preprocessing import MultiLabelBinarizer
+from huggingface_hub import HfApi
 from collections import defaultdict
+import numpy as np
 from pymongo import MongoClient
 from dotenv import load_dotenv
 
@@ -134,4 +135,16 @@ torch.save({
     "group_theme_freq": {k: v.tolist() for k, v in group_theme_freq.items()}
 }, "travel_model.pth")
 
-print("\n💾 Model trained & saved successfully as travel_model.pth\n")
+print("💾 Model trained & saved successfully as travel_model.pth")
+
+api = HfApi(token=os.getenv("HF_TOKEN"))
+try:    
+    api.upload_file(
+        path_or_fileobj="travel_model.pth",
+        path_in_repo="travel_model.pth",
+        repo_id="Snehodipto14/DestinifyTours",
+        repo_type="model",
+    )
+    print("✅ Model successfully uploaded & overwritten to ☁️.")
+except Exception as e:
+    print("❌ Failed to upload/overwrite model!\n", str(e))

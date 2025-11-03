@@ -1,7 +1,7 @@
-import torch
+import torch, os
 import torch.nn as nn
 import numpy as np
-import os
+from huggingface_hub import hf_hub_download
 
 
 class TravelRecommender(nn.Module):
@@ -19,8 +19,17 @@ class TravelRecommender(nn.Module):
 # -----------------------------
 # Load model + extract sizes
 # -----------------------------
-base_dir = os.path.dirname(os.path.abspath(__file__))
-model_path = os.path.join(base_dir, "travel_model.pth")
+try:
+    model_path = hf_hub_download(
+        repo_id="Snehodipto14/DestinifyTours",
+        filename="travel_model.pth",
+        repo_type="model"
+    )
+    print("✅ Model loaded from ☁️")    
+except Exception:
+    print("❌ Failed to load model from ☁️, switching to local fallback.")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(base_dir, "travel_model.pth")
 
 checkpoint = torch.load(model_path, map_location=torch.device("cpu"))
 theme_classes = checkpoint["theme_classes"]
