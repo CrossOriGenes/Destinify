@@ -18,6 +18,11 @@ const appReducer = (state, action) => {
     case "SET_REQUEST":
       return { ...state, pageRequestCount: action.payload };
 
+    case "SET_WISHLIST":
+      localStorage.setItem("wishlist", JSON.stringify(action.payload));
+      console.log("wishlist set to localstorage");
+      return { ...state, wishlist: action.payload };
+
     case "ADD_TO_WISHLIST":
       if (state.wishlist.find((place) => place.id === action.payload.id))
         return state; // avoid duplicates
@@ -68,6 +73,9 @@ export const AppContextProvider = ({ children }) => {
   }
   function setRequestCount(cntVal) {
     dispatch({ type: "SET_REQUEST", payload: cntVal });
+  }
+  function setWishlist(wishlist) {
+    dispatch({ type: "SET_WISHLIST", payload: wishlist });
   }
   function resetRequestCount() {
     dispatch({ type: "RESET_REQUEST" });
@@ -147,34 +155,31 @@ export const AppContextProvider = ({ children }) => {
       if (res.ok) {
         console.log("User data fetched successfully.✔️");
         console.log(data);
-        const { _id, username, email, picture, age } = data.user;
+        const { _id, username, email, picture, dob, age } = data.user;
         setUser({
           id: _id,
           username,
+          dob,
           age,
           email,
           picture: picture ? picture : null,
         });
-        if (!JSON.parse(localStorage.getItem("preferred_themes"))) {
-          localStorage.setItem(
-            "preferred_themes",
-            JSON.stringify(data.user.preferred_themes)
-          );
-          console.log("preferred themes set to localstorage");
-        }
-        if (!JSON.parse(localStorage.getItem("search_list"))) {
-          localStorage.setItem(
-            "search_list",
-            JSON.stringify(data.user.recent_searches)
-          );
-          console.log("search list set to localstorage");
-        }
-        if (!JSON.parse(localStorage.getItem("wishlist"))) {
-          localStorage.setItem("wishlist", JSON.stringify(data.user.wishlist));
-          console.log("wishlist set to localstorage");
-        }
+        localStorage.setItem(
+          "preferred_themes",
+          JSON.stringify(data.user.preferred_themes)
+        );
+        setPreferredThemes(data.user.preferred_themes);
+        console.log("preferred themes set");
+        localStorage.setItem(
+          "search_list",
+          JSON.stringify(data.user.recent_searches)
+        );
+        setSearchList(data.user.recent_searches);
+        console.log("search list set");
+        setWishlist(data.user.wishlist || []);
       } else {
         console.log("User data not found due to token issues.❌ \n", data);
+        removeAccessToken();
         setUser({});
       }
     } catch (err) {

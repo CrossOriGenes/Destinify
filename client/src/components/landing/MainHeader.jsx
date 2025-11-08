@@ -1,7 +1,10 @@
 import { Link as ScrollLink } from "react-scroll";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { AppContext } from "../store/AppContext";
+import Menu from "../UI/Menu";
+import LogoutPrompt from "../UI/LogoutPrompt";
 
 const navItems = [
   { name: "Hero", to: "hero" },
@@ -14,6 +17,9 @@ const navItems = [
 const MainHeader = ({ activeLink, setActiveLink, fixedClass }) => {
   const navigate = useNavigate();
   const [showNav, setShowNav] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState("");
+  const { token, user } = useContext(AppContext);
 
   return (
     <>
@@ -47,22 +53,55 @@ const MainHeader = ({ activeLink, setActiveLink, fixedClass }) => {
             ))}
           </ul>
         </nav>
-        <div className="lg:flex lg:flex-row flex-col items-center gap-2 hidden">
-          <button
-            type="button"
-            className="w-26 h-12 py-1 px-4 outline-none border-3 border-teal-800 bg-teal-800 text-white hover:bg-teal-700 hover:border-teal-700 rounded-[40px] font-bold text-[12.5px] uppercase tracking-widest cursor-pointer transition duration-300"
-            onClick={() => navigate("auth?mode=signin")}
-          >
-            LogIn
-          </button>
-          <button
-            type="button"
-            className="w-26 h-12 py-1 px-4 outline-none border-3 border-teal-800 text-teal-800 hover:bg-teal-700 hover:border-teal-700 hover:text-white rounded-[40px] font-bold text-[12.5px] uppercase tracking-widest cursor-pointer transition duration-300"
-            onClick={() => navigate("auth?mode=signup")}
-          >
-            SignUp
-          </button>
-        </div>
+        {!token && (
+          <div className="lg:flex lg:flex-row flex-col items-center gap-2 hidden">
+            <button
+              type="button"
+              className="w-26 h-12 py-1 px-4 outline-none border-3 border-teal-800 bg-teal-800 text-white hover:bg-teal-700 hover:border-teal-700 rounded-[40px] font-bold text-[12.5px] uppercase tracking-widest cursor-pointer transition duration-300"
+              onClick={() => navigate("auth?mode=signin")}
+            >
+              LogIn
+            </button>
+            <button
+              type="button"
+              className="w-26 h-12 py-1 px-4 outline-none border-3 border-teal-800 text-teal-800 hover:bg-teal-700 hover:border-teal-700 hover:text-white rounded-[40px] font-bold text-[12.5px] uppercase tracking-widest cursor-pointer transition duration-300"
+              onClick={() => navigate("auth?mode=signup")}
+            >
+              SignUp
+            </button>
+          </div>
+        )}
+        {token && (
+          <div className="relative flex items-center">
+            <div
+              className="w-10 h-10 relative rounded-full border-2 border-white overflow-hidden hover:ring-5 hover:ring-gray-700 transition duration-300"
+              onClick={() => setOpen((prev) => !prev)}
+            >
+              {user ? (
+                <img
+                  src={user?.picture ?? "/images/avatar_default.png"}
+                  alt=""
+                  className="absolute top-0 left-0 w-full h-full object-cover"
+                />
+              ) : (
+                <img
+                  src="/images/avatar_default.png"
+                  alt=""
+                  className="absolute top-0 left-0 w-full h-full object-cover"
+                />
+              )}
+            </div>
+            <AnimatePresence>
+              {open && (
+                <Menu
+                  onClose={() => setOpen(false)}
+                  openLogoutModal={() => setOpen2("logout_prompt")}
+                  arrowPosition="-top-1.5 right-4"
+                />
+              )}
+            </AnimatePresence>
+          </div>
+        )}
 
         {/* menu-toggler */}
         <motion.div
@@ -120,23 +159,32 @@ const MainHeader = ({ activeLink, setActiveLink, fixedClass }) => {
                 ))}
               </ul>
             </nav>
-            <div className="flex flex-col mt-15 items-center gap-4">
-              <button
-                type="button"
-                className="w-40 h-12 py-1 px-4 outline-none border-3 border-teal-800 bg-teal-800 text-white hover:bg-teal-700 hover:border-teal-700 rounded-[40px] font-bold text-[12.5px] uppercase tracking-widest cursor-pointer transition duration-300"
-                onClick={() => navigate("auth?mode=signin")}
-              >
-                LogIn
-              </button>
-              <button
-                type="button"
-                className="w-40 h-12 py-1 px-4 outline-none border-3 border-teal-800 text-teal-800 hover:bg-teal-700 hover:border-teal-700 hover:text-white rounded-[40px] font-bold text-[12.5px] uppercase tracking-widest cursor-pointer transition duration-300"
-                onClick={() => navigate("auth?mode=signup")}
-              >
-                SignUp
-              </button>
-            </div>
+            {!token && (
+              <div className="flex flex-col mt-15 items-center gap-4">
+                <button
+                  type="button"
+                  className="w-40 h-12 py-1 px-4 outline-none border-3 border-teal-800 bg-teal-800 text-white hover:bg-teal-700 hover:border-teal-700 rounded-[40px] font-bold text-[12.5px] uppercase tracking-widest cursor-pointer transition duration-300"
+                  onClick={() => navigate("auth?mode=signin")}
+                >
+                  LogIn
+                </button>
+                <button
+                  type="button"
+                  className="w-40 h-12 py-1 px-4 outline-none border-3 border-teal-800 text-teal-800 hover:bg-teal-700 hover:border-teal-700 hover:text-white rounded-[40px] font-bold text-[12.5px] uppercase tracking-widest cursor-pointer transition duration-300"
+                  onClick={() => navigate("auth?mode=signup")}
+                >
+                  SignUp
+                </button>
+              </div>
+            )}
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Logout prompt */}
+      <AnimatePresence>
+        {open2 === "logout_prompt" && (
+          <LogoutPrompt onClose={() => setOpen2("")} />
         )}
       </AnimatePresence>
     </>

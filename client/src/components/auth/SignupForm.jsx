@@ -8,13 +8,6 @@ export function getTodaysDate() {
   const dd = String(dt.getDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
 }
-// function getFormattedDate(date) {
-//   const dt = new Date(date);
-//   const yyyy = dt.getFullYear();
-//   const mm = String(dt.getMonth() + 1).padStart(2, "0");
-//   const dd = String(dt.getDate()).padStart(2, "0");
-//   return `${yyyy}-${mm}-${dd}`;
-// }
 
 const SignupForm = ({
   isActive,

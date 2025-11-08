@@ -21,9 +21,9 @@ const Wishlist = ({ onClose }) => {
       }
       onClose={onClose}
     >
-      {token && !wishlist && (
+      {token && (!wishlist || wishlist.length === 0) && (
         <div className="w-full h-full flex items-center justify-center flex-col -mt-10 px-4">
-          <h3 className="font-extrabold text-[26px] text-gray-300">
+          <h3 className="font-extrabold text-[26px] text-indigo-200">
             Wishlist is Empty!😢
           </h3>
           <div className="w-54 h-54 relative bg-[url('/images/empty-bag-fallback.png')] bg-center bg-cover" />

@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { AppContext } from "../store/AppContext";
@@ -15,7 +15,7 @@ const Backdrop = ({ onClose }) => {
   );
 };
 
-const Menu = ({ onClose, openLogoutModal }) => {
+const Menu = ({ onClose, openLogoutModal, arrowPosition }) => {
   const navigate = useNavigate();
   const { user, token } = useContext(AppContext);
   const container = {
@@ -45,7 +45,11 @@ const Menu = ({ onClose, openLogoutModal }) => {
         exit="hidden"
         className="absolute top-14 right-0 w-[250px] h-[202px] bg-amber-50 rounded-lg shadow-xl z-10"
       >
-        <div className="absolute -top-1.5 right-24 w-3 h-3 bg-amber-50 rotate-45" />
+        <div
+          className={`absolute ${
+            arrowPosition ? arrowPosition : "-top-1.5 right-24"
+          } w-3 h-3 bg-amber-50 rotate-45`}
+        />
         {user && token && (
           <div className="relative py-3 px-1">
             <div className="flex items-center justify-around mt-1 px-3">
@@ -78,7 +82,7 @@ const Menu = ({ onClose, openLogoutModal }) => {
                 exit="hidden"
                 className="inline-flex items-center py-1.5 w-full hover:bg-gray-400 rounded-sm cursor-default"
                 onClick={() => {
-                  navigate("../profile");
+                  navigate("../home/profile");
                   onClose();
                 }}
               >

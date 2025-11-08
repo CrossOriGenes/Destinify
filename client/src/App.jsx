@@ -8,7 +8,7 @@ import RouteProtector from "./components/store/RouteProtector";
 
 const Root = lazy(() => import("./pages/Root"));
 const Home = lazy(() => import("./pages/Home"));
-const HomeRoot = lazy(() => import("./pages/HomeRoot"));
+const Profile = lazy(() => import("./pages/ProfilePage"));
 const Places = lazy(() => import("./pages/Places"));
 const PlaceDetails = lazy(() => import("./pages/PlaceDetails"));
 const Auth = lazy(() => import("./pages/Auth"));
@@ -31,10 +31,17 @@ const router = createBrowserRouter([
     path: "home",
     element: (
       <RouteProtector>
-        <HomeRoot />
+        <Home />
       </RouteProtector>
     ),
-    children: [{ index: true, element: <Home /> }],
+  },
+  {
+    path: "home/profile",
+    element: (
+      <RouteProtector>
+        <Profile />
+      </RouteProtector>
+    ),
   },
   {
     path: "forgot-password",

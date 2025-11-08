@@ -9,7 +9,7 @@ const FEATURES = [
   { iconClr: "#ef5c72", labelTxt: "Real-time event detection" },
   { iconClr: "#7054e6", labelTxt: "Optimal travel paths" },
   { iconClr: "#f89321", labelTxt: "Personalized recommendations" },
-  { iconClr: "#00c7c4", labelTxt: "Interactive 3D exploration" },
+  { iconClr: "#00c7c4", labelTxt: "Users age and preferences based suggestions" },
 ];
 
 const AboutUs = () => {

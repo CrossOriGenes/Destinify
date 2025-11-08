@@ -100,21 +100,12 @@ const Quickies2 = () => {
       const result = await res.json();
 
       if (res.status === 400) {
-        toast.warning(
-          <div className="flex flex-col px-1.5">
-            <h3 className="font-bold text-amber-100 text-[16px]">
-              {result.msg}
-            </h3>
-            <p className="text-xs text-amber-500 font-medium leading-3 mt-1.5">
-              {result.description}
-            </p>
-          </div>
-        );
+        console.warn(`${result.msg},\n ${result.description}`);
         return;
       }
       setPlaces(result.places);
       console.log(result.msg);
-      //   console.log(result);
+      // console.log(result);
     } catch (err) {
       console.error("Failed to fetch place recommendations from AI!\n", err);
       return;
@@ -133,11 +124,7 @@ const Quickies2 = () => {
       });
       const result = await res.json();
       if (res.status === 400) {
-        toast.warning(
-          <p className="text-[11px] text-amber-500 font-medium leading-3">
-            {result.errMsg}
-          </p>
-        );
+        console.warn(result.errMsg);
         return;
       }
       setPlaces2(result.places);
