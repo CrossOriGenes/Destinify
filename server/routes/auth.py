@@ -764,6 +764,49 @@ def reset_password():
         "description": "Your new password has been updated. Re-login to continue"
     })    
 
+
+# =========================================
+# REMOVE ACCOUNT VERIFICATION (generate OTP)
+# =========================================
+@auth_routes.route("/generate_otp_v2")
+def generate_otp_to_mail_v2():
+    verify_jwt_in_request()
+    email = get_jwt_identity()
+    if not email:
+        return jsonify({ "errMsg": "Email Missing!" }), 400
+    
+    otp = str(random.randint(100000, 999999))
+    hashed_otp = bcrypt.generate_password_hash(otp).decode("utf-8")
+    now = datetime.now(UTC)
+    expiery = now + timedelta(minutes=15)
+    result = OTPs.update_one(
+        { "email": email },
+        {
+            "$set": {
+                "email": email,
+                "otp": hashed_otp,
+                "created_at": now,
+                "expires_at": expiery
+            }
+        },
+        upsert=True
+    )
+    if not result.did_upsert:
+        return jsonify({ "errMsg": "Failed to upsert into DB!" }), 400
+    print("Data upsurted successfully...")
+    sent = send_mail(
+        reciever=email,
+        subject="OTP for account deletion request",
+        otp=otp
+    )
+    if not sent:
+        return jsonify({ "errMsg": "Email not sent!" }), 400
+    
+    return jsonify({
+        "success": True,
+        "msg": "OTP sent",
+        "description": "OTP has been sent to email."
+    })
     
 # =========================================
 # TEST ROUTE

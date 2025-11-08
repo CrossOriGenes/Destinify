@@ -422,18 +422,30 @@ def estimate_cost(routes_data, user_budget=None):
 # ====================================
 def serialize_user(user_doc):
     if not user_doc: return None
+    dob = user_doc.get("dob")
+    dob = datetime.fromisoformat(dob.replace("z","+00:00"))
+    formatted_dob = dob.strftime("%d/%m/%Y")
+    
     return {
         "_id": str(user_doc.get("_id")),
         "age": int(user_doc.get("age")),
         "username": user_doc.get("username"),
         "email": user_doc.get("email"),
+        "dob": formatted_dob,
         "picture": user_doc.get("picture"),
         "wishlist": user_doc.get("wishlist"),
         "preferred_themes": user_doc.get("preferred_themes"),
         "recent_searches": user_doc.get("recent_searches")
     }
     
-
-# ====================================
-# OAuth helpers
-# ====================================
+def normalize_date(value):
+    if isinstance(value, datetime):
+        return value.strftime("%Y-%m-%d")
+    if isinstance(value, str):
+        # handle things like '2000-11-15 00:00:00'
+        try:
+            parsed = datetime.fromisoformat(value.strip())
+            return parsed.strftime("%Y-%m-%d")
+        except Exception:
+            pass
+    return value
