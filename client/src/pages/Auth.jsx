@@ -10,7 +10,7 @@ import NewUserAuthModal from "../components/auth/NewUserAuthModal";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const ORIGIN_URL = import.meta.env.VITE_API_ORIGIN;
-const ORIGIN_URL_2 = import.meta.env.VITE_API_ORIGIN_2;
+// const ORIGIN_URL_2 = import.meta.env.VITE_API_ORIGIN_TEST;
 
 function Auth() {
   const [loading, setLoading] = useState(null);
@@ -226,7 +226,7 @@ function Auth() {
       return;
     }
     window.addEventListener("message", async (e) => {
-      if (!ORIGIN_URL_2.includes(e.origin)) {
+      if (!ORIGIN_URL.includes(e.origin)) {
         toast.warning(
           <p className="text-[11px] font-semibold">
             Unauthorized message origin!
@@ -273,7 +273,7 @@ function Auth() {
       return;
     }
     window.addEventListener("message", async (e) => {
-      if (!ORIGIN_URL_2.includes(e.origin)) {
+      if (!ORIGIN_URL.includes(e.origin)) {
         toast.warning(
           <p className="text-[11px] font-semibold">
             Unauthorized message origin!
