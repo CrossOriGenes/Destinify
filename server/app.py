@@ -18,7 +18,11 @@ app = Flask(__name__)
 
 CORS(
     app, 
-    origins=["http://localhost:5173",]
+    origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://destinifytours.vercel.app"
+    ]
 )
 init_mail(app)
 app.config["SECRET_KEY"] = os.getenv("APP_SECRET_KEY")
