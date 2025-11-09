@@ -16,7 +16,10 @@ load_dotenv() # initiate .env
 
 app = Flask(__name__)
 
-CORS(app)
+CORS(
+    app, 
+    origins=["http://localhost:5173",]
+)
 init_mail(app)
 app.config["SECRET_KEY"] = os.getenv("APP_SECRET_KEY")
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET")
