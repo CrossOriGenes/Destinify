@@ -17,7 +17,7 @@ load_dotenv()
 # 1. Load data from MongoDB
 # -------------------------------
 client = MongoClient(os.getenv("MONGO_URI"))
-db = client.get_database() or os.getenv("DB_NAME")
+db = client.get_database(os.getenv("DB_NAME"))
 if db is None:
     raise Exception('Database not found!')
 Users = db["Users"]
