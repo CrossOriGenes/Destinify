@@ -11,3 +11,4 @@ scikit-learn
 numpy
 huggingface_hub
 cloudinary
+gunicorn
