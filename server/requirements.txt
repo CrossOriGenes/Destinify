@@ -12,4 +12,3 @@ numpy
 huggingface_hub
 cloudinary
 gunicorn
-schedule
