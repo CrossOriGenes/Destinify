@@ -26,7 +26,6 @@ app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET")
 app.config["JWT_TOKEN_LOCATION"] = ["cookies", "headers"]
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 60 * 60 * 12
 jwt = JWTManager(app)
-PORT = int(os.getenv("PORT"))
 MONGO_URI = os.getenv("MONGO_URI", "")
 DB_NAME = os.getenv("DB_NAME", "")
 
@@ -79,5 +78,6 @@ def revoked_token_callback(jwt_header, jwt_payload):
 
 
 if __name__ == "__main__":
-    print(f"Server running on PORT:{PORT}\n")
-    app.run(host='0.0.0.0', port=PORT, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
+    print(f"Server running on PORT:{port}\n")
