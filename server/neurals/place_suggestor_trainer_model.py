@@ -17,13 +17,12 @@ load_dotenv()
 # 1. Load data from MongoDB
 # -------------------------------
 MONGO_URI = os.getenv("MONGO_URI")
-DB_NAME = os.getenv("DB_NAME", "destinify")
 client = MongoClient(MONGO_URI)
-db = client.get_database(DB_NAME)
+db = client.get_database()
 if db is None:
     raise Exception('Database not found!')
 Users = db["Users"]
-users = list(Users.find({}, {"_id": 0, "age": 1, "preferred_themes": 1}))
+users = Users.find({}, { "_id": 0, "age": 1, "preferred_themes": 1 }).to_list()
 print(f"Loaded {len(users)} user records.")
 
 
@@ -139,7 +138,8 @@ torch.save({
 
 print("💾 Model trained & saved successfully as travel_model.pth")
 
-api = HfApi(token=os.getenv("HF_TOKEN"))
+HF_TOKEN = os.getenv("HF_TOKEN")
+api = HfApi(token=HF_TOKEN)
 try:    
     api.upload_file(
         path_or_fileobj="travel_model.pth",

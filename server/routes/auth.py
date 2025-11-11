@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, Response, redirect
 from flask_bcrypt import Bcrypt
+from dotenv import load_dotenv
 from datetime import datetime, timedelta, UTC
 from flask_jwt_extended import create_access_token, get_jwt_identity, verify_jwt_in_request, unset_jwt_cookies
 from schemas.user_schema import Users
@@ -12,13 +13,18 @@ import re, random, os, requests, json
 auth_routes = Blueprint('auth-routes', __name__)
 
 bcrypt = Bcrypt()
+load_dotenv()
 
+SERVER_URL_TEST = os.getenv("SERVER_URL_TEST")
+SERVER_URL_LIVE = os.getenv("SERVER_URL_LIVE")
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-GOOGLE_REDIRECT_URI_1 = "http://127.0.0.1:5000/api/auth/google/callback"
-GOOGLE_REDIRECT_URI_2 = "http://127.0.0.1:5000/api/auth/signup/google/callback"
 GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
 GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
+GOOGLE_REDIRECT_URI_1 = f"{SERVER_URL_LIVE}/api/auth/google/callback"
+GOOGLE_REDIRECT_URI_2 = f"{SERVER_URL_LIVE}/api/auth/signup/google/callback"
+# GOOGLE_REDIRECT_URI_TEST_1 = f"{SERVER_URL_TEST}/api/auth/google/callback"
+# GOOGLE_REDIRECT_URI_TEST_2 = f"{SERVER_URL_TEST}/api/auth/signup/google/callback"
 
 
 
