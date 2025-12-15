@@ -24,7 +24,7 @@ Our mission is to make meaningful travel accessible, safe, and unforgettable usi
 
 ## 📄**Documentation**
 
-This app is based on hybrid tech-structure approach and is *under development* (beta release). Please [click here](https://linktodocumentation) for insights to our official documentation page for detailed info on the tech-stack and SDLC structures.
+This app is based on hybrid tech-structure approach and is *under development* (beta release). Please [click here](https://res.cloudinary.com/dtfoedy3u/image/upload/v1765814091/Project_document_report__Final_qffrh4.pdf) for insights to our official documentation page for detailed info on the tech-stack and SDLC structures.
 
 
 ### 🛠️**Tech Stack**
