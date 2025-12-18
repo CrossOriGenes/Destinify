@@ -30,8 +30,10 @@ This app is based on hybrid tech-structure approach and is *under development* (
 ### 🛠️**Tech Stack**
     
 **Client** - React, TailwindCSS, Framer-motion, gsap\
-**Server** - Flask\
-**Database** - MongoDB
+**Server** - Flask, JWT, OAuth, Bcrypt\
+**APIs** - Google Maps(distance/directions metric), Google Places(Photos & Reviews), Unsplash, Wikipedia, Eventbrite, Calenderific\
+**ML-model & Dataset** - PyTorch, Scikit-learn, Kaggle\
+**Database & storage** - MongoDB, Hugging-Face\
 
 
 ### 👥**Authors**
